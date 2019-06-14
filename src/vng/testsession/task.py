@@ -150,7 +150,7 @@ def ZGW_deploy(session):
     # check migrations status
     while len(uwsgi_containers) != 0:
         uwsgi_containers = [c for c in uwsgi_containers if 'spawned uWSGI' not in k8s.get_pod_log(c.name)]
-        update_session_status(session, 'Check migration status', int(40 + (6 - len(uwsgi_containers)) / 45))
+        update_session_status(session, 'Check migration status', int(40 + (6 - len(uwsgi_containers)) * 45 / 6))
         time.sleep(5)
 
     update_session_status(session, 'Loading preconfigured models', 85)
