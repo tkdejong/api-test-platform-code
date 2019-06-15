@@ -2,18 +2,19 @@
 
 user_name: maykin
 group_name: staff
-project_name: myproject
+project_name: vng
 target: production
 project_root: "/srv/sites/{{ project_name }}-{{ target }}"
-project_src_dir: "myproject"
-celery_worker_path: "myproject"
+project_src_dir: "vng"
+celery_worker_path: "vng"
 django_settings_module: "{{ project_src_dir }}.conf.{{ target }}"
 
 pub_key_users:
   - alex
   - joeri
+  - alvise
 
-project_repo: git@bitbucket.org:maykinmedia/myproject.git
+project_repo: git@github.com:maykinmedia/api-testvoorziening-code.git
 branch: master
 
 nginx_server_name: "{{ project_name }}.maykin.nl"
