@@ -4,7 +4,8 @@ import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import FormView
+from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -12,11 +13,13 @@ from django.utils import timezone
 from django.views import View
 
 
-from vng.testsession.models import (
-    ScenarioCase, Session, SessionLog, ExposedUrl, TestSession, Report
+from .models import (
+    ScenarioCase, Session, SessionLog, ExposedUrl,
+    TestSession, Report, SessionType
 )
 
 from .task import run_tests, bootstrap_session, stop_session
+from .forms import SessionForm
 from ..utils import choices
 from ..utils.views import (
     ListAppendView, OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
@@ -50,11 +53,10 @@ class SessionListView(LoginRequiredMixin, ListView):
         return Session.objects.filter(user=self.request.user).order_by('-started')
 
 
-class SessionForm(CreateView):
+class SessionFormView(FormView):
 
-    model = Session
     template_name = 'testsession/session-form.html'
-    fields = ['session_type', 'sandbox']
+    form_class = SessionForm
 
     def get_success_url(self):
         return reverse('testsession:sessions')
@@ -216,3 +218,9 @@ class PostmanDownloadView(View):
             response['Content-Length'] = len(response.content)
             response['Content-Disposition'] = 'attachment;filename=test{}.json'.format(eu.vng_endpoint.name)
             return response
+
+
+class SessionTypeDetail(DetailView):
+
+    model = SessionType
+    template_name = 'testsession/session_type-detail.html'
