@@ -14,20 +14,19 @@ pub_key_users:
   - joeri
   - alvise
 
-project_repo: git@github.com:maykinmedia/api-testvoorziening-code.git
+project_repo: git@github.com:VNG-Realisatie/api-testvoorziening-code.git
 branch: master
 
-nginx_server_name: "{{ project_name }}.maykin.nl"
+nginx_server_name: "api-test.nl"
 nginx_access_log_file: "{{ project_root }}/log/nginx/access.log"
 nginx_error_log_file: "{{ project_root }}/log/nginx/error.log"
 nginx_static_dir: "{{ project_root }}/static/"
 nginx_media_dir: "{{ project_root }}/media/"
 
-dbname: myprojectprod
-dbuser: myproject
-dbpassword: myprojectpass
+dbname: vngatvprod
+dbuser: vngatv
+# dbpassword: (see vault)
 
-uwsgi_port: 8081
+uwsgi_port: 8084
 
-new_relic_license_key: df267b81c76433faafdbc414918535ea9b22b425
 
