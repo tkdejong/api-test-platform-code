@@ -2,6 +2,7 @@
 
 - hosts: rachel
   vars_files:
+    - vars/staging-secrets.yml
     - vars/staging.yml
     - vars/packages.yml
   become: yes

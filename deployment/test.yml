@@ -2,6 +2,7 @@
 
 - hosts: rachel
   vars_files:
+    - vars/test-secrets.yml
     - vars/test.yml
     - vars/packages.yml
   become: yes
