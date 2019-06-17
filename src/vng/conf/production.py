@@ -44,9 +44,9 @@ CACHES = {
 }
 
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/5"
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_HOST_USER = 'apikey'
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # Caching sessions.
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
