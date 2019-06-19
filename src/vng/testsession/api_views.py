@@ -344,7 +344,7 @@ class RunTest(CSRFExemptMixin, View):
             if not sub.endswith('/'):
                 sub = sub + '/'
             return re.sub(
-                '{}://{}:{}/'.format(query.scheme, endpoint.docker_url, 8080),
+                '{}://{}:{}/'.format(query.scheme, endpoint.docker_url, endpoint.port),
                 sub,
                 content
             )
@@ -376,7 +376,7 @@ class RunTest(CSRFExemptMixin, View):
                 sub = sub + '/'
             return re.sub(
                 sub,
-                '{}://{}:{}/'.format(query.scheme, endpoint.docker_url, 8080),
+                '{}://{}:{}/'.format(query.scheme, endpoint.docker_url, endpoint.port),
                 content
             )
 
@@ -392,8 +392,8 @@ class RunTest(CSRFExemptMixin, View):
             host = reverse_sub('run_test', ep.subdomain, kwargs={
                 'relative_url': ''
             })
-            logger.info("Rewriting response body:")
             parsed = self.sub_url_response(parsed, host, ep)
+            logger.info("Rewriting response body: {}".format(parsed))
         return parsed
 
     def parse_response_text(self, text, endpoints):
@@ -417,7 +417,7 @@ class RunTest(CSRFExemptMixin, View):
                 'relative_url': ''
             })
             parsed = self.sub_url_request(parsed, host, eu)
-        logger.info("Rewriting request body:")
+        logger.info("Rewriting request body:{}".format(parsed))
         return parsed
 
     def build_url(self, eu, arguments):
@@ -425,7 +425,7 @@ class RunTest(CSRFExemptMixin, View):
         if eu.vng_endpoint.url is not None:
             request_url = '{}/{}?{}'.format(eu.vng_endpoint.url, self.kwargs['relative_url'], arguments)
         else:
-            request_url = 'http://{}:{}/{}?{}'.format(eu.docker_url, 8080, self.kwargs['relative_url'], arguments)
+            request_url = 'http://{}:{}/{}?{}'.format(eu.docker_url, eu.port, self.kwargs['relative_url'], arguments)
         if arguments == '':
             request_url = request_url[:-1]
         return request_url
@@ -457,7 +457,7 @@ class RunTest(CSRFExemptMixin, View):
             response = make_call()
         except Exception as e:
             try:
-                request_header['Host'] = '{}:{}'.format(eu.docker_url, 8080)
+                request_header['Host'] = '{}:{}'.format(eu.docker_url, eu.port)
                 response = make_call()
             except Exception as e:
                 logger.exception(e)
@@ -467,11 +467,15 @@ class RunTest(CSRFExemptMixin, View):
 
         self.save_call(request, request_method_name, request.subdomain,
                        self.kwargs['relative_url'], session, response.status_code, session_log)
-        reply = HttpResponse(self.parse_response(response, request, eu.vng_endpoint.url, endpoints), status=response.status_code)
+        if response.encoding:
+            reply = HttpResponse(self.parse_response(response, request, eu.vng_endpoint.url, endpoints), status=response.status_code)
+        else:
+            reply = HttpResponse(response, status=response.status_code)
         white_headers = ['Content-type', 'location']
         for h in white_headers:
             if h in response.headers:
                 reply[h] = self.parse_response_text(response.headers[h], endpoints)
+
         return reply
 
     def build_method_handler(self, request_method_name, request, body=False):

@@ -42,7 +42,15 @@ class ExposedUrlAdmin(admin.ModelAdmin):
 
 @admin.register(model.SessionType)
 class SessionTypeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'standard', 'role', 'application', 'version', 'header']
+    list_display = [
+        'name',
+        'standard',
+        'role',
+        'application',
+        'version',
+        'header',
+        'db_data'
+    ]
     list_filter = ['name']
     search_fields = ['name']
 
@@ -124,4 +132,13 @@ class ReportAdmin(admin.ModelAdmin):
         'scenario_case',
         'session_log',
         'result'
+    ]
+
+
+@admin.register(model.EnvironmentalVariables)
+class EnvironmentalVariablesAdmin(admin.ModelAdmin):
+    list_display = [
+        'vng_endpoint',
+        'key',
+        'value'
     ]
