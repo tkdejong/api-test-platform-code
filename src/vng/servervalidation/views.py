@@ -80,6 +80,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
+        pre_form = data['form']
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
         self.fetch_server()
 
@@ -101,6 +102,8 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
         else:
             pass
         data['form'].set_labels(url_names)
+        for k, v in pre_form.errors.items():
+            data['form'].errors[k] = v
         return data
 
     def form_valid(self, form):
@@ -135,7 +138,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             ep.server_run = self.server
             ep.save()
         except IntegrityError as e:
-            form.add_error('url', 'asds')
+            form.add_error(None, 'Endpoint rrl not configured, contact the admin.')
             return super().form_invalid(form)
         self.endpoints.append(ep)
         if not self.server.scheduled:

@@ -2,7 +2,7 @@
 {% load i18n sniplates %}
 {% load tag_library %}
 {% block _errors %}
-    {% if errors or form.non_field_errors and errors or index == 0 %}
+    {% if errors or form.non_field_errors  or index == 0 %}
         <div class="invalid-feedback">
             <ul>
             {% for error in errors %}
