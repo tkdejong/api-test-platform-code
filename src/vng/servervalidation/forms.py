@@ -19,7 +19,13 @@ class CreateServerRunForm(forms.ModelForm):
 
     class Meta:
         model = ServerRun
-        fields = ['test_scenario', 'scheduled']
+        fields = [
+            'test_scenario',
+            'supplier_name',
+            'software_product',
+            'product_role',
+            'scheduled',
+        ]
 
     def clean(self):
         """
