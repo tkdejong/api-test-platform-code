@@ -209,17 +209,18 @@ class IntegrationTest(WebTest):
         self.assertIn(str(ServerRun.objects.filter(user=self.user, scheduled=True).count()), call.text)
 
     def test_information_form(self):
-        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
+        self.test_badge()
+        new_server = ServerRun.objects.latest('id')
+        call = self.app.get(
+            reverse(
+                'server_run:server-run_detail_uuid',
+                kwargs={'uuid': new_server.uuid}),
+            user=self.user
+        )
         form = call.forms[0]
-        form['test_scenario'] = self.server_s.test_scenario.pk
         form['supplier_name'] = 'test_name'
         form['software_product'] = 'test_software'
         form['product_role'] = 'test_product'
         res = form.submit().follow()
-        form = res.forms[0]
-        form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
-        form['Client ID'] = 'client id'
-        form['Secret'] = 'secret'
-        form.submit()
         new_server = ServerRun.objects.latest('id')
         self.assertEqual(new_server.product_role, 'test_product')
