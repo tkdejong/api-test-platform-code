@@ -243,5 +243,5 @@ class Endpoint(models.Model):
 
     test_scenario_url = models.ForeignKey(TestScenarioUrl, on_delete=models.CASCADE)
     url = models.TextField()
-    jwt = models.TextField(null=True, default=None)
+    jwt = models.TextField(null=True, default=None, blank=True)
     server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE)

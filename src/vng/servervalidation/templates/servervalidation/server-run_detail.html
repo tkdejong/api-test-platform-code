@@ -1,4 +1,5 @@
 {% extends 'master.html' %}
+{% load sniplates %}
 {% load django_bootstrap_breadcrumbs %}
 
 {% block title %}Server-run detail{% endblock%}
@@ -146,6 +147,17 @@
                     </div>
                     <div class="card-body">
                         {{object.test_scenario.description|safe}}
+                    </div>
+                </div>
+                {% load_widgets form='forms.html' %}
+                 <div class="card">
+                    <div class="card-header">
+                        Update information
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% form_field field %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>

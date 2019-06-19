@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.views import View
-from django.views.generic import DetailView, CreateView, FormView
+from django.views.generic import DetailView, CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
 
 from ..utils import choices, postman
@@ -170,16 +170,25 @@ class ServerRunOutput(OwnerSingleObject, DetailView):
         return context
 
 
-class ServerRunOutputUuid(DetailView):
+class ServerRunOutputUuid(DetailView, UpdateView):
 
     model = ServerRun
+    fields = [
+        'supplier_name',
+        'software_product',
+        'product_role',
+    ]
     template_name = 'servervalidation/server-run_detail.html'
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
 
+    # def get_success_url(self):
+    # return reverse_lazy('view-profile', kwargs={'pk': self.object.pk})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         server_run = context['object']
+        context['form'] = self.get_form()
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
         return context

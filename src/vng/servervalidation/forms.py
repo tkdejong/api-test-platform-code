@@ -21,9 +21,6 @@ class CreateServerRunForm(forms.ModelForm):
         model = ServerRun
         fields = [
             'test_scenario',
-            'supplier_name',
-            'software_product',
-            'product_role',
             'scheduled',
         ]
 
