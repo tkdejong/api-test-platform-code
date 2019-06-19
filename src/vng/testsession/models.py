@@ -33,6 +33,8 @@ class SessionType(models.Model):
     client_id = models.TextField(default=None, null=True, blank=True)
     secret = models.TextField(default=None, null=True, blank=True)
     header = models.TextField(default=None, null=True, blank=True)
+    database = models.BooleanField(help_text='Check if the a postgres db is needed in the Kubernetes cluster', default=False)
+    db_data = models.TextField(default=None, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Sessie type'
@@ -108,6 +110,13 @@ class VNGEndpoint(models.Model):
     def __str__(self):
         # To show the session type when adding a scenario case
         return self.name + " ({})".format(self.session_type)
+
+
+class EnvironmentalVariables(models.Model):
+
+    vng_endpoint = models.ForeignKey(VNGEndpoint, on_delete=models.CASCADE)
+    key = models.CharField(max_length=50)
+    value = models.CharField(max_length=100)
 
 
 class ScenarioCase(OrderedModel):
@@ -206,6 +215,7 @@ class Session(models.Model):
 
 class ExposedUrl(models.Model):
 
+    port = models.PositiveIntegerField(default=8080)
     subdomain = models.CharField(max_length=200, unique=True, null=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     vng_endpoint = models.ForeignKey(VNGEndpoint, on_delete=models.CASCADE)
