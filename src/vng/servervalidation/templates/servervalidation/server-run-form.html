@@ -19,12 +19,14 @@
                         {% load_widgets form='forms.html' %}
 
                         {% for field in form %}
-                        {% if field.name == 'test_scenario' %}
-                                <div id='id_test_scenario' style="padding:10px">
-                                {% for radio in field %}
-                                    {{radio.tag}}
-                                    <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
-                                {% endfor %}
+                            {% if field.name == 'test_scenario' %}
+                                <div id='id_test_scenario' style="padding:20px">
+                                    {% for radio in field %}
+                                        <div class='row'>
+                                            {{radio.tag}}
+                                            <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
+                                        </div>
+                                    {% endfor %}
                                 </div>
                         {% else %}
                             {% form_field field %}
