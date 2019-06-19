@@ -392,8 +392,8 @@ class RunTest(CSRFExemptMixin, View):
             host = reverse_sub('run_test', ep.subdomain, kwargs={
                 'relative_url': ''
             })
-            logger.info("Rewriting response body:")
             parsed = self.sub_url_response(parsed, host, ep)
+            logger.info("Rewriting response body: {}".format(parsed))
         return parsed
 
     def parse_response_text(self, text, endpoints):
@@ -417,7 +417,7 @@ class RunTest(CSRFExemptMixin, View):
                 'relative_url': ''
             })
             parsed = self.sub_url_request(parsed, host, eu)
-        logger.info("Rewriting request body:")
+        logger.info("Rewriting request body:{}".format(parsed))
         return parsed
 
     def build_url(self, eu, arguments):
