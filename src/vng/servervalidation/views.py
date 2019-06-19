@@ -51,6 +51,9 @@ class ServerRunForm(CreateView):
     def form_valid(self, form):
         ts_id = form.instance.test_scenario.id
         self.request.session['server_run_scheduled'] = form.instance.scheduled
+        self.request.session['supplier_name'] = form.instance.supplier_name
+        self.request.session['software_product'] = form.instance.software_product
+        self.request.session['product_role'] = form.instance.product_role
         return redirect(reverse('server_run:server-run_create', kwargs={
             "test_id": ts_id
         }))
@@ -76,7 +79,14 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
     def fetch_server(self):
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
-        self.server = ServerRun(user=self.request.user, test_scenario=ts, scheduled=self.request.session['server_run_scheduled'])
+        self.server = ServerRun(
+            user=self.request.user,
+            test_scenario=ts,
+            scheduled=self.request.session['server_run_scheduled'],
+            supplier_name=self.request.session['supplier_name'],
+            software_product=self.request.session['software_product'],
+            product_role=self.request.session['product_role']
+        )
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -138,7 +148,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             ep.server_run = self.server
             ep.save()
         except IntegrityError as e:
-            form.add_error(None, 'Endpoint rrl not configured, contact the admin.')
+            form.add_error(None, 'Endpoint url not configured, contact the admin.')
             return super().form_invalid(form)
         self.endpoints.append(ep)
         if not self.server.scheduled:
