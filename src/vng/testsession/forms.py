@@ -1,11 +1,12 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import SessionType
+from .models import SessionType, Session
 from ..utils.choices import AuthenticationChoices
+from ..utils.forms import CustomModelChoiceField
 
 
-class SessionTypeForm(forms.ModelForm):
+class SessionTypeFormAdmin(forms.ModelForm):
 
     class Meta:
         model = SessionType
@@ -20,3 +21,12 @@ class SessionTypeForm(forms.ModelForm):
             if not cleaned_data['header']:
                 raise forms.ValidationError(_('Header must be provided with this authentication method'))
         return cleaned_data
+
+
+class SessionForm(forms.ModelForm):
+
+    session_type = CustomModelChoiceField(SessionType.objects.all(), widget=forms.RadioSelect, empty_label=None)
+
+    class Meta:
+        model = Session
+        fields = ['session_type', 'sandbox']

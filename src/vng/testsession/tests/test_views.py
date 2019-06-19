@@ -595,7 +595,6 @@ class TestLogNewman(WebTest):
 
         http_host = get_subdomain(call['exposedurl_set'][0]['subdomain'])
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(http_host)})
-        call = get_object(call.body)
 
         call = self.app.get(reverse('apiv1session:stop_session', kwargs={'pk': session_id}))
         call = get_object(call.body)

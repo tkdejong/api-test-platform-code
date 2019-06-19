@@ -2,6 +2,7 @@
 
 - hosts: rachel
   vars_files:
+    - vars/staging-secrets.yml
     - vars/staging.yml
     - vars/packages.yml
   become: yes
@@ -26,7 +27,7 @@
     - include: maykin-deployment/ansible/tasks/supervisor-per-group.yml
     - include: maykin-deployment/ansible/tasks/unset-maintenance-mode.yml
     - include: maykin-deployment/ansible/tasks/cronjobs.yml
-    - include: maykin-deployment/ansible/tasks/rsnapshot.yml
+#    - include: maykin-deployment/ansible/tasks/rsnapshot.yml
     - include: maykin-deployment/ansible/tasks/stopdeploy.yml
     rescue:
     - include: maykin-deployment/ansible/tasks/errordeploy.yml

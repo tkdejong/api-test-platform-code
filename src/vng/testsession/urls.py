@@ -10,7 +10,7 @@ app_name = apps.AppConfig.__name__
 
 urlpatterns = [
     url('^$', views.SessionListView.as_view(), name='sessions'),
-    url('^create', views.SessionForm.as_view(), name='session_create'),
+    url('^create', views.SessionFormView.as_view(), name='session_create'),
     url(r'^postman/(?P<pk>[0-9]+)', views.PostmanDownloadView.as_view(), name='postman_download'),
     url(r'^(?P<session_id>[0-9]+)/stop', views.StopSession.as_view(), name='stop_session'),
     url(r'^(?P<session_id>[0-9]+)/report-pdf', views.SessionReportPdf.as_view(), name='session_report-pdf'),
@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^(?P<session_id>[0-9]+)/test-report/(?P<pk>[0-9]+)', views.SessionTestReport.as_view(), name='session-test_report'),
     url(r'^(?P<session_id>[0-9]+)/log/(?P<pk>\d+)', views.SessionLogDetailView.as_view(), name='session_log-detail'),
     url(r'^(?P<session_id>[0-9]+)/', views.SessionLogView.as_view(), name='session_log'),
+    url(r'^sessiontype/(?P<pk>[0-9]+)/', views.SessionTypeDetail.as_view(), name='session_type-detail'),
 ]

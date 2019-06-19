@@ -1,4 +1,5 @@
 import raven
+import os
 
 from .base import *
 
@@ -15,18 +16,18 @@ ADMINS = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vng',
-        'USER': 'vng',
-        'PASSWORD': 'vng',
+        'NAME': 'vngatvprod',
+        'USER': 'vngatv',
+        'PASSWORD': os.getenv('DB_PASS'),
         'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',  # Set to empty string for default.
     }
 }
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '-tu6q!6cvp@pe5!97e1i##lmp_%yxjj$k20*ul+ac^u(p2)clj'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.api-test.nl']
 
 # Redis cache backend
 # NOTE: If you do not use a cache backend, do not use a session backend or
@@ -34,13 +35,18 @@ ALLOWED_HOSTS = []
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/2", # NOTE: watch out for multiple projects using the same cache!
+        "LOCATION": "redis://127.0.0.1:6379/4", # NOTE: watch out for multiple projects using the same cache!
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
         }
     }
 }
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/5"
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_HOST_USER = 'apikey'
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # Caching sessions.
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -53,7 +59,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 # The file storage engine to use when collecting static files with the
 # collectstatic management command.
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # Production logging facility.
 LOGGING['loggers'].update({
@@ -101,8 +107,7 @@ INSTALLED_APPS = INSTALLED_APPS + [
     'raven.contrib.django.raven_compat',
 ]
 RAVEN_CONFIG = {
-    'dsn': 'https://', # https://username:password@sentry-domain/project-nr
-    'public_dsn': '', # https://username@sentry-domain/project-nr
+    'dsn': 'https://c0af4517252242e7a8db00470b488517@sentry.maykinmedia.nl/124',
     'release': raven.fetch_git_sha(BASE_DIR),
 }
 LOGGING['handlers'].update({

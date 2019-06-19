@@ -19,7 +19,19 @@
                         {% load_widgets form='forms.html' %}
 
                         {% for field in form %}
-                        {% form_field field %}
+                        {% if field.name == 'session_type' %}
+                            <ul>
+                            {% for radio in field %}
+                                <li>
+                                    {{radio.tag}}
+                                    <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
+
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            {% form_field field %}
+                        {% endif %}
                         {% endfor %}
                     </div>
                     <div class="card-footer">
