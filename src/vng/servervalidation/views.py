@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.views import View
@@ -182,8 +183,11 @@ class ServerRunOutputUuid(DetailView, UpdateView):
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
 
-    # def get_success_url(self):
-    # return reverse_lazy('view-profile', kwargs={'pk': self.object.pk})
+    def get_success_url(self):
+        return reverse_lazy(
+            'server_run:server-run_detail_uuid',
+            kwargs={'uuid': self.object.uuid}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
