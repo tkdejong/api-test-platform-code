@@ -157,6 +157,7 @@ class QueryParamsScenario(models.Model):
 
 class Session(models.Model):
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField('Naam', max_length=30, unique=True, null=True)
     session_type = models.ForeignKey(SessionType, verbose_name='Sessie type', on_delete=models.PROTECT)
     started = models.DateTimeField('Gestart op', default=timezone.now)
