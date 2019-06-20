@@ -40,6 +40,7 @@ class SessionListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         _choices = dict(choices.StatusChoices.choices)
+        _choices['error_deploy'] = choices.StatusChoices.error_deploy
         context.update({
             'choices': _choices,
         })
