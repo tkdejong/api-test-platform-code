@@ -111,7 +111,7 @@ class SessionLogView(OwnerMultipleObjects):
 class StopSession(OwnerSingleObject, View):
 
     model = Session
-    pk_name = 'session_uuid'
+    pk_name = 'session_id'
 
     def post(self, request, *args, **kwargs):
         session = self.get_object()
