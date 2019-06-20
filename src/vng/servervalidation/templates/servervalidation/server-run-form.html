@@ -8,7 +8,7 @@
 {% block content %}
 <div id="ui-view">
     <div class="row">
-        <div class="offset-sm-2 offset-sm-5">
+        <div class="col-sm-4 offset-sm-4">
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
@@ -19,15 +19,15 @@
                         {% load_widgets form='forms.html' %}
 
                         {% for field in form %}
-                        {% if field.name == 'test_scenario' %}
-                            <ul id='id_test_scenario'>
-                            {% for radio in field %}
-                                <li>
-                                    {{radio.tag}}
-                                    <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
-                                </li>
-                            {% endfor %}
-                            </ul>
+                            {% if field.name == 'test_scenario' %}
+                                <div id='id_test_scenario' style="padding:20px">
+                                    {% for radio in field %}
+                                        <div class='row'>
+                                            {{radio.tag}}
+                                            <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                         {% else %}
                             {% form_field field %}
                         {% endif %}

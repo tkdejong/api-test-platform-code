@@ -13,6 +13,7 @@ urlpatterns = [
     url('^create', views.SessionFormView.as_view(), name='session_create'),
     url(r'^postman/(?P<pk>[0-9]+)', views.PostmanDownloadView.as_view(), name='postman_download'),
     url(r'^(?P<session_id>[0-9]+)/stop', views.StopSession.as_view(), name='stop_session'),
+    url(r'^(?P<session_id>[0-9]+)/update', views.SessionLogUpdateView.as_view(), name='session_update'),
     url(r'^(?P<session_id>[0-9]+)/report-pdf', views.SessionReportPdf.as_view(), name='session_report-pdf'),
     url(r'^(?P<session_id>[0-9]+)/report', views.SessionReport.as_view(), name='session_report'),
     url(r'^(?P<session_id>[0-9]+)/test-report-pdf/(?P<pk>[0-9]+)$', views.SessionTestReportPDF.as_view(), name='session-test_report-pdf'),

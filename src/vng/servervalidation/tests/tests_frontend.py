@@ -6,7 +6,7 @@ from django.urls import reverse
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User
 
-from .factories import TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory
+from .factories import TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory
 from ...utils import choices, forms
 
 
@@ -207,3 +207,28 @@ class IntegrationTest(WebTest):
     def test_session_number_user(self):
         call = self.app.get(reverse('server_run:server-run_list'), user=self.user)
         self.assertIn(str(ServerRun.objects.filter(user=self.user, scheduled=True).count()), call.text)
+
+    def test_information_form(self):
+        self.test_badge()
+        new_server = ServerRun.objects.latest('id')
+        call = self.app.get(
+            reverse(
+                'server_run:server-run_info-update',
+                kwargs={'uuid': new_server.uuid}),
+            user=self.user
+        )
+        form = call.forms[0]
+        form['supplier_name'] = 'test_name'
+        form['software_product'] = 'test_software'
+        form['product_role'] = 'test_product'
+        res = form.submit().follow()
+        new_server = ServerRun.objects.latest('id')
+        self.assertEqual(new_server.product_role, 'test_product')
+
+        call = self.app.get(
+            reverse(
+                'server_run:server-run_info-update',
+                kwargs={'uuid': new_server.uuid}),
+            user='random',
+            status=[403]
+        )

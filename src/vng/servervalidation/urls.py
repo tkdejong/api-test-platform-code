@@ -5,7 +5,6 @@ from django.views.generic import TemplateView
 from . import views, apps
 
 app_name = apps.AppConfig.__name__
-
 urlpatterns = [
     url(r'^testscenario/(?P<pk>[0-9]+)', views.SessionTypeDetail.as_view(), name='testscenario-detail'),
     url(r'(?P<test_id>[0-9]+)/create', views.CreateEndpoint.as_view(), name='server-run_create'),
@@ -18,6 +17,7 @@ urlpatterns = [
     url(r'(?P<uuid>[0-9a-f-]+)/log', views.ServerRunLogView.as_view(), name='server-run_detail_log'),
     url(r'(?P<uuid>[0-9a-f-]+)/pdf', views.ServerRunPdfView.as_view(), name='server-run_detail_pdf'),
     url(r'^(?P<pk>[0-9]+)$', views.ServerRunOutput.as_view(), name='server-run_detail'),
+    url(r'(?P<uuid>[0-9a-f-]+)/update', views.ServerRunOutputUpdate.as_view(), name='server-run_info-update'),
     url(r'(?P<uuid>[0-9a-f-]+)', views.ServerRunOutputUuid.as_view(), name='server-run_detail_uuid'),
     url(r'$', views.TestScenarioSelect.as_view(), name='server-run_list'),
 ]

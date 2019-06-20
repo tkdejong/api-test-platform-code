@@ -2,7 +2,7 @@
 {% load i18n sniplates %}
 {% load tag_library %}
 {% block _errors %}
-    {% if errors or form.non_field_errors and errors or index == 0 %}
+    {% if errors or form.non_field_errors  or index == 0 %}
         <div class="invalid-feedback">
             <ul>
             {% for error in errors %}
@@ -17,23 +17,24 @@
 
 
 {% block input %}
-    {% with input_type=input_type|default:"text" %}
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="form-group">
-                {% comment %} <label for="name">{{ html_name }}</label> {% endcomment %}
-                <input  id="{{ id }}"
-                        name="{{ html_name }}"
-                        type="{{ input_type }}"
-                        value="{{ raw_value|default:"" }}"
-                        class="form-control {{ errors|yesno:"is-invalid, " }}{{ form.non_field_errors|yesno:"is-invalid, " }}"
-                        {{ widget.attrs|flatattrs }}
-                        {{ required|yesno:"required," }}
-                        {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}>
-                {% reuse '_errors' index=index %}
-            </div>
+    {% with input_type=input_type|default:"text" %}        <div class="input-group mb-3">
+            {% if label %}
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3">{{ label }}</span>
+                </div>
+            {% endif %}
+            {% comment %} <label for="name">{{ html_name }}</label> {% endcomment %}
+            <input  id="{{ id }}"
+                    name="{{ html_name }}"
+                    type="{{ input_type }}"
+                    value="{{ raw_value|default:"" }}"
+                    aria-describedby="basic-addon3"
+                    class="form-control {{ errors|yesno:"is-invalid, " }}{{ form.non_field_errors|yesno:"is-invalid, " }}"
+                    {{ widget.attrs|flatattrs }}
+                    {{ required|yesno:"required," }}
+                    {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}>
+            {% reuse '_errors' index=index %}
         </div>
-    </div>
     {% endwith %}
 {% endblock %}
 
@@ -92,7 +93,7 @@
 
 {% block TextInput %}
     <div class="form__control" role="group">
-        {% reuse '_label' %}
+
         {% reuse 'input' css_classes='form__input' placeholder=placeholder|default:label %}
         {% reuse '_help' %}
         {% reuse '_errors' %}

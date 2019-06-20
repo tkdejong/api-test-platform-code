@@ -570,6 +570,23 @@ class TestAllProcedure(WebTest):
         call = self.app.get(url, user=self.user, status=[404])
         self.assertIn('404', call.status)
 
+    def test_update_session(self):
+        self._test_create_session()
+        session = Session.objects.latest('id')
+        call = self.app.get(
+            reverse(
+                'testsession:session_update',
+                kwargs={'session_id': session.id}),
+            user=self.user
+        )
+        form = call.forms[0]
+        form['supplier_name'] = 'test_name'
+        form['software_product'] = 'test_software'
+        form['product_role'] = 'test_product'
+        res = form.submit().follow()
+        session = Session.objects.latest('id')
+        self.assertEqual(session.product_role, 'test_product')
+
 
 class TestLogNewman(WebTest):
 
