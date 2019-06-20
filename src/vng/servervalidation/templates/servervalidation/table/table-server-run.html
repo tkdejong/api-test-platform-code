@@ -79,7 +79,12 @@
         </td>
     </td>
 </tr>
-
+{% if request.user.is_authenticated %}
+<tr>
+    <td>Update information</td>
+    <td><a href="{% url 'server_run:server-run_info-update' server_run.uuid %}">Update</a></td>
+</tr>
+{% endif %}
 
 
 {% endspaceless %}

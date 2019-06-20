@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import DetailView, CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
+from django.core.exceptions import PermissionDenied
 
 from ..utils import choices, postman
 from ..utils.views import OwnerSingleObject, PDFGenerator
@@ -171,14 +172,42 @@ class ServerRunOutput(OwnerSingleObject, DetailView):
         return context
 
 
-class ServerRunOutputUuid(DetailView, UpdateView):
+class ServerRunOuputUpdate(UpdateView):
 
     model = ServerRun
+    slug_field = 'uuid'
+    pk_name = 'uuid'
+    slug_url_kwarg = 'uuid'
     fields = [
         'supplier_name',
         'software_product',
         'product_role',
     ]
+    template_name = 'servervalidation/server-run_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'server_run:server-run_detail_uuid',
+            kwargs={'uuid': self.object.uuid}
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        server_run = context['object']
+        ptr = PostmanTestResult.objects.filter(server_run=server_run)
+        context["postman_result"] = ptr
+        return context
+
+    def get_object(self, queryset=None):
+        res = super().get_object(queryset=queryset)
+        if res.user != self.request.user:
+            raise PermissionDenied()
+        return res
+
+
+class ServerRunOutputUuid(DetailView):
+
+    model = ServerRun
     template_name = 'servervalidation/server-run_detail.html'
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
@@ -192,7 +221,6 @@ class ServerRunOutputUuid(DetailView, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         server_run = context['object']
-        context['form'] = self.get_form()
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
         return context

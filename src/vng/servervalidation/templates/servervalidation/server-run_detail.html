@@ -149,26 +149,28 @@
                         {{object.test_scenario.description|safe}}
                     </div>
                 </div>
-                {% load_widgets form='forms.html' %}
-                 <div class="card">
-                    <form class="" method="post">{% csrf_token %}
-                        <div class="card-header">
-                            Update information
-                        </div>
-                        <div class="card-body">
-                            {% for field in form %}
-                                {% form_field field %}
-                            {% endfor %}
-                        </div>
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-auto mr-auto">
-                                    <button class="btn btn-sm btn-primary" type="submit">
-                                        <i class="fa fa-dot-circle-o"></i>Start</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                <div class="card">
+                    <div class="card-header">
+                        Client information
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <td scope="row"><strong>Supplier name</td>
+                                    <td>{{ object.supplier_name|default_if_none:'NP' }}</td>
+                                </tr>
+                                <tr>
+                                    <td scope="row"><strong>Software product</td>
+                                    <td>{{ object.software_product|default_if_none:'NP' }}</td>
+                                </tr>
+                                <tr>
+                                    <td scope="row"><strong>Product role</td>
+                                    <td>{{ object.product_role|default_if_none:'NP' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
