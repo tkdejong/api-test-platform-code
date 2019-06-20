@@ -176,7 +176,6 @@ class ServerRunOuputUpdate(UpdateView):
 
     model = ServerRun
     slug_field = 'uuid'
-    pk_name = 'uuid'
     slug_url_kwarg = 'uuid'
     fields = [
         'supplier_name',

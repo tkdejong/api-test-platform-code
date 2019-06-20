@@ -1,0 +1,133 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load subdomainurls %}
+
+{% block title %}Test consumer - Detailweergave test-sessie{% endblock%}
+
+{% block breadcrumb %}
+{% breadcrumb "Home" "testsession:sessions" %}
+{% breadcrumb "test consumer" "" %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                {% load_widgets form='forms.html' %}
+                <form class="" method="post">{% csrf_token %}
+                    <div class="card-header">
+                        Update information
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% form_field field %}
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" >
+                                    <i class="fa fa-dot-circle-o"></i>Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-header">
+                        Endpoints & Rapports
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <ul class="list-group">
+                                    {% for endpoint in session.exposedurl_set.all %}
+                                    {% if endpoint.subdomain %}
+                                    <li class="list-group-item">
+                                        {{endpoint.vng_endpoint.name }} -
+                                        <a
+                                            href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
+                                            {{endpoint.vng_endpoint.name}}
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <br />
+                                <p>
+                                    <input type="button" class="btn btn-primary" value="Rapport"
+                                        onclick="location.href = '{% url 'testsession:session_report' session.id %}';">
+                                </p>
+                                <p>
+                                    <input type="button" class="btn btn-primary" value="Rapport (PDF)"
+                                        onclick="location.href = '{% url 'testsession:session_report-pdf' session.id %}';">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    Summary in a glance
+                </div>
+                <div class="card-body">
+                    <div class='table-responsive'>
+                        <table class="table">
+                            <thead>
+                                <th>Property</th>
+                                <th>Value</th>
+                            </thead>
+                            <tbody>
+                                <tr class="table-active">
+                                    <td>
+                                        Total scenario cases
+                                    </td>
+                                    <td>
+                                        {{ total }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Cases failed
+                                    </td>
+                                    <td class="table-success">
+                                        {{ failed }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Cases successful
+                                    </td>
+                                    <td class="table-danger">
+                                        {{ success }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Cases not called
+                                    </td>
+                                    <td>
+                                        {{ not_called }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% endblock %}
