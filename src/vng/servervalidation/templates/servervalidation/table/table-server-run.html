@@ -81,15 +81,15 @@
 </tr>
 <tr>
     <td>Supplier name</td>
-    <td>{{ server_run.supplier_name|default_if_none:'NP' }}</td>
+    <td>{{ server_run.supplier_name|default_if_none:''|urlize }}</td>
 </tr>
 <tr>
     <td>Software product</td>
-    <td>{{ server_run.software_product|default_if_none:'NP' }}</td>
+    <td>{{ server_run.software_product|default_if_none:''|urlize }}</td>
 </tr>
 <tr>
     <td>Product role</td>
-    <td>{{ server_run.product_role|default_if_none:'NP' }}</td>
+    <td>{{ server_run.product_role|default_if_none:''|urlize }}</td>
 </tr>
 {% if request.user.is_authenticated and update_info %}
     <tr>

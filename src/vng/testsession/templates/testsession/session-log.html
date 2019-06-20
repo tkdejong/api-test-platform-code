@@ -264,15 +264,15 @@
                             <tbody>
                                 <tr>
                                     <td scope="row"><strong>Supplier name</td>
-                                    <td>{{ session.supplier_name|default_if_none:'NP' }}</td>
+                                    <td>{{ session.supplier_name|default_if_none:''|urlize }}</td>
                                 </tr>
                                 <tr>
                                     <td scope="row"><strong>Software product</td>
-                                    <td>{{ session.software_product|default_if_none:'NP' }}</td>
+                                    <td>{{ session.software_product|default_if_none:''|urlize }}</td>
                                 </tr>
                                 <tr>
                                     <td scope="row"><strong>Product role</td>
-                                    <td>{{ session.product_role|default_if_none:'NP' }}</td>
+                                    <td>{{ session.product_role|default_if_none:''|urlize }}</td>
                                 </tr>
                             </tbody>
                         </table>
