@@ -224,3 +224,11 @@ class IntegrationTest(WebTest):
         res = form.submit().follow()
         new_server = ServerRun.objects.latest('id')
         self.assertEqual(new_server.product_role, 'test_product')
+
+        call = self.app.get(
+            reverse(
+                'server_run:server-run_info-update',
+                kwargs={'uuid': new_server.uuid}),
+            user='random',
+            status=[403]
+        )
