@@ -172,7 +172,7 @@ class ServerRunOutput(OwnerSingleObject, DetailView):
         return context
 
 
-class ServerRunOuputUpdate(UpdateView):
+class ServerRunOutputUpdate(UpdateView):
 
     model = ServerRun
     slug_field = 'uuid'
