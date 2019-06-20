@@ -232,6 +232,7 @@ class ExposedUrl(models.Model):
 
 class SessionLog(models.Model):
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     date = models.DateTimeField(default=timezone.now)
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     request = models.TextField(blank=True, null=True, default=None)
