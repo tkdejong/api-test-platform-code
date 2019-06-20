@@ -6,7 +6,7 @@ from django.urls import reverse
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User
 
-from .factories import TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory
+from .factories import TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory
 from ...utils import choices, forms
 
 
@@ -213,7 +213,7 @@ class IntegrationTest(WebTest):
         new_server = ServerRun.objects.latest('id')
         call = self.app.get(
             reverse(
-                'server_run:server-run_detail_uuid',
+                'server_run:server-run_info-update',
                 kwargs={'uuid': new_server.uuid}),
             user=self.user
         )
