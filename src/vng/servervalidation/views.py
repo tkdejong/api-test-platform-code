@@ -196,6 +196,7 @@ class ServerRunOuputUpdate(UpdateView):
         server_run = context['object']
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
+        context["update_info"] = False
         return context
 
     def get_object(self, queryset=None):
@@ -223,6 +224,7 @@ class ServerRunOutputUuid(DetailView):
         server_run = context['object']
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
+        context["update_info"] = True
         return context
 
 
