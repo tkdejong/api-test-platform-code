@@ -23,18 +23,22 @@
         </td>
         <td>{{ session.session_type.name }}</td>
 
-        <td>
-            <ul class="list-group">
-                {% for endpoint in session.exposedurl_set.all %}
-                    {% if endpoint.subdomain %}
-                        <li class="list-group-item">
-                            <a href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
-                                {{endpoint.vng_endpoint.name}}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+        <td class="td-20">
+            {% if session.status == choices.error_deploy %}
+                {{ session.error_message }}
+            {% else %}
+                <ul class="list-group">
+                    {% for endpoint in session.exposedurl_set.all %}
+                        {% if endpoint.subdomain %}
+                            <li class="list-group-item">
+                                <a href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
+                                    {{endpoint.vng_endpoint.name}}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </td>
 
         {% if session.is_starting and session.deploy_status %}
