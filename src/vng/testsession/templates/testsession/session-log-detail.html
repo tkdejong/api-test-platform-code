@@ -5,7 +5,7 @@
 
 {% block breadcrumb %}
 {% breadcrumb "Home" 'testsession:sessions' %}
-{% breadcrumb 'Log' 'testsession:session_log' object.session.pk %}
+{% breadcrumb "Log" "testsession:session_log" object.session.uuid %}
 {% breadcrumb 'Detail call' 'testsession:sessions' %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
