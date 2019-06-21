@@ -1,8 +1,6 @@
 
 import json
 
-from itertools import zip_longest
-
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, JsonResponse, Http404
 from django.utils import timezone
@@ -21,7 +19,6 @@ from drf_yasg.utils import swagger_auto_schema
 from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield
 from .models import ServerRun, PostmanTestResult
 from .task import execute_test
-from ..permissions.UserPermissions import isOwner
 from ..utils import postman as ptm
 from ..utils import choices
 
