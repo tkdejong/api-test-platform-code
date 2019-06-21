@@ -3,7 +3,7 @@
 {% with session_related.0 as session %}
     <tr>
         <td>
-            <a href="{% url 'testsession:session_log' session.uuid %}">#{{ session.uuid }}</a>
+            <a href="{% url 'testsession:session_log' session.uuid %}">#{{ session.id }}</a>
         </td>
         <td>
             {% if session.status == choices.running %}

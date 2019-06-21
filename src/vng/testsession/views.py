@@ -19,11 +19,11 @@ from .models import (
     TestSession, Report, SessionType
 )
 
-from .task import run_tests, bootstrap_session, stop_session
+from .task import bootstrap_session, stop_session
 from .forms import SessionForm
 from ..utils import choices
 from ..utils.views import (
-    ListAppendView, OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
+    OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
 )
 
 
@@ -37,8 +37,8 @@ class SessionListView(LoginRequiredMixin, ListView):
     paginate_by = 10
     model = Session
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         _choices = dict(choices.StatusChoices.choices)
         _choices['error_deploy'] = choices.StatusChoices.error_deploy
         context.update({
@@ -94,8 +94,8 @@ class SessionLogView(OwnerMultipleObjects):
     def get_queryset(self):
         return SessionLog.objects.filter(session__uuid=self.kwargs['uuid']).order_by('date')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         stats = session.get_report_stats()
 
@@ -139,7 +139,7 @@ class SessionLogUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy(
             'testsession:session_log',
-            kwargs={'session_id': self.object.pk}
+            kwargs={'uuid': self.object.uuid}
         )
 
     def get_object(self, queryset=None):
