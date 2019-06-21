@@ -481,7 +481,7 @@ class RunTest(CSRFExemptMixin, View):
             return self.build_method(request_method_name, request, body)
         except Http404:
             return JsonResponse({
-                'info': 'The resource requested has been already turned off.'
+                'info': 'The requested resource has been already turned off.'
             })
 
     def get(self, request, *args, **kwargs):
