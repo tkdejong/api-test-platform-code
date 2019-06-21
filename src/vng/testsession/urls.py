@@ -1,10 +1,7 @@
-from django.urls import include, path
-from django.contrib.auth.decorators import login_required
-
-from rest_framework import routers, serializers, viewsets
+from django.urls import path
 
 from . import views
-from . import api_views, apps
+from . import apps
 
 app_name = apps.AppConfig.__name__
 

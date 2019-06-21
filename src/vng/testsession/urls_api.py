@@ -1,8 +1,6 @@
-from rest_framework import routers, serializers, viewsets
-from rest_framework.documentation import include_docs_urls
+from rest_framework import routers
 
-from django.urls import path, include
-from django.contrib.auth.decorators import login_required
+from django.urls import path
 
 from . import api_views, apps
 from ..utils.schema import schema_view

@@ -148,7 +148,6 @@ class QueryParamsScenario(models.Model):
     expected_value = models.CharField(max_length=50, default='*')
 
     def __str__(self):
-        self
         if self.expected_value:
             return '{} - {}: {}'.format(self.scenario_case, self.name, self.expected_value)
         else:
