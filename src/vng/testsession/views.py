@@ -3,12 +3,13 @@ import logging
 
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 
@@ -106,6 +107,46 @@ class SessionLogView(OwnerMultipleObjects):
             'total': sum(stats)
         })
         return context
+
+
+class SessionLogUpdateView(UpdateView):
+
+    template_name = 'testsession/session-update.html'
+    context_object_name = 'session'
+    model = Session
+    slug_field = 'pk'
+    slug_url_kwarg = 'session_id'
+    fields = [
+        'supplier_name',
+        'software_product',
+        'product_role',
+    ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        session = context['session']
+        stats = session.get_report_stats()
+
+        context.update({
+            'session': session,
+            'success': stats[0],
+            'failed': stats[1],
+            'not_called': stats[2],
+            'total': sum(stats),
+        })
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'testsession:session_log',
+            kwargs={'session_id': self.object.pk}
+        )
+
+    def get_object(self, queryset=None):
+        res = super().get_object(queryset=queryset)
+        if res.user != self.request.user:
+            raise PermissionDenied()
+        return res
 
 
 class StopSession(OwnerSingleObject, View):

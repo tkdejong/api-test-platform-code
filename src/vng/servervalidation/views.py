@@ -2,11 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.views import View
-from django.views.generic import DetailView, CreateView, FormView
+from django.views.generic import DetailView, CreateView, FormView, UpdateView
 from django.views.generic.list import ListView
+from django.core.exceptions import PermissionDenied
 
 from ..utils import choices, postman
 from ..utils.views import OwnerSingleObject, PDFGenerator
@@ -51,6 +53,9 @@ class ServerRunForm(CreateView):
     def form_valid(self, form):
         ts_id = form.instance.test_scenario.id
         self.request.session['server_run_scheduled'] = form.instance.scheduled
+        self.request.session['supplier_name'] = form.instance.supplier_name
+        self.request.session['software_product'] = form.instance.software_product
+        self.request.session['product_role'] = form.instance.product_role
         return redirect(reverse('server_run:server-run_create', kwargs={
             "test_id": ts_id
         }))
@@ -76,10 +81,18 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
     def fetch_server(self):
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
-        self.server = ServerRun(user=self.request.user, test_scenario=ts, scheduled=self.request.session['server_run_scheduled'])
+        self.server = ServerRun(
+            user=self.request.user,
+            test_scenario=ts,
+            scheduled=self.request.session['server_run_scheduled'],
+            supplier_name=self.request.session['supplier_name'],
+            software_product=self.request.session['software_product'],
+            product_role=self.request.session['product_role']
+        )
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
+        pre_form = data['form']
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
         self.fetch_server()
 
@@ -101,6 +114,8 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
         else:
             pass
         data['form'].set_labels(url_names)
+        for k, v in pre_form.errors.items():
+            data['form'].errors[k] = v
         return data
 
     def form_valid(self, form):
@@ -135,7 +150,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             ep.server_run = self.server
             ep.save()
         except IntegrityError as e:
-            form.add_error('url', 'asds')
+            form.add_error(None, 'Endpoint url not configured, contact the admin.')
             return super().form_invalid(form)
         self.endpoints.append(ep)
         if not self.server.scheduled:
@@ -157,6 +172,39 @@ class ServerRunOutput(OwnerSingleObject, DetailView):
         return context
 
 
+class ServerRunOutputUpdate(UpdateView):
+
+    model = ServerRun
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
+    fields = [
+        'supplier_name',
+        'software_product',
+        'product_role',
+    ]
+    template_name = 'servervalidation/server-run_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'server_run:server-run_detail_uuid',
+            kwargs={'uuid': self.object.uuid}
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        server_run = context['object']
+        ptr = PostmanTestResult.objects.filter(server_run=server_run)
+        context["postman_result"] = ptr
+        context["update_info"] = False
+        return context
+
+    def get_object(self, queryset=None):
+        res = super().get_object(queryset=queryset)
+        if res.user != self.request.user:
+            raise PermissionDenied()
+        return res
+
+
 class ServerRunOutputUuid(DetailView):
 
     model = ServerRun
@@ -164,11 +212,18 @@ class ServerRunOutputUuid(DetailView):
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
 
+    def get_success_url(self):
+        return reverse_lazy(
+            'server_run:server-run_detail_uuid',
+            kwargs={'uuid': self.object.uuid}
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         server_run = context['object']
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
+        context["update_info"] = True
         return context
 
 

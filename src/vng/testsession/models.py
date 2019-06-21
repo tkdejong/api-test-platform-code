@@ -169,6 +169,9 @@ class Session(models.Model):
     deploy_status = models.TextField(blank=True, null=True, default=None)
     deploy_percentage = models.IntegerField(default=None, null=True, blank=True)
     sandbox = models.BooleanField(default=False)
+    supplier_name = models.CharField(max_length=100, blank=True, null=True)
+    software_product = models.CharField(max_length=100, blank=True, null=True)
+    product_role = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Sessie'
