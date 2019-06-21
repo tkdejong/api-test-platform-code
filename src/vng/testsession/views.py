@@ -140,7 +140,7 @@ class SessionLogUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy(
             'testsession:session_log',
-            kwargs={'session_id': self.object.pk}
+            kwargs={'uuid': self.object.uuid}
         )
 
     def get_object(self, queryset=None):
