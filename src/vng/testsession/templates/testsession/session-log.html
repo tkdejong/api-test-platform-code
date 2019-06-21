@@ -244,11 +244,11 @@
                                 <br />
                                 <p>
                                     <input type="button" class="btn btn-primary" value="Rapport"
-                                        onclick="location.href = '{% url 'testsession:session_report' session.id %}';">
+                                        onclick="location.href = '{% url 'testsession:session_report' session.uuid %}';">
                                 </p>
                                 <p>
                                     <input type="button" class="btn btn-primary" value="Rapport (PDF)"
-                                        onclick="location.href = '{% url 'testsession:session_report-pdf' session.id %}';">
+                                        onclick="location.href = '{% url 'testsession:session_report-pdf' session.uuid %}';">
                                 </p>
                             </div>
                         </div>
