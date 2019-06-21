@@ -10,7 +10,7 @@ app_name = apps.AppConfig.__name__
 
 urlpatterns = [
     path('', views.SessionListView.as_view(), name='sessions'),
-    path('^create', views.SessionFormView.as_view(), name='session_create'),
+    path('create', views.SessionFormView.as_view(), name='session_create'),
     path('postman/<int:pk>', views.PostmanDownloadView.as_view(), name='postman_download'),
     path('<int:session_id>/stop', views.StopSession.as_view(), name='stop_session'),
     path('<uuid:uuid>/report-pdf', views.SessionReportPdf.as_view(), name='session_report-pdf'),
@@ -20,5 +20,5 @@ urlpatterns = [
     path('<uuid:uuid>/log/<uuid:log_uuid>', views.SessionLogDetailView.as_view(), name='session_log-detail'),
     path('<uuid:uuid>/', views.SessionLogView.as_view(), name='session_log'),
     path('<int:session_id>/update', views.SessionLogUpdateView.as_view(), name='session_update'),
-    path('^sessiontype/<int:pk>', views.SessionTypeDetail.as_view(), name='session_type-detail'),
+    path('sessiontype/<int:pk>', views.SessionTypeDetail.as_view(), name='session_type-detail'),
 ]
