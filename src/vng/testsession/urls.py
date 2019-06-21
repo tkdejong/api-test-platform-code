@@ -19,5 +19,6 @@ urlpatterns = [
     path('<uuid:uuid>/test-report/<int:pk>', views.SessionTestReport.as_view(), name='session-test_report'),
     path('<uuid:uuid>/log/<uuid:log_uuid>', views.SessionLogDetailView.as_view(), name='session_log-detail'),
     path('<uuid:uuid>/', views.SessionLogView.as_view(), name='session_log'),
+    path('<int:session_id>/update', views.SessionLogUpdateView.as_view(), name='session_update'),
     path('^sessiontype/<int:pk>', views.SessionTypeDetail.as_view(), name='session_type-detail'),
 ]
