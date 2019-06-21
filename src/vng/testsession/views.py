@@ -23,7 +23,6 @@ from .models import (
 from .task import run_tests, bootstrap_session, stop_session
 from .forms import SessionForm
 from ..utils import choices
-from ..utils.helper import validateUUID
 from ..utils.views import (
     ListAppendView, OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
 )
@@ -173,8 +172,6 @@ class SessionReport(OwnerSingleObject):
     template_name = 'testsession/session-report.html'
 
     def get_object(self):
-        if not validateUUID(self.kwargs['uuid']):
-            raise Http404()
         self.session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         return self.session
 

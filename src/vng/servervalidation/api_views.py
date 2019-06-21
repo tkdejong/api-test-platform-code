@@ -24,7 +24,6 @@ from .task import execute_test
 from ..permissions.UserPermissions import isOwner
 from ..utils import postman as ptm
 from ..utils import choices
-from ..utils.helper import validateUUID
 
 
 class ServerRunViewSet(
@@ -88,8 +87,6 @@ class ResultServerViewShield(
 
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def retrieve(self, request, pk=None):
-        if not validateUUID(pk):
-            raise Http404()
         server = ServerRun.objects.get(uuid=pk)
         res = server.get_execution_result()
         is_error = True
