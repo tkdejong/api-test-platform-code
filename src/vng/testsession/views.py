@@ -3,6 +3,7 @@ import logging
 
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.edit import FormView, UpdateView
@@ -22,6 +23,7 @@ from .models import (
 from .task import run_tests, bootstrap_session, stop_session
 from .forms import SessionForm
 from ..utils import choices
+from ..utils.helper import validateUUID
 from ..utils.views import (
     ListAppendView, OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
 )
@@ -171,6 +173,8 @@ class SessionReport(OwnerSingleObject):
     template_name = 'testsession/session-report.html'
 
     def get_object(self):
+        if not validateUUID(self.kwargs['uuid']):
+            raise Http404()
         self.session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         return self.session
 
