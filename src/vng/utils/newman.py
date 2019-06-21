@@ -26,7 +26,6 @@ class NewmanManager:
                        '--reporter-htmlextra-logs '
                        '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html {}')
 
-    RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {}'
     GLOBAL_VAR_SYNTAX = ' --global-var {}={} '
     TOKEN = 'TOKEN'
 
