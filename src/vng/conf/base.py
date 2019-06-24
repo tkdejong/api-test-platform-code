@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'tinymce',
     'compat',  # Part of hijack
     'hijack_admin',
+    'elasticapm.contrib.django',
     'easy_thumbnails',
     'django_bootstrap_breadcrumbs',
 
@@ -96,6 +97,7 @@ SITE_ID = 1
 APPEND_SLASH = True
 
 MIDDLEWARE = [
+    'elasticapm.contrib.django.middleware.TracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'django.middleware.locale.LocaleMiddleware',
@@ -390,4 +392,11 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'vng.servervalidation.task.execute_test_scheduled',
         'schedule': crontab(hour=0, minute=0),
     },
+}
+
+# Elastic APM
+ELASTIC_APM = {
+    'SERVICE_NAME': 'VNG API-Testplatform',
+    'SECRET_TOKEN': os.getenv('ELASTIC_APM_SECRET_TOKEN', 'default'),
+    'SERVER_URL': os.getenv('ELASTIC_APM_SERVER_URL', 'http://example.com'),
 }

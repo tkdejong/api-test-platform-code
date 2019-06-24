@@ -102,6 +102,8 @@ SECURE_BROWSER_XSS_FILTER = True # Sets X-XSS-Protection: 1; mode=block
 # Library settings
 #
 
+ELASTIC_APM['SERVICE_NAME'] += ' ' + ENVIRONMENT
+
 # Raven
 INSTALLED_APPS = INSTALLED_APPS + [
     'raven.contrib.django.raven_compat',

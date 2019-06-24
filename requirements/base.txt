@@ -47,6 +47,7 @@ djangorestframework-filters==0.10.2.post0
 djangorestframework==3.9.0
 drf-yasg==1.13.0
 easy-thumbnails==2.5
+elastic-apm==4.2.2
 et-xmlfile==1.0.1         # via openpyxl
 google-api-python-client==1.7.4
 google-auth-httplib2==0.0.3  # via google-api-python-client
