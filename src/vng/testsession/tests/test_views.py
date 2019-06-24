@@ -136,7 +136,7 @@ class CreationAndDeletion(WebTest):
         }), user=session.user)
 
         self.app.get(reverse('testsession:session_log', kwargs={
-            'session_id': session.id
+            'uuid': session.uuid
         }), user=session.user)
 
     def test_deploy_docker_via_api(self):
@@ -204,10 +204,10 @@ class TestLog(WebTest):
         self.endpoint_echo_h.save()
 
     def test_retrieve_no_logged(self):
-        call = self.app.get(reverse('testsession:session_log', kwargs={'session_id': self.session.id}), status=302)
+        call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), status=302)
 
     def test_retrieve_no_entries(self):
-        call = self.app.get(reverse('testsession:session_log', kwargs={'session_id': self.session.id}), user=self.session.user)
+        call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
         self.assertTrue('Er zijn nog geen verzoeken' in call.text)
 
     def test_retrieve_no_entry(self):
@@ -215,31 +215,31 @@ class TestLog(WebTest):
             'relative_url': ''
         })
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(self.exp_url.subdomain)}, user=self.session.user)
-        call2 = self.app.get(reverse('testsession:session_log', kwargs={'session_id': self.session.id}), user=self.session.user)
+        call2 = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
         self.assertTrue(url in call2.text)
 
     def test_log_report(self):
         self.test_retrieve_no_entry()
-        call = self.app.get(reverse('testsession:session_report', kwargs={'session_id': self.session.id}), user=self.session.user)
+        call = self.app.get(reverse('testsession:session_report', kwargs={'uuid': self.session.uuid}), user=self.session.user)
 
     def test_log_report_pdf(self):
         self.test_retrieve_no_entry()
-        call = self.app.get(reverse('testsession:session_report-pdf', kwargs={'session_id': self.session.id}), user=self.session.user)
+        call = self.app.get(reverse('testsession:session_report-pdf', kwargs={'uuid': self.session.uuid}), user=self.session.user)
 
     def test_log_detail_view(self):
         sl = self.session_log
         call = self.app.get(reverse('testsession:session_log-detail',
                                     kwargs={
-                                        'session_id': sl.session.id,
-                                        'pk': sl.pk}),
+                                        'uuid': sl.session.uuid,
+                                        'log_uuid': sl.uuid}),
                             user=sl.session.user)
 
     def test_log_detail_view_no_authorized(self):
         sl = self.session_log
         call = self.app.get(reverse('testsession:session_log-detail',
                                     kwargs={
-                                        'session_id': sl.session.id,
-                                        'pk': sl.id}),
+                                        'uuid': sl.session.uuid,
+                                        'log_uuid': sl.uuid}),
                             status=[302, 401, 403, 404])
 
     def test_api_session(self):
@@ -283,7 +283,7 @@ class TestLog(WebTest):
 
     def test_ordered_report(self):
         url = reverse('testsession:session_report', kwargs={
-            'session_id': self.session.id
+            'uuid': self.session.uuid
         })
         sc = ScenarioCase.objects.filter(vng_endpoint__session_type=self.session.session_type).order_by('order')
         call = self.app.get(url, user=self.session.user)
@@ -539,12 +539,12 @@ class TestAllProcedure(WebTest):
         self._test_stop_session()
         session = Session.objects.get(pk=self.session.pk)
         url = reverse('testsession:session_report', kwargs={
-            'session_id': self.session.pk,
+            'uuid': self.session.uuid,
         })
         call = self.app.get(url, user=self.session.user)
 
         url = reverse('testsession:session_report-pdf', kwargs={
-            'session_id': self.session.pk,
+            'uuid': self.session.uuid,
         })
         call = self.app.get(url, user=self.session.user)
 
@@ -556,19 +556,37 @@ class TestAllProcedure(WebTest):
         })
         call = self.app.post(url, user=self.session.user).follow()
         call = self.app.get(reverse('testsession:session_log', kwargs={
-            'session_id': self.session.pk
+            'uuid': self.session.uuid
         }))
         self.assertIn('200 OK', call.text)
 
     def test_url_slash(self):
+        from uuid import uuid4
         url = reverse('testsession:session_log', kwargs={
-            'session_id': 555
+            'uuid': uuid4()
         })
 
         call = self.app.get(url[:-1], user=self.user)
         self.assertIn('301', call.status)
         call = self.app.get(url, user=self.user, status=[404])
         self.assertIn('404', call.status)
+
+    def test_update_session(self):
+        self._test_create_session()
+        session = Session.objects.latest('id')
+        call = self.app.get(
+            reverse(
+                'testsession:session_update',
+                kwargs={'session_id': session.id}),
+            user=self.user
+        )
+        form = call.forms[0]
+        form['supplier_name'] = 'test_name'
+        form['software_product'] = 'test_software'
+        form['product_role'] = 'test_product'
+        res = form.submit().follow()
+        session = Session.objects.latest('id')
+        self.assertEqual(session.product_role, 'test_product')
 
 
 class TestLogNewman(WebTest):

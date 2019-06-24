@@ -33,6 +33,8 @@ class SessionType(models.Model):
     client_id = models.TextField(default=None, null=True, blank=True)
     secret = models.TextField(default=None, null=True, blank=True)
     header = models.TextField(default=None, null=True, blank=True)
+    database = models.BooleanField(help_text='Check if the a postgres db is needed in the Kubernetes cluster', default=False)
+    db_data = models.TextField(default=None, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Sessie type'
@@ -110,6 +112,13 @@ class VNGEndpoint(models.Model):
         return self.name + " ({})".format(self.session_type)
 
 
+class EnvironmentalVariables(models.Model):
+
+    vng_endpoint = models.ForeignKey(VNGEndpoint, on_delete=models.CASCADE)
+    key = models.CharField(max_length=50)
+    value = models.CharField(max_length=100)
+
+
 class ScenarioCase(OrderedModel):
 
     url = models.CharField(max_length=200, help_text='''
@@ -139,7 +148,6 @@ class QueryParamsScenario(models.Model):
     expected_value = models.CharField(max_length=50, default='*')
 
     def __str__(self):
-        self
         if self.expected_value:
             return '{} - {}: {}'.format(self.scenario_case, self.name, self.expected_value)
         else:
@@ -148,6 +156,7 @@ class QueryParamsScenario(models.Model):
 
 class Session(models.Model):
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField('Naam', max_length=30, unique=True, null=True)
     session_type = models.ForeignKey(SessionType, verbose_name='Sessie type', on_delete=models.PROTECT)
     started = models.DateTimeField('Gestart op', default=timezone.now)
@@ -159,6 +168,9 @@ class Session(models.Model):
     deploy_status = models.TextField(blank=True, null=True, default=None)
     deploy_percentage = models.IntegerField(default=None, null=True, blank=True)
     sandbox = models.BooleanField(default=False)
+    supplier_name = models.CharField(max_length=100, blank=True, null=True)
+    software_product = models.CharField(max_length=100, blank=True, null=True)
+    product_role = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Sessie'
@@ -176,7 +188,7 @@ class Session(models.Model):
 
     def get_absolute_request_url(self, request):
         test_session_url = 'https://{}{}'.format(request.get_host(),
-                                                 reverse('testsession:session_log', args=[self.id]))
+                                                 reverse('testsession:session_log', args=[self.uuid]))
         return test_session_url
 
     def is_stopped(self):
@@ -206,6 +218,7 @@ class Session(models.Model):
 
 class ExposedUrl(models.Model):
 
+    port = models.PositiveIntegerField(default=8080)
     subdomain = models.CharField(max_length=200, unique=True, null=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     vng_endpoint = models.ForeignKey(VNGEndpoint, on_delete=models.CASCADE)
@@ -221,6 +234,7 @@ class ExposedUrl(models.Model):
 
 class SessionLog(models.Model):
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     date = models.DateTimeField(default=timezone.now)
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     request = models.TextField(blank=True, null=True, default=None)

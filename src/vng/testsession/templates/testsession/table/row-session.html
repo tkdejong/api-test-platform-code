@@ -3,7 +3,7 @@
 {% with session_related.0 as session %}
     <tr>
         <td>
-            <a href="{% url 'testsession:session_log' session.id %}">#{{ session.id }}</a>
+            <a href="{% url 'testsession:session_log' session.uuid %}">#{{ session.id }}</a>
         </td>
         <td>
             {% if session.status == choices.running %}
@@ -23,18 +23,22 @@
         </td>
         <td>{{ session.session_type.name }}</td>
 
-        <td>
-            <ul class="list-group">
-                {% for endpoint in session.exposedurl_set.all %}
-                    {% if endpoint.subdomain %}
-                        <li class="list-group-item">
-                            <a href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
-                                {{endpoint.vng_endpoint.name}}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+        <td class="td-20">
+            {% if session.status == choices.error_deploy %}
+                {{ session.error_message }}
+            {% else %}
+                <ul class="list-group">
+                    {% for endpoint in session.exposedurl_set.all %}
+                        {% if endpoint.subdomain %}
+                            <li class="list-group-item">
+                                <a href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
+                                    {{endpoint.vng_endpoint.name}}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </td>
 
         {% if session.is_starting and session.deploy_status %}
@@ -51,6 +55,8 @@
                     </div>
                 </div>
             </div>
+            <td>
+            </td>
             {% else %}
                 <td>
                     {{session_related.1}} <i class="cui-circle-check "></i>

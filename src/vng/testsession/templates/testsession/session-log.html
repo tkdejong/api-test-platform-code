@@ -216,49 +216,77 @@
         </div>
 
         <div class="col-sm-5">
-            <div class="card-deck">
-                <div class="card">
-                    <div class="card-header">
-                        Endpoints & Rapports
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <ul class="list-group">
-                                    {% for endpoint in session.exposedurl_set.all %}
-                                    {% if endpoint.subdomain %}
-                                    <li class="list-group-item">
-                                        {{endpoint.vng_endpoint.name }} -
-                                        <a
-                                            href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
-                                            {{endpoint.vng_endpoint.name}}
-                                        </a>
-                                    </li>
-                                    {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            </div>
+            <div class="card">
+                <div class="card-header">
+                    Endpoints & Rapports
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <ul class="list-group">
+                                {% for endpoint in session.exposedurl_set.all %}
+                                {% if endpoint.subdomain %}
+                                <li class="list-group-item">
+                                    {{endpoint.vng_endpoint.name }} -
+                                    <a
+                                        href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
+                                        {{endpoint.vng_endpoint.name}}
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <br />
-                                <p>
-                                    <input type="button" class="btn btn-primary" value="Rapport"
-                                        onclick="location.href = '{% url 'testsession:session_report' session.id %}';">
-                                </p>
-                                <p>
-                                    <input type="button" class="btn btn-primary" value="Rapport (PDF)"
-                                        onclick="location.href = '{% url 'testsession:session_report-pdf' session.id %}';">
-                                </p>
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <br />
+                            <p>
+                                <input type="button" class="btn btn-primary" value="Rapport"
+                                    onclick="location.href = '{% url 'testsession:session_report' session.uuid %}';">
+                            </p>
+                            <p>
+                                <input type="button" class="btn btn-primary" value="Rapport (PDF)"
+                                    onclick="location.href = '{% url 'testsession:session_report-pdf' session.uuid %}';">
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card">
                 <div class="card-header">
-                    Summary in a glance
+                Information
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <td scope="row"><strong>Supplier name</td>
+                            <td>{{ session.supplier_name|default_if_none:''|urlize }}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row"><strong>Software product</td>
+                                <td>{{ session.software_product|default_if_none:''|urlize }}</td>
+                            </tr>
+                            <tr>
+                                <td scope="row"><strong>Product role</td>
+                                    <td>{{ session.product_role|default_if_none:''|urlize }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <a class="btn btn-primary" href="{% url 'testsession:session_update' session.id %}">Update</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div class="card">
+                    <div class="card-header">
+                        Summary in a glance
+                    </div>
                 <div class="card-body">
                     <div class='table-responsive'>
                         <table class="table">
@@ -304,7 +332,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 

@@ -1,22 +1,24 @@
 import time
 import random
+import copy
+import os
+import uuid
 
 from datetime import timedelta, datetime
 from celery.utils.log import get_task_logger
 
 from django.utils.timezone import make_aware
 
+from vng.k8s_manager.kubernetes import *
+from vng.k8s_manager.container_manager import K8S
+
 from ..celery.celery import app
 from .models import ExposedUrl, Session, TestSession, VNGEndpoint
 from ..utils import choices
 from ..utils.newman import NewmanManager
-from .container_manager import K8S
+from .gemma_containers import *
 
 logger = get_task_logger(__name__)
-
-
-def get_app_name(session, bind_url):
-    return '{}{}'.format(session.name, str(bind_url.pk))
 
 
 @app.task
@@ -28,9 +30,8 @@ def stop_session(session_pk):
     eu = ExposedUrl.objects.filter(session=session)
     for e_url in eu:
         if e_url.vng_endpoint.url is None:
-            kuber = K8S()
-            app_name = get_app_name(session, e_url)
-            kuber.delete(app_name)
+            kuber = K8S(app_name=session.name)
+            kuber.delete()
     session.status = choices.StatusChoices.stopped
     session.save()
 
@@ -55,40 +56,6 @@ def align_sessions_data():
         session.save()
 
 
-def start_app_b8s(session, bind_url):
-    update_session_status(session, 'Verbinding maken met Kubernetes', 1)
-    kuber = K8S()
-    endpoint = bind_url.vng_endpoint
-    app_name = get_app_name(session, bind_url)
-    update_session_status(session, 'Docker image installatie op Kubernetes', 10)
-    kuber.deploy(app_name, endpoint.docker_image, endpoint.port)
-    update_session_status(session, 'Installatie voortgang', 22)
-    N_TRIALS = 10
-    for trial in range(N_TRIALS):
-        try:
-            time.sleep(10)                      # Waiting for the load balancer to be loaded
-            percentage = 28 + (12 * trial)
-            update_session_status(session, 'Installatie voortgang {}'.format(trial + 1), percentage if percentage < 95 else 94)
-            ip = kuber.status(app_name)
-
-            update_session_status(session, 'Status controle van pod', 95)
-            ready, message = kuber.get_pods_status(app_name)
-            if not ready:
-                update_session_status(session, 'An error within the image prevented from a correct deployment')
-                return ready, message
-            update_session_status(session, 'Installatie succesvol uitgevoerd', 100)
-            return ip, None
-        except Exception as e:
-            pass
-    update_session_status(session, 'Impossible to deploy successfully, trying to remove old sessions')
-    if purge_sessions():
-        start_app_b8s(session, bind_url)
-    else:
-        update_session_status(session, 'Impossible to deploy successfully, all the resources are being used')
-    ready, message = kuber.get_pods_status(app_name)
-    return ready, message
-
-
 @app.task
 def purge_sessions():
     align_sessions_data()
@@ -99,42 +66,219 @@ def purge_sessions():
     return purged
 
 
+def deploy_db(session, data=[]):
+
+    db_k8s = K8S(app_name='db-{}'.format(session.name))
+    db_k8s.initialize()
+    db = copy.deepcopy(postgis)
+    db.name = 'db-{}'.format(session.name)
+    db.data = data
+    d_db = Deployment(
+        name='db-{}'.format(session.name),
+        labels='db-{}'.format(session.name),
+        containers=[db]
+    ).execute()
+
+    for i in range(10):
+        time.sleep(3)
+        # Visualize the new pod can be not immediate, pooling is the way :(
+        try:
+            db_IP_address = db_k8s.get_pod_status()['status']['podIP']
+            return db_IP_address, db_k8s
+        except:
+            pass
+
+
+def ZGW_deploy(session):
+    update_session_status(session, 'Verbinding maken met Kubernetes', 1)
+
+    k8s = K8S(app_name=session.name)
+    k8s.initialize()
+
+    # create deployment DB
+    db_IP_address, k8s_db = deploy_db(session, postgis.data)
+
+    # group all the other containers in the same pod
+    containers = [
+        copy.deepcopy(ZRC),
+        copy.deepcopy(NRC),
+        copy.deepcopy(ZTC),
+        copy.deepcopy(BRC),
+        copy.deepcopy(DRC),
+        copy.deepcopy(AC),
+        copy.deepcopy(NRC_CELERY),
+        copy.deepcopy(rabbitMQ),
+    ]
+    uwsgi_containers = containers[:-2]
+    exposed_urls = []
+    for c in containers:
+        vng_endpoint = VNGEndpoint.objects.filter(session_type=session.session_type).filter(name__icontains=c.name)
+        if len(vng_endpoint) != 0:
+            bind_url = ExposedUrl.objects.create(
+                session=session,
+                vng_endpoint=vng_endpoint[0],
+                subdomain='{}'.format(int(time.time()) * 100 + random.randint(0, 99)),
+                port=c.public_port
+            )
+            exposed_urls.append(bind_url)
+            c.name = '{}-{}'.format(session.name, c.name)
+            c.variables['DB_HOST'] = db_IP_address
+
+    Deployment(
+        name=session.name,
+        labels=session.name,
+        containers=containers
+    ).execute()
+
+    update_session_status(session, 'Deployment of pod', 5)
+
+    # Crete the service forwarding the right ports
+    LoadBalancer(
+        name='{}-loadbalancer'.format(session.name),
+        app=session.name,
+        containers=containers
+    ).execute()
+    ip = external_ip_pooling(k8s, session, max_percentage=40)
+    if ip is None:
+        update_session_status(session, 'Impossible to deploy successfully, IP address not allocated')
+        session.status = choices.StatusChoices.error_deploy
+        session.save()
+    for ex in exposed_urls:
+        ex.docker_url = ip
+        ex.save()
+
+    # check migrations status
+    while len(uwsgi_containers) != 0:
+        uwsgi_containers = [c for c in uwsgi_containers if 'spawned uWSGI' not in k8s.get_pod_log(c.name)]
+        update_session_status(session, 'Check migration status', int(40 + (6 - len(uwsgi_containers)) * 45 / 6))
+        time.sleep(5)
+
+    update_session_status(session, 'Loading preconfigured models', 85)
+    filename = str(uuid.uuid4())
+    file_location = os.path.join(os.path.dirname(__file__), 'kubernetes/data/dump.sql')
+    new_file = os.path.join(os.path.dirname(__file__), 'kubernetes/data/{}'.format(filename))
+    with open(file_location) as in_file:
+        content = in_file.read()
+        content = content.replace('BASE_IP', ip)
+    with open(new_file, 'w') as out_file:
+        out_file.write(content)
+
+    # running the eventual migrations
+    k8s_db.copy_to(new_file, 'dump.sql')
+    os.remove(new_file)
+    k8s_db.exec([
+        'psql',
+        '-f',
+        'dump.sql',
+        '-U',
+        'postgres'
+    ])
+    update_session_status(session, 'Installatie succesvol uitgevoerd', 100)
+    session.status = choices.StatusChoices.running
+    session.save()
+
+
+def external_ip_pooling(k8s, session, n_trial=15, purge=True, percentage=36, max_percentage=99):
+    for i in range(n_trial):
+        time.sleep(10)
+        res, message = k8s.get_pod_status_deployment()
+        if res:
+            break
+    if not res:
+        if purge and purge_sessions():
+            update_session_status(session, 'Impossible to deploy successfully, trying to remove old sessions')
+            external_ip_pooling(k8s, session, purge=False)
+        else:
+            update_session_status(session, 'Impossible to deploy successfully, all the resources are being used')
+            return None
+    for i in range(n_trial):
+        time.sleep(10)
+        update_session_status(session, 'Installatie voortgang {}'.format(i + 1), min(percentage + i * 6, max_percentage))
+        ip = k8s.service_status()
+        if ip is not None:
+            return ip
+    return None
+
+
 @app.task
-def bootstrap_session(session_pk):
+def bootstrap_session(session_pk, purged=False):
     '''
     Create all the necessary endpoint and exposes it so they can be used as proxy
     In case there is one or multiple docker images linked, it starts all of them
     '''
     session = Session.objects.get(pk=session_pk)
+    if session.session_type.name == 'ZGW':
+        ZGW_deploy(session)
+        return
+    update_session_status(session, 'Verbinding maken met Kubernetes', 1)
     endpoint = VNGEndpoint.objects.filter(session_type=session.session_type)
-    try:
-        error_deployment = False
 
-        for ep in endpoint:
-            bind_url = ExposedUrl.objects.create(
-                session=session,
-                vng_endpoint=ep,
-                subdomain='{}'.format(int(time.time()) * 100 + random.randint(0, 99))
+    k8s = K8S(app_name=session.name)
+    # Init of the procedure
+    containers = []
+    exposed_urls = []
+
+    db_IP_address = None
+    if session.session_type.database:
+        data = session.session_type.db_data or []
+
+        db_IP_address, _ = deploy_db(session, data)
+        if not db_IP_address:
+            update_session_status(session, 'An error within the image prevented from a correct deployment')
+            return
+
+    # collecting all the containers
+    subdomains = list(range(100, 200))
+    random.shuffle(subdomains)
+    for ep in endpoint:
+        bind_url = ExposedUrl.objects.create(
+            session=session,
+            vng_endpoint=ep,
+            subdomain='{}{}'.format(int(time.time()), subdomains.pop()),
+            port=ep.port
+        )
+        exposed_urls.append(bind_url)
+
+        if ep.docker_image:
+            k8s.initialize()
+            env_var = bind_url.vng_endpoint.environmentalvariables_set.all()
+            variables = {v.key: v.value for v in env_var}
+
+            if db_IP_address:
+                variables['DB_HOST'] = db_IP_address
+            container = Container(
+                name=session.name,
+                image=ep.docker_image,
+                public_port=ep.port,
+                private_port=ep.port,
+                variables=variables
+                # filename= TODO: add filename to each endpoint
             )
-            if ep.docker_image:
-                ip, message = start_app_b8s(session, bind_url)
-                if message is None:
-                    bind_url.docker_url = ip
-                else:
-                    error_deployment = True
-                    session.status = choices.StatusChoices.error_deploy
-                    session.error_message = message
-            if not error_deployment:
-                bind_url.save()
-            else:
-                bind_url.delete()
-        if not error_deployment:
-            session.status = choices.StatusChoices.running
-        session.save()
-    except Exception as e:
-        logger.exception(e)
-        session.status = choices.StatusChoices.error_deploy
-        update_session_status(session, 'Impossible to deploy successfully, all the resources are being used')
+            containers.append(container)
+    if len(containers) != 0:
+        update_session_status(session, 'Docker image installatie op Kubernetes', 10)
+        deployment = Deployment(
+            name=session.name,
+            labels=session.name,
+            containers=containers
+        ).execute()
+        lb = LoadBalancer(
+            name='{}-loadbalancer'.format(session.name),
+            app=session.name,
+            containers=containers
+        ).execute()
+        ip = external_ip_pooling(k8s, session)
+        if not ip:
+            update_session_status(session, 'An error within the image prevented from a correct deployment')
+            return
+        for ex in exposed_urls:
+            ex.docker_url = ip
+            ex.save()
+
+        update_session_status(session, 'Installatie succesvol uitgevoerd', 100)
+
+    session.status = choices.StatusChoices.running
+    session.save()
 
 
 @app.task

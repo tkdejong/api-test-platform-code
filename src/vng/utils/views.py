@@ -113,10 +113,16 @@ class CSRFExemptMixin(object):
 
 
 class OwnerSingleObject(ObjectOwner, DetailView):
+
     pk_name = 'pk'
+    slug_pk_name = 'pk'
 
     def get_queryset(self, object):
-        return object.__class__.objects.filter(pk=object.pk)
+        return object.__class__.objects.filter(
+            **{
+                self.slug_pk_name: getattr(object, self.slug_pk_name)
+            }
+        )
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -131,7 +137,9 @@ class OwnerSingleObject(ObjectOwner, DetailView):
         pk = self.kwargs.get(self.pk_name)
         if not pk:
             raise Exception('Primary key param name not defined in the URLs')
-        obj = get_object_or_404(self.model, pk=pk)
+        obj = get_object_or_404(self.model, **{
+            self.slug_pk_name: pk
+        })
 
         return obj
 

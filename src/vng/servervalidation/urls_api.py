@@ -1,7 +1,6 @@
 
-from django.conf.urls import url, include
+from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
-from django.conf.urls import url
 
 from . import api_views, apps
 from ..utils.schema import schema_view
@@ -15,8 +14,8 @@ router.register('provider-run-shield', api_views.ResultServerViewShield, base_na
 
 
 urlpatterns = [
-    url('schema', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    url('provider-run/(?P<pk>[0-9]+)/trigger', api_views.TriggerServerRunView.as_view({'put': 'update'}), name='provider'),
-    url('provider-run/(?P<pk>[0-9]+)/result', api_views.ResultServerView.as_view(), name='provider_result'),
-    url('', include((router.urls, 'server-api'), namespace='provider')),
+    path('schema', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('provider-run/<int:pk>/trigger', api_views.TriggerServerRunView.as_view({'put': 'update'}), name='provider'),
+    path('provider-run/<int:pk>/result', api_views.ResultServerView.as_view(), name='provider_result'),
+    path('', include((router.urls, 'server-api'), namespace='provider')),
 ]

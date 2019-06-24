@@ -75,6 +75,9 @@ class ServerRun(models.Model):
     percentage_exec = models.IntegerField(default=None, null=True, blank=True)
     status_exec = models.TextField(default=None, null=True, blank=True)
     scheduled = models.BooleanField(default=False)
+    supplier_name = models.CharField(max_length=100, blank=True, null=True)
+    software_product = models.CharField(max_length=100, blank=True, null=True)
+    product_role = models.CharField(max_length=100, blank=True, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
@@ -240,5 +243,5 @@ class Endpoint(models.Model):
 
     test_scenario_url = models.ForeignKey(TestScenarioUrl, on_delete=models.CASCADE)
     url = models.TextField()
-    jwt = models.TextField(null=True, default=None)
+    jwt = models.TextField(null=True, default=None, blank=True)
     server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE)

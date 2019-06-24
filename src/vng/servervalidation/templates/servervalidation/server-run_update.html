@@ -1,0 +1,42 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block title %}Server-run detail{% endblock%}
+
+{% block breadcrumb %}
+{% breadcrumb "Home" 'server_run:server-run_list' %}
+{% breadcrumb 'Detail' 'testsession:sessions' %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="offset-sm-3 col-sm-6">
+            <div class="card">
+                {% load_widgets form='forms.html' %}
+                <form class="" method="post">{% csrf_token %}
+                    <div class="card-header">
+                        Update information
+                    </div>
+                    <div class="card-body">
+                        {% for field in form %}
+                            {% form_field field %}
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" >
+                                    <i class="fa fa-dot-circle-o"></i>Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+</div>
+{% endblock %}
+

@@ -25,7 +25,6 @@ class NewmanManager:
                        '--reporter-htmlextra-title '
                        '--reporter-htmlextra-logs '
                        '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html {}')
-
     RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {}'
     GLOBAL_VAR_SYNTAX = ' --global-var {}={} '
     TOKEN = 'TOKEN'
@@ -39,11 +38,10 @@ class NewmanManager:
             os.makedirs(self.REPORT_FOLDER)
 
     def __del__(self):
-        pass
-        # for file in self.file_to_be_discarted:
-        #     full_path = os.path.realpath(file.name)
-        #     logger.debug('Deleteing file {}'.format(full_path))
-        #     os.remove(full_path)
+        for file in self.file_to_be_discarted:
+            full_path = os.path.realpath(file.name)
+            logger.debug('Deleteing file {}'.format(full_path))
+            os.remove(full_path)
 
     def run_command(self, command, *args):
         command = command.format(*args, self.global_vars)
@@ -62,7 +60,7 @@ class NewmanManager:
             logger.exception(error)
             raise DidNotRunException()
         f = open('{}/{}.html'.format(self.REPORT_FOLDER, filename))
-        # self.file_to_be_discarted.append(f)
+        self.file_to_be_discarted.append(f)
         return f
 
     def execute_test_json(self):
@@ -73,5 +71,5 @@ class NewmanManager:
             logger.exception(error)
             raise DidNotRunException(error)
         f = open('{}/{}.json'.format(self.REPORT_FOLDER, filename))
-        # self.file_to_be_discarted.append(f)
+        self.file_to_be_discarted.append(f)
         return f
