@@ -19,7 +19,7 @@ chardet==3.0.4
 coreapi==2.3.3
 coreschema==0.0.4         # via coreapi, drf-yasg
 cssselect2==0.2.1         # via cairosvg, weasyprint
-dotenv==0.0.5
+python-dotenv==0.10.3
 defusedxml==0.5.0         # via cairosvg
 diff-match-patch==20121119
 django-admin-relation-links==0.0.5
@@ -47,6 +47,7 @@ djangorestframework-filters==0.10.2.post0
 djangorestframework==3.9.0
 drf-yasg==1.13.0
 easy-thumbnails==2.5
+elastic-apm==4.2.2
 et-xmlfile==1.0.1         # via openpyxl
 google-api-python-client==1.7.4
 google-auth-httplib2==0.0.3  # via google-api-python-client

@@ -78,6 +78,8 @@ CSRF_COOKIE_SECURE = getenv('CSRF_COOKIE_SECURE', False)
 AXES_BEHIND_REVERSE_PROXY = False
 ENVIRONMENT = 'docker'
 
+ELASTIC_APM['SERVICE_NAME'] += ' ' + ENVIRONMENT
+
 # Override settings with local settings.
 try:
     from .local import *
