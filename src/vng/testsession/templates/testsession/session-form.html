@@ -23,7 +23,7 @@
                                 <div id='id_test_scenario' style="padding:20px">
                                     {% for radio in field %}
                                         <div class='row'>
-                                            {{radio.tag}}
+                                            {{radio.tag}}&nbsp;
                                             <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
                                         </div>
                                     {% endfor %}
