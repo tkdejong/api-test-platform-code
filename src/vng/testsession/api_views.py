@@ -7,10 +7,8 @@ from urllib import parse
 from zds_client import ClientAuth
 from subdomains.utils import reverse as reverse_sub
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from django.views import View
 from django.utils import timezone
-from django.conf import settings
 from django.db.models import Count
 from django.core.exceptions import PermissionDenied
 from django.http import (
@@ -21,7 +19,7 @@ from rest_framework import generics, permissions, viewsets, views, mixins
 from rest_framework.authentication import (
     SessionAuthentication, TokenAuthentication
 )
-from vng.testsession.models import (
+from .models import (
     ScenarioCase, Session, SessionLog, SessionType, ExposedUrl, Report,
     QueryParamsScenario, InjectHeader
 )
@@ -483,7 +481,7 @@ class RunTest(CSRFExemptMixin, View):
             return self.build_method(request_method_name, request, body)
         except Http404:
             return JsonResponse({
-                'info': 'The resource requested has been already turned off.'
+                'info': 'The requested resource has been already turned off.'
             })
 
     def get(self, request, *args, **kwargs):

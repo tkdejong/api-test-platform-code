@@ -238,18 +238,18 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <br />
-                                <p>
-                                    <input type="button" class="btn btn-primary" value="Rapport"
-                                        onclick="location.href = '{% url 'testsession:session_report' session.id %}';">
-                                </p>
-                                <p>
-                                    <input type="button" class="btn btn-primary" value="Rapport (PDF)"
-                                        onclick="location.href = '{% url 'testsession:session_report-pdf' session.id %}';">
-                                </p>
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <br />
+                            <p>
+                                <input type="button" class="btn btn-primary" value="Rapport"
+                                    onclick="location.href = '{% url 'testsession:session_report' session.uuid %}';">
+                            </p>
+                            <p>
+                                <input type="button" class="btn btn-primary" value="Rapport (PDF)"
+                                    onclick="location.href = '{% url 'testsession:session_report-pdf' session.uuid %}';">
+                            </p>
                         </div>
                     </div>
                 </div>``
@@ -307,7 +307,7 @@
                                     <td>
                                         Cases failed
                                     </td>
-                                    <td class="table-success">
+                                    <td class="table-danger">
                                         {{ failed }}
                                     </td>
                                 </tr>
@@ -315,7 +315,7 @@
                                     <td>
                                         Cases successful
                                     </td>
-                                    <td class="table-danger">
+                                    <td class="table-success">
                                         {{ success }}
                                     </td>
                                 </tr>
@@ -332,7 +332,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 

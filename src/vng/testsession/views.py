@@ -19,11 +19,11 @@ from .models import (
     TestSession, Report, SessionType
 )
 
-from .task import run_tests, bootstrap_session, stop_session
+from .task import bootstrap_session, stop_session
 from .forms import SessionForm
 from ..utils import choices
 from ..utils.views import (
-    ListAppendView, OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
+    OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
 )
 
 
@@ -37,8 +37,8 @@ class SessionListView(LoginRequiredMixin, ListView):
     paginate_by = 10
     model = Session
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         _choices = dict(choices.StatusChoices.choices)
         _choices['error_deploy'] = choices.StatusChoices.error_deploy
         context.update({
@@ -79,7 +79,8 @@ class SessionLogDetailView(OwnerSingleObject):
     template_name = 'testsession/session-log-detail.html'
     context_object_name = 'log_list'
     model = SessionLog
-    pk_name = 'pk'
+    pk_name = 'log_uuid'
+    slug_pk_name = 'uuid'
     user_field = 'session__user'
 
 
@@ -91,11 +92,11 @@ class SessionLogView(OwnerMultipleObjects):
     field_name = 'session__user'
 
     def get_queryset(self):
-        return SessionLog.objects.filter(session__pk=self.kwargs['session_id']).order_by('date')
+        return SessionLog.objects.filter(session__uuid=self.kwargs['uuid']).order_by('date')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        session = get_object_or_404(Session, pk=self.kwargs['session_id'])
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         stats = session.get_report_stats()
 
         context.update({
@@ -138,7 +139,7 @@ class SessionLogUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy(
             'testsession:session_log',
-            kwargs={'session_id': self.object.pk}
+            kwargs={'uuid': self.object.uuid}
         )
 
     def get_object(self, queryset=None):
@@ -170,7 +171,7 @@ class SessionReport(OwnerSingleObject):
     template_name = 'testsession/session-report.html'
 
     def get_object(self):
-        self.session = get_object_or_404(Session, pk=self.kwargs['session_id'])
+        self.session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         return self.session
 
     def get_context_data(self, **kwargs):
@@ -205,7 +206,7 @@ class SessionTestReport(OwnerSingleObject):
 
     model = TestSession
     template_name = 'testsession/session-test-report.html'
-    pk_name = 'pk'
+    pk_name = 'uuid'
     user_field = 'exposedurl__session__user'
 
     def get_context_data(self, **kwargs):

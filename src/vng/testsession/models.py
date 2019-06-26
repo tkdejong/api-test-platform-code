@@ -148,7 +148,6 @@ class QueryParamsScenario(models.Model):
     expected_value = models.CharField(max_length=50, default='*')
 
     def __str__(self):
-        self
         if self.expected_value:
             return '{} - {}: {}'.format(self.scenario_case, self.name, self.expected_value)
         else:
@@ -157,6 +156,7 @@ class QueryParamsScenario(models.Model):
 
 class Session(models.Model):
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField('Naam', max_length=30, unique=True, null=True)
     session_type = models.ForeignKey(SessionType, verbose_name='Sessie type', on_delete=models.PROTECT)
     started = models.DateTimeField('Gestart op', default=timezone.now)
@@ -188,7 +188,7 @@ class Session(models.Model):
 
     def get_absolute_request_url(self, request):
         test_session_url = 'https://{}{}'.format(request.get_host(),
-                                                 reverse('testsession:session_log', args=[self.id]))
+                                                 reverse('testsession:session_log', args=[self.uuid]))
         return test_session_url
 
     def is_stopped(self):
@@ -234,6 +234,7 @@ class ExposedUrl(models.Model):
 
 class SessionLog(models.Model):
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     date = models.DateTimeField(default=timezone.now)
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     request = models.TextField(blank=True, null=True, default=None)

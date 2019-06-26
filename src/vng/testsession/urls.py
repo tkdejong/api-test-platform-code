@@ -1,24 +1,21 @@
-from django.conf.urls import include, url
-from django.contrib.auth.decorators import login_required
-
-from rest_framework import routers, serializers, viewsets
+from django.urls import path
 
 from . import views
-from . import api_views, apps
+from . import apps
 
 app_name = apps.AppConfig.__name__
 
 urlpatterns = [
-    url('^$', views.SessionListView.as_view(), name='sessions'),
-    url('^create', views.SessionFormView.as_view(), name='session_create'),
-    url(r'^postman/(?P<pk>[0-9]+)', views.PostmanDownloadView.as_view(), name='postman_download'),
-    url(r'^(?P<session_id>[0-9]+)/stop', views.StopSession.as_view(), name='stop_session'),
-    url(r'^(?P<session_id>[0-9]+)/update', views.SessionLogUpdateView.as_view(), name='session_update'),
-    url(r'^(?P<session_id>[0-9]+)/report-pdf', views.SessionReportPdf.as_view(), name='session_report-pdf'),
-    url(r'^(?P<session_id>[0-9]+)/report', views.SessionReport.as_view(), name='session_report'),
-    url(r'^(?P<session_id>[0-9]+)/test-report-pdf/(?P<pk>[0-9]+)$', views.SessionTestReportPDF.as_view(), name='session-test_report-pdf'),
-    url(r'^(?P<session_id>[0-9]+)/test-report/(?P<pk>[0-9]+)', views.SessionTestReport.as_view(), name='session-test_report'),
-    url(r'^(?P<session_id>[0-9]+)/log/(?P<pk>\d+)', views.SessionLogDetailView.as_view(), name='session_log-detail'),
-    url(r'^(?P<session_id>[0-9]+)/', views.SessionLogView.as_view(), name='session_log'),
-    url(r'^sessiontype/(?P<pk>[0-9]+)/', views.SessionTypeDetail.as_view(), name='session_type-detail'),
+    path('', views.SessionListView.as_view(), name='sessions'),
+    path('create', views.SessionFormView.as_view(), name='session_create'),
+    path('postman/<int:pk>', views.PostmanDownloadView.as_view(), name='postman_download'),
+    path('<int:session_id>/stop', views.StopSession.as_view(), name='stop_session'),
+    path('<uuid:uuid>/report-pdf', views.SessionReportPdf.as_view(), name='session_report-pdf'),
+    path('<uuid:uuid>/report', views.SessionReport.as_view(), name='session_report'),
+    path('<uuid:uuid>/test-report-pdf/<int:pk>', views.SessionTestReportPDF.as_view(), name='session-test_report-pdf'),
+    path('<uuid:uuid>/test-report/<int:pk>', views.SessionTestReport.as_view(), name='session-test_report'),
+    path('<uuid:uuid>/log/<uuid:log_uuid>', views.SessionLogDetailView.as_view(), name='session_log-detail'),
+    path('<uuid:uuid>/', views.SessionLogView.as_view(), name='session_log'),
+    path('<int:session_id>/update', views.SessionLogUpdateView.as_view(), name='session_update'),
+    path('sessiontype/<int:pk>', views.SessionTypeDetail.as_view(), name='session_type-detail'),
 ]

@@ -108,6 +108,9 @@ INSTALLED_APPS += [
 CELERY_BROKER_URL = "redis://localhost"
 
 CELERY_TASK_ALWAYS_EAGER = True
+
+ELASTIC_APM['DEBUG'] = True
+
 # Override settings with local settings.
 try:
     from .local import *  # noqa
