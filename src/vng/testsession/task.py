@@ -300,7 +300,7 @@ def run_tests(session_pk):
             })
         else:
             newman.replace_parameters({
-                ep.name: eu.docker_url
+                ep.name: '{}:{}{}'.format(eu.docker_url, ep.port, ep.path)
             })
         result = newman.execute_test()
         ts = TestSession()
