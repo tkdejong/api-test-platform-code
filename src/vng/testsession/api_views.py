@@ -465,7 +465,7 @@ class RunTest(CSRFExemptMixin, View):
 
         self.save_call(request, request_method_name, request.subdomain,
                        self.kwargs['relative_url'], session, response.status_code, session_log)
-        if response.encoding:
+        if response.apparent_encoding == 'ascii':
             reply = HttpResponse(self.parse_response(response, request, eu.vng_endpoint.url, endpoints), status=response.status_code)
         else:
             reply = HttpResponse(response, status=response.status_code)
