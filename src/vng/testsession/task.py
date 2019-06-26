@@ -208,7 +208,7 @@ def bootstrap_session(session_pk, purged=False):
     In case there is one or multiple docker images linked, it starts all of them
     '''
     session = Session.objects.get(pk=session_pk)
-    if session.session_type.name == 'ZGW':
+    if session.session_type.ZGW_images:
         ZGW_deploy(session)
         return
     update_session_status(session, 'Verbinding maken met Kubernetes', 1)
