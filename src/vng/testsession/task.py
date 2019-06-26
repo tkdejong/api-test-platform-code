@@ -253,7 +253,6 @@ def bootstrap_session(session_pk, purged=False):
                 public_port=ep.port,
                 private_port=ep.port,
                 variables=variables
-                # filename= TODO: add filename to each endpoint
             )
             containers.append(container)
     if len(containers) != 0:
