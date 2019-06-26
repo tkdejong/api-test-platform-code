@@ -465,10 +465,7 @@ class RunTest(CSRFExemptMixin, View):
 
         self.save_call(request, request_method_name, request.subdomain,
                        self.kwargs['relative_url'], session, response.status_code, session_log)
-        if response.encoding:
-            reply = HttpResponse(self.parse_response(response, request, eu.vng_endpoint.url, endpoints), status=response.status_code)
-        else:
-            reply = HttpResponse(response, status=response.status_code)
+        reply = HttpResponse(self.parse_response(response, request, eu.vng_endpoint.url, endpoints), status=response.status_code)
         white_headers = ['Content-type', 'location']
         for h in white_headers:
             if h in response.headers:
