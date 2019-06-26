@@ -26,7 +26,7 @@ def stop_session(session_pk):
     session = Session.objects.get(pk=session_pk)
     if session.status == choices.StatusChoices.stopped:
         return
-    run_tests.delay(session.pk)
+    run_tests(session.pk)
     eu = ExposedUrl.objects.filter(session=session)
     for e_url in eu:
         if e_url.vng_endpoint.url is None:
