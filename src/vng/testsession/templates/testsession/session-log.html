@@ -216,27 +216,26 @@
         </div>
 
         <div class="col-sm-5">
-                <div class="card">
-                    <div class="card-header">
-                        Endpoints & Rapports
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <ul class="list-group">
-                                    {% for endpoint in session.exposedurl_set.all %}
-                                    {% if endpoint.subdomain %}
-                                    <li class="list-group-item">
-                                        {{endpoint.vng_endpoint.name }} -
-                                        <a
-                                            href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
-                                            {{endpoint.vng_endpoint.name}}
-                                        </a>
-                                    </li>
-                                    {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            </div>
+            <div class="card">
+                <div class="card-header">
+                    Endpoints & Rapports
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <ul class="list-group">
+                                {% for endpoint in session.exposedurl_set.all %}
+                                {% if endpoint.subdomain %}
+                                <li class="list-group-item">
+                                    {{endpoint.vng_endpoint.name }} -
+                                    <a
+                                        href="{% url_sub 'run_test' endpoint.subdomain endpoint.vng_endpoint.path|slice:"1:" %}">
+                                        {{endpoint.vng_endpoint.name}}
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                     <div class="row">
@@ -252,7 +251,8 @@
                             </p>
                         </div>
                     </div>
-                </div>``
+                </div>
+            </div>
             <div class="card">
                 <div class="card-header">
                     Information -> Supplier information
