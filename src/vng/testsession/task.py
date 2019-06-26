@@ -143,6 +143,7 @@ def ZGW_deploy(session):
         update_session_status(session, 'Impossible to deploy successfully, IP address not allocated')
         session.status = choices.StatusChoices.error_deploy
         session.save()
+        return
     for ex in exposed_urls:
         ex.docker_url = ip
         ex.save()
