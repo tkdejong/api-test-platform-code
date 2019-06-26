@@ -149,6 +149,38 @@
                         {{object.test_scenario.description|safe}}
                     </div>
                 </div>
+                <div class="card">
+                <div class="card-header">
+                    Information -> Supplier information
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td scope="row"><strong>Supplier name</td>
+                                <td>{{ object.supplier_name|default_if_none:''|urlize }}</td>
+                            </tr>
+                            <tr>
+                                <td scope="row"><strong>Software product</td>
+                                <td>{{ object.software_product|default_if_none:''|urlize }}</td>
+                            </tr>
+                            <tr>
+                                <td scope="row"><strong>Product role</td>
+                                <td>{{ object.product_role|default_if_none:''|urlize }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% if request.user.is_authenticated and update_info %}
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <a class="btn btn-primary" href="{% url 'server_run:server-run_info-update' object.uuid %}">Update</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
             </div>
 
         {% endwith %}

@@ -79,24 +79,6 @@
         </td>
     </td>
 </tr>
-<tr>
-    <td>Supplier name</td>
-    <td>{{ server_run.supplier_name|default_if_none:''|urlize }}</td>
-</tr>
-<tr>
-    <td>Software product</td>
-    <td>{{ server_run.software_product|default_if_none:''|urlize }}</td>
-</tr>
-<tr>
-    <td>Product role</td>
-    <td>{{ server_run.product_role|default_if_none:''|urlize }}</td>
-</tr>
-{% if request.user.is_authenticated and update_info %}
-    <tr>
-        <td>Update information</td>
-        <td><a class="btn btn-primary" href="{% url 'server_run:server-run_info-update' server_run.uuid %}">Update</a></td>
-    </tr>
-{% endif %}
 
 
 {% endspaceless %}
