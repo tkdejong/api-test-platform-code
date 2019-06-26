@@ -84,12 +84,11 @@ class SessionLogDetailView(OwnerSingleObject):
     user_field = 'session__user'
 
 
-class SessionLogView(OwnerMultipleObjects):
+class SessionLogView(ListView):
 
     template_name = 'testsession/session-log.html'
     context_object_name = 'log_list'
     paginate_by = 200
-    field_name = 'session__user'
 
     def get_queryset(self):
         return SessionLog.objects.filter(session__uuid=self.kwargs['uuid']).order_by('date')
