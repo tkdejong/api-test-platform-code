@@ -1,8 +1,9 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load i18n %}
 
 
-{% block title %}Session Type{% endblock %}
+{% block title %}{% trans "Session Type" %}{% endblock %}
 
 
 {% block content %}
@@ -12,7 +13,7 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                 <div class="card-header">
-                        Sessie type {{ object.name }}
+                        {% trans "Sessie type " %}{{ object.name }}
                     </div>
                     <div class="card-body">
                         <p class="card-text">

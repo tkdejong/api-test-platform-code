@@ -1,12 +1,14 @@
+{% load i18n %}
+
 {% spaceless %}
 <tr>
-    <th scope='col'>Sessie ID</th>
-    <th scope='col'>Sessie status</th>
-    <th scope='col'>Gestart op</th>
-    <th scope='col'>Sessie type</th>
-    <th scope='col'>Beschikbare API URLs</th>
-    <th scope='col'>Calls status</th>
-    <th scope='col'>Postman result</th>
-    <th scope='col'>Acties</th>
+    <th scope='col'>{% trans "Session ID" %}</th>
+    <th scope='col'>{% trans "Session status" %}</th>
+    <th scope='col'>{% trans "Started at" %}</th>
+    <th scope='col'>{% trans "Session type" %}</th>
+    <th scope='col'>{% trans "Available API URLs" %}</th>
+    <th scope='col'>{% trans "Calls status" %}</th>
+    <th scope='col'>{% trans "Postman result" %}</th>
+    <th scope='col'>{% trans "Actions" %}</th>
 </tr>
 {% endspaceless %}
