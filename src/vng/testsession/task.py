@@ -138,7 +138,7 @@ def ZGW_deploy(session):
         app=session.name,
         containers=containers
     ).execute()
-    ip = external_ip_pooling(k8s, session, max_percentage=80)
+    ip = external_ip_pooling(k8s, session, n_trial=30, max_percentage=40)
     if ip is None:
         update_session_status(session, 'Impossible to deploy successfully, IP address not allocated')
         session.status = choices.StatusChoices.error_deploy
