@@ -39,11 +39,11 @@
             {% endif %}
         {% endwith %}
     </td>
-    {% if server_run.is_running %}
-        <td id='starting' server_run_id='{{server_run.id}}'>
-    {% else %}
-        <td>
-    {% endif %}
+        {% if server_run.is_running %}
+            <td class='starting' server_run_id='{{server_run.id}}'>
+        {% else %}
+            <td>
+        {% endif %}
         {% if not server_run.is_stopped and not server_run.is_running %}
         <form method="POST" action="{% url 'server_run:server-run_stop' server_run.id %}">
             {% csrf_token %}
@@ -55,12 +55,12 @@
             <div class="progress-group">
                 <div class="progress-group-header">
                     <i class="cui-cloud progress-group-icon"></i>
-                    <div id="statuslabel"></div>
-                    <div class="ml-auto font-weight-bold" id="progressbar-indicator">43%</div>
+                    <div class="statuslabel"></div>
+                    <div class="ml-auto font-weight-bold progressbar-indicator"></div>
                 </div>
                 <div class="progress-group-bars">
                     <div class="progress progress-xs">
-                    <div class="progress-bar bg-success" id="progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
