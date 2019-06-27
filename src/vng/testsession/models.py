@@ -40,6 +40,7 @@ class SessionType(models.Model):
     class Meta:
         verbose_name = 'Sessie type'
         verbose_name_plural = 'Sessie type'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
