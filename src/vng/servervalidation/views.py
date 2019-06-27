@@ -189,8 +189,8 @@ class ServerRunOutputUpdate(UpdateView):
             kwargs={'uuid': self.object.uuid}
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
@@ -217,8 +217,8 @@ class ServerRunOutputUuid(DetailView):
             kwargs={'uuid': self.object.uuid}
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
@@ -282,8 +282,8 @@ class ServerRunPdfView(PDFGenerator, ServerRunOutputUuid):
 
     template_name = 'servervalidation/server-run-PDF.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
         for ptm in context['postman_result']:
             ptm.json = ptm.get_json_obj()
