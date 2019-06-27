@@ -21,9 +21,6 @@ function update() {
                     pro[i].css('width', `${session[window.percentage]}%`);
                     proInd[i].text(session[window.percentage] + '%');
                     statusLabel[i].text(session[window.status]);
-                    // if (session[window.percentage] < 100) setTimeout(() => {
-                    //     toUpdate=true
-                    // }, 2000);
                     if (session[window.percentage] == 100) {
                         setTimeout(() => {
                             location.reload();
