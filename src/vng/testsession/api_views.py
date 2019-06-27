@@ -419,7 +419,7 @@ class RunTest(CSRFExemptMixin, View):
         return parsed
 
     def build_url(self, eu, arguments):
-        ru = self.kwargs['relative_url']
+        self.kwargs['relative_url']
         if eu.vng_endpoint.url is not None:
             request_url = '{}/{}?{}'.format(eu.vng_endpoint.url, self.kwargs['relative_url'], arguments)
         else:
