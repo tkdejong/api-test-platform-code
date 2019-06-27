@@ -10,7 +10,6 @@ var obj = wrap($(".starting"));
 var pro = wrap($(".progressbar"));
 var proInd = wrap($(".progressbar-indicator"));
 var statusLabel = wrap($(".statuslabel"));
-var toUpdate = false
 
 function update() {
     for (let i = 0; i < obj.length; i++) {
