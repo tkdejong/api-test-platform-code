@@ -5,13 +5,13 @@
         </td>
         <td>
             {% if server_run.status == choices.running %}
-                <span class="badge badge-pill badge-success">Running</span>
+                <span class="badge badge-pill badge-success">{% trans "Running" %}</span>
             {% elif server_run.status == choices.starting %}
-                <span class="badge badge-pill badge-light">Starting</span>
+                <span class="badge badge-pill badge-light">{% trans "Starting" %}</span>
             {% elif server_run.status == choices.stopped %}
-                <span class="badge badge-pill badge-secondary">Stopped</span>
+                <span class="badge badge-pill badge-secondary">{% trans "Stopped" %}</span>
             {% elif server_run.status == choices.error_deploy %}
-                <span class="badge badge-pill badge-danger">Error during deployment</span>
+                <span class="badge badge-pill badge-danger">{% trans "Error during deployment" %}</span>
             {% else %}
                 <span class="badge badge-pill badge-dark">{{ server_run.status }}</span>
             {% endif %}

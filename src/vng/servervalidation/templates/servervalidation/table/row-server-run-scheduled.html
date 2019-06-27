@@ -6,19 +6,19 @@
 
     <td>
         {% if server_run.status == choices.running %}
-            <span class="badge badge-pill badge-success">Running</span>
+            <span class="badge badge-pill badge-success">{% trans "Running" %}</span>
         {% elif server_run.status == choices.starting %}
-            <span class="badge badge-pill badge-light">Starting</span>
+            <span class="badge badge-pill badge-light">{% trans "Starting" %}</span>
         {% elif server_run.status == choices.stopped %}
-            <span class="badge badge-pill badge-secondary">Stopped</span>
+            <span class="badge badge-pill badge-secondary">{% trans "Stopped" %}</span>
         {% elif server_run.status == choices.error_deploy %}
-            <span class="badge badge-pill badge-danger">Error during deployment</span>
+            <span class="badge badge-pill badge-danger">{% trans "Error during deployment" %}</span>
         {% else %}
             <span class="badge badge-pill badge-dark">{{ server_run.status }}</span>
         {% endif %}
     </td>
     {% if not server_run.stopped %}
-        <td>00:01 Elke dag</td>
+        <td>00:01{% trans "Every day" %}</td>
     {% else %}
         <td></td>
     {% endif %}
@@ -45,7 +45,7 @@
                 <input type="submit" class="btn btn-danger"  value="Stop">
              </form>
 
-             <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">Uitvoeren</a>
+             <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">{% trans "Fire now" %}</a>
         {% endif %}
     </td>
     <td>

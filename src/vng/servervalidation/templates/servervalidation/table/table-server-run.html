@@ -1,11 +1,11 @@
 {% spaceless %}
 <tr>
-    <td>Sessie</td>
+    <td>{% trans "Session" %}</td>
     <td>{{ server_run.pk }}</td>
 </tr>
 
 <tr>
-    <td>Test Scenario</td>
+    <td>{% trans "Test Scenario" %}</td>
     <td>
         <ul>
             {% for pc in server_run.test_scenario.postmantest_set.all %}
@@ -24,7 +24,7 @@
 {% endfor %}
 
 <tr>
-    <td>Started</td>
+    <td>{% trans "Started" %}</td>
     <td>{{ server_run.started }}</td>
 </tr>
 {% if server_run.stopped %}
@@ -36,16 +36,16 @@
 
 {% if server_run.scheduled and not server_run.is_stopped and request.user.is_authenticated and server_run.user == request.user %}
 <tr>
-    <td>Status</td>
+    <td>{% trans "Status" %}</td>
     <td>{{ server_run.status }}
-    Wordt automatisch uitgevoerd om: <span class="badge badge-secondary">00:01</span>
+    {% trans "Run automatically at" %} <span class="badge badge-secondary">00:01</span>
     {% if server_run.last_exec %}
-        Laatste uitvoering om: <span class="badge badge-secondary">{{server_run.last_exec}}</span>
+        {% trans "Last run" %}<span class="badge badge-secondary">{{server_run.last_exec}}</span>
     {% endif %}
     </td>
 </tr>
 <tr>
-    <td>Actie</td>
+    <td>{% trans "Action" %}</td>
     <td>
         <div class='row'>
         <div class='col-3'>
@@ -55,25 +55,25 @@
             </form>
         </div>
         <div class='col-6'>
-          <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">Nu Uitvoeren</a>
+          <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">{% trans "Fire now" %}</a>
         </div>
         </div>
     </td>
 </tr>
 {% else %}
 <tr>
-    <td>Status</td>
+    <td>{% trans "Status" %}</td>
     <td>{{ server_run.status }}</td>
 </tr>
 {% endif %}
 <tr>
-    <td>Log</td>
+    <td>{% trans "Log" %}</td>
         <td>
             {% for pr in postman_result %}
                 <ul>
-                    <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid %}">Visualize HTML log</a></li>
-                    <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid %}">Visualize JSON log</a></li>
-                    <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid  %}">Visualize PDF report</a></li>
+                    <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid %}">{% trans "Visualize HTML log" %}</a></li>
+                    <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid %}">{% trans "Visualize JSON log" %}</a></li>
+                    <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid  %}">{% trans "Visualize PDF report" %}</a></li>
                 </ul>
             {% endfor %}
         </td>

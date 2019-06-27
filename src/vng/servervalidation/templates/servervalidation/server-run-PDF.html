@@ -7,7 +7,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Server Report</title>
+    <title>{% trans "Server Report" %}</title>
     <style type="text/css">
         :root {
             --blue: #007bff;
@@ -11039,19 +11039,19 @@
                 <img src="{% static 'ico/favicon.ico' %}" alt="VNG Logo">
             </div>
             <div class="col-md-2">
-                <h3 class="mt-5">Server Report</h3>
+                <h3 class="mt-5">{% trans "Server Report" %}</h3>
             </div>
             <div class="col-md-12">
                 <div class='table-responsive'>
                     <table class="table table-striped">
                         <tbody>
                             <tr>
-                                <td>Sessie</td>
+                                <td>{% trans "Session" %}</td>
                                 <td>{{ object.uuid }}</td>
                             </tr>
 
                             <tr>
-                                <td>Test Scenario</td>
+                                <td>{% trans "Test Scenario" %}</td>
                                 <td>
                                     <ul>
                                         {% for pc in object.test_scenario.postmantest_set.all %}
@@ -11071,30 +11071,30 @@
                             {% endfor %}
 
                             <tr>
-                                <td>Started </td>
+                                <td>{% trans "Started" %} </td>
                                 <td>{{ object.started }}</td>
                             </tr>
                             {% if object.stopped %}
                             <tr>
-                                <td>Stopped</td>
+                                <td>{% trans "Stopped" %}</td>
                                 <td>{{ object.stopped }}</td>
                             </tr>
                             {% endif %}
 
                             {% if object.scheduled and not object.is_stopped and request.user.is_authenticated and object.user == request.user %}
                             <tr>
-                                <td>Status</td>
+                                <td>{% trans "Status" %}</td>
                                 <td>{{ object.status }}
-                                    <p>Wordt automatisch uitgevoerd om: <span class="badge badge-secondary">00:01</span>
+                                    <p>{% trans "Run automatically at" %}: <span class="badge badge-secondary">00:01</span>
                                     </p>
                                     {% if object.last_exec %}
-                                    <p>Laatste uitvoering om: <span
+                                    <p>{% trans "Latest run at" %}: <span
                                             class="badge badge-secondary">{{object.last_exec}}</span></p>
                                     {% endif %}
                                 </td>
                             </tr>
                             <tr>
-                                <td>Actie</td>
+                                <td>{% trans "Action" %}</td>
                                 <td>
                                     <div class='row'>
                                         <div class='col-3'>
@@ -11106,15 +11106,15 @@
                                         </div>
                                         <div class='col-6'>
                                             <a type="submit" class="btn btn-primary"
-                                                href="{% url 'server_run:server_run_trigger' object.pk %}">Nu
-                                                Uitvoeren</a>
+                                                href="{% url 'server_run:server_run_trigger' object.pk %}">
+                                                {% trans "Run now" %}</a>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td>Status</td>
+                                <td>{% trans "Status" %}</td>
                                 <td>{{ object.status }}</td>
                             </tr>
                             {% endif %}
@@ -11126,7 +11126,7 @@
                 {% for postman in postman_result %}
                 <div class="row">
                     <div class="col-sm-12">
-                        <h2>Results</h2>
+                        <h2>{% trans "Results" %}</h2>
                         <table class="table">
                             <tbody>
                                 {% for calls in postman.get_json_obj %}
@@ -11177,7 +11177,7 @@
                                     {% endif %}
                                     <td>
                                         {% if forloop.counter == 1 %}
-                                        <u>Tests</u>
+                                        <u>{% trans "Tests" %}</u>
                                         {% endif %}
                                     </td>
                                     {% if 'error' in assertion %}
@@ -11208,14 +11208,14 @@
                     {% if postman.get_json_obj_info.run.failures %}
                     <div class="row">
                         <div class="col-sm-12">
-                            <h2>Failures</h2>
+                            <h2>{% trans "Failures" %}</h2>
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Error</th>
-                                        <th>Test</th>
-                                        <th>Message</th>
+                                        <th>{% trans "Name" %}</th>
+                                        <th>{% trans "Error" %}</th>
+                                        <th>{% trans "Test" %}</th>
+                                        <th>{% trans "Message" %}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -11235,13 +11235,13 @@
                     {% if postman.get_json_obj.0.assertions %}
                     <div class="row">
                         <div class="col-sm-12">
-                            <h2>Assertions</h2>
+                            <h2>{% trans "Assertions" %}</h2>
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Name call</th>
-                                        <th>Name assertion</th>
-                                        <th>Assertion</th>
+                                        <th>{% trans "Name call" %}</th>
+                                        <th>{% trans "Name assertion" %}</th>
+                                        <th>{% trans "Assertion" %}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

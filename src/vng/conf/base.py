@@ -2,6 +2,7 @@ import os
 
 # Django-hijack (and Django-hijack-admin)
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -102,6 +103,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'django.middleware.locale.LocaleMiddleware',
     'subdomains.middleware.SubdomainURLRoutingMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -144,6 +146,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
                 'vng.utils.context_processors.settings',
                 # REQUIRED FOR ADMIN INDEX
                 'django_admin_index.context_processors.dashboard',
@@ -180,10 +183,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGES = (('nl', 'Nederlands'),)
+LANGUAGES = (('en', _('English')),)
 
 
-LANGUAGE_CODE = 'nl'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'Europe/Amsterdam'
 
