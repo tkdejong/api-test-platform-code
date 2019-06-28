@@ -530,7 +530,7 @@ class RunTest(CSRFExemptMixin, View):
 class ResultTestsessionViewShield(views.APIView):
 
     def get(self, request, uuid=None):
-        session = get_object_or_404(Session, pk=uuid)
+        session = get_object_or_404(Session, uuid=uuid)
         scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
         report = list(Report.objects.filter(session_log__session=session))
         report_ordered = []
