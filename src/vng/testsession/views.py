@@ -22,9 +22,7 @@ from .models import (
 from .task import bootstrap_session, stop_session
 from .forms import SessionForm
 from ..utils import choices
-from ..utils.views import (
-    OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
-)
+from ..utils.views import OwnerSingleObject, PDFGenerator
 
 
 logger = logging.getLogger(__name__)
