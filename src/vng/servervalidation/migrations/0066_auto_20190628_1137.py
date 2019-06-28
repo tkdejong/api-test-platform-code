@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='testscenariourl',
-            name='placeholders',
+            name='placeholder',
             field=models.CharField(blank=True, default='https://www.example.com', max_length=100),
         ),
     ]
