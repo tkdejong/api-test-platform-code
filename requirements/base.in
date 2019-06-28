@@ -43,11 +43,11 @@ django-bootstrap-breadcrumbs
 drf-yasg
 gemma-zds-client
 django-admin-relation-links
-django-filer
 django-registration-redux
 django-recaptcha
 django-tinymce
 python-dotenv
 elastic-apm
+-e git+https://github.com/maykinmedia/django-filer.git@api-testplatform#egg=django-filer
 -e git+https://github.com/maykinmedia/gemma-zds-client-3.4.git@e826a2fa111100d33d7c164a7bdf95d07c3b916c#egg=gemma-zds-client
 -e git+https://github.com/maykinmedia/django-subdomains.git@master
