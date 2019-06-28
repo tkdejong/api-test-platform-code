@@ -82,7 +82,7 @@ class ResultServerViewShield(views.APIView):
 
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
-        server = ServerRun.objects.get(uuid=uuid)
+        server = get_object_or_404(ServerRun, uuid=uuid)
         res = server.get_execution_result()
         is_error = True
         if res is None:
