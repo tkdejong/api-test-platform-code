@@ -59,7 +59,7 @@ class CreateEndpointForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Override the field type since in the model is charfield
         if not placeholders:
-            placeholders = ['http://www.example.com' for i in quantity + 1]
+            placeholders = ['http://www.example.com' for i in range(quantity + 1)]
         self.fields['url'] = forms.URLField(
             widget=forms.URLInput(
                 attrs={'placeholder': placeholders[0]})
