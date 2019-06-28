@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='testscenariourl',
             name='placeholders',
-            field=models.CharField(blank=True, default='htts://www.example.com', max_length=100),
+            field=models.CharField(blank=True, default='https://www.example.com', max_length=100),
         ),
     ]
