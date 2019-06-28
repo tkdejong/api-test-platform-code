@@ -116,7 +116,6 @@ class TestSessionAdmin(admin.ModelAdmin, AdminStaticFile):
 
 @admin.register(model.VNGEndpoint)
 class VNGEndpointAdmin(admin.ModelAdmin, AdminStaticFile):
-
     list_display = [
         'url',
         'name',
