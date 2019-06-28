@@ -2,7 +2,7 @@
 {% load sniplates %}
 
 
-{% block title %}Providers{% endblock %}
+{% block title %}Start Consumer test-sesion{% endblock %}
 
 
 {% block content %}
@@ -23,8 +23,8 @@
                                 <div id='id_test_scenario' style="padding:20px">
                                     {% for radio in field %}
                                         <div class='row'>
-                                            {{radio.tag}}&nbsp;
-                                            <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
+                                            {{radio.tag}}&nbsp;{{ radio.choice_label.name }} [
+                                            <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">info</a>]
                                         </div>
                                     {% endfor %}
                                 </div>
