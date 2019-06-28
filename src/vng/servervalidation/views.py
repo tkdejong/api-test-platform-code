@@ -310,7 +310,7 @@ class PostmanDownloadView(View):
             return response
 
 
-class SessionTypeDetail(DetailView):
+class TestScenarioDetail(DetailView):
 
     model = TestScenario
     template_name = 'servervalidation/test_scenario-detail.html'
