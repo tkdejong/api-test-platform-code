@@ -49,7 +49,7 @@ def align_sessions_data():
     for session in Session.objects.all():
         for item in data.get('items'):
             metadata = item.get('metadata')
-            if metadata and session.name in metadata.get('name'):
+            if metadata and metadata.get('name') and session.name in metadata.get('name'):
                 continue
         session.status = choices.StatusChoices.stopped
         session.save()
