@@ -538,31 +538,30 @@ class ResultTestsessionViewShield(views.APIView):
         not_full = False
 
         for case in scenario_case:
-            is_in = False
+            missing = False
             for rp in report:
                 if rp.result == choices.HTTPCallChoiches.failed:
                     is_error = True
-                if rp.scenario_case == case:
+                if rp.scenario_case == case and rp.result != choices.HTTPCallChoiches.not_called:
                     report_ordered.append(rp)
-                    is_in = True
+                    missing = True
                     break
-            if not is_in:
+            if not missing:
                 not_full = True
 
         if not scenario_case:
             message = 'No results'
             color = 'inactive'
-        if not_full:
+        elif is_error:
+            message = 'Failed'
+            color = 'red'
+        elif not_full:
             message = 'No errors, not completed'
             color = 'orange'
         else:
-            if not is_error:
-                message = 'Success'
-                color = 'green'
-                is_error = False
-            else:
-                message = 'Failed'
-                color = 'red'
+            message = 'Success'
+            color = 'green'
+            is_error = False
 
         result = {
             'schemaVersion': 1,
