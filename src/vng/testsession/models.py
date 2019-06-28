@@ -40,9 +40,20 @@ class SessionType(models.Model):
     class Meta:
         verbose_name = 'Sessie type'
         verbose_name_plural = 'Sessie type'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.ZGW_images:
+            VNGEndpoint(name='ZRC', session_type=self).save()
+            VNGEndpoint(name='NRC', session_type=self).save()
+            VNGEndpoint(name='ZTC', session_type=self).save()
+            VNGEndpoint(name='BRC', session_type=self).save()
+            VNGEndpoint(name='DRC', session_type=self).save()
+            VNGEndpoint(name='AC', session_type=self).save()
 
 
 class InjectHeader(models.Model):

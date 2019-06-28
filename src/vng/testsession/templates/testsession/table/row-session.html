@@ -44,16 +44,16 @@
         </td>
 
         {% if session.is_starting and session.deploy_status %}
-            <td id='starting' class='td-20' session_id='{{session.id}}' >
+            <td class='starting' id='test' class='td-20' session_id='{{session.id}}' >
             <div class="progress-group">
                 <div class="progress-group-header">
                     <i class="cui-cloud progress-group-icon"></i>
-                    <div id="statuslabel"></div>
-                    <div class="ml-auto font-weight-bold" id="progressbar-indicator"></div>
+                    <div class="statuslabel"></div>
+                    <div class="ml-auto font-weight-bold progressbar-indicator" ></div>
                 </div>
                 <div class="progress-group-bars">
                     <div class="progress progress-xs">
-                    <div class="progress-bar bg-success" id="progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
