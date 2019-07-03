@@ -203,9 +203,6 @@ class TestLog(WebTest):
         self.endpoint_echo_h.session.save()
         self.endpoint_echo_h.save()
 
-    def test_retrieve_no_logged(self):
-        call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), status=302)
-
     def test_retrieve_no_entries(self):
         call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
         self.assertTrue('Er zijn nog geen verzoeken' in call.text)
