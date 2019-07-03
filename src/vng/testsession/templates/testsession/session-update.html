@@ -2,8 +2,9 @@
 {% load sniplates %}
 {% load django_bootstrap_breadcrumbs %}
 {% load subdomainurls %}
+{% load i18n %}
 
-{% block title %}Test consumer - Detailweergave test-sessie{% endblock%}
+{% block title %}{% trans "Test consumer - detail session view" %}{% endblock%}
 
 {% block breadcrumb %}
 {% breadcrumb "Home" "testsession:sessions" %}
@@ -19,7 +20,7 @@
                 {% load_widgets form='forms.html' %}
                 <form class="" method="post">{% csrf_token %}
                     <div class="card-header">
-                        Update information
+                        {% trans "Update information" %}
                     </div>
                     <div class="card-body">
                         {% for field in form %}
@@ -30,7 +31,7 @@
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" >
-                                    <i class="fa fa-dot-circle-o"></i>Update</button>
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Update" %}</button>
                             </div>
                         </div>
                     </div>
