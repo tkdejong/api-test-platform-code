@@ -37,13 +37,13 @@
                         {% if session.is_stopped %}
                         {% for postman in session.exposedurl_set.all %}
                         {% if postman.test_session.get_json_obj %}
-                        <h4>{% trans "Postman Collectio" %}n</h4>
+                        <h4>{% trans "Postman Collection" %}</h4>
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">{% trans "Time" %}</th>
                                     <th scope="col">{% trans "Name" %}</th>
-                                    <th scope="col">{% trans "Resultaat" %}</th>
+                                    <th scope="col">{% trans "Result" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
