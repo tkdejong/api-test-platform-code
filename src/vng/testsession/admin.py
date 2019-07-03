@@ -1,9 +1,11 @@
 from ordered_model.admin import OrderedModelAdmin
 from django.contrib import admin
 
+
 import vng.testsession.models as model
 
 from .forms import SessionTypeFormAdmin
+from ..utils.admin import AdminStaticFile
 
 
 class VNGEndpointInline(admin.TabularInline):
@@ -27,21 +29,21 @@ class InjectHeaderInline(admin.TabularInline):
 
 
 @admin.register(model.InjectHeader)
-class InjectHeaderAdmin(admin.ModelAdmin):
+class InjectHeaderAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = ['session_type', 'key', 'value']
     list_filter = ['session_type']
     search_fields = ['key', 'value']
 
 
 @admin.register(model.ExposedUrl)
-class ExposedUrlAdmin(admin.ModelAdmin):
+class ExposedUrlAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = ['session', 'vng_endpoint', 'subdomain', 'id', 'test_session', 'docker_url']
     list_filter = ['session']
     search_fields = ['session__name']
 
 
 @admin.register(model.SessionType)
-class SessionTypeAdmin(admin.ModelAdmin):
+class SessionTypeAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = [
         'name',
         'standard',
@@ -59,7 +61,7 @@ class SessionTypeAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.Session)
-class SessionAdmin(admin.ModelAdmin):
+class SessionAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = [
         'started',
         'stopped',
@@ -78,14 +80,14 @@ class SessionAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.SessionLog)
-class SessionLogAdmin(admin.ModelAdmin):
+class SessionLogAdmin(admin.ModelAdmin, AdminStaticFile):
     date_hierarchy = 'date'
     search_fields = ['session', 'date']
     list_display = ['date', 'session', 'response_status']
 
 
 @admin.register(model.ScenarioCase)
-class ScenarioCaseAdmin(OrderedModelAdmin):
+class ScenarioCaseAdmin(OrderedModelAdmin, AdminStaticFile):
     list_display = [
         'url',
         'move_up_down_links',
@@ -99,13 +101,13 @@ class ScenarioCaseAdmin(OrderedModelAdmin):
 
 
 @admin.register(model.QueryParamsScenario)
-class QueryParamsScenarioAdmin(admin.ModelAdmin):
+class QueryParamsScenarioAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = ['name', 'scenario_case', 'expected_value']
     list_filter = ['scenario_case']
 
 
 @admin.register(model.TestSession)
-class TestSessionAdmin(admin.ModelAdmin):
+class TestSessionAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = [
         'test_result',
         'json_result',
@@ -113,7 +115,7 @@ class TestSessionAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.VNGEndpoint)
-class VNGEndpointAdmin(admin.ModelAdmin):
+class VNGEndpointAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = [
         'url',
         'name',
@@ -127,7 +129,7 @@ class VNGEndpointAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.Report)
-class ReportAdmin(admin.ModelAdmin):
+class ReportAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = [
         'scenario_case',
         'session_log',
@@ -136,7 +138,7 @@ class ReportAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.EnvironmentalVariables)
-class EnvironmentalVariablesAdmin(admin.ModelAdmin):
+class EnvironmentalVariablesAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = [
         'vng_endpoint',
         'key',
