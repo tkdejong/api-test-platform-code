@@ -49,23 +49,31 @@ class CreateEndpointForm(forms.ModelForm):
         for e in text_area:
             self.fields[e] = forms.CharField(widget=forms.Textarea)
 
-    def __init__(self, quantity=0, field_name='field', text_area=[], text_area_field_name=[], *args, **kwargs):
+    def __init__(self,
+                 quantity=0,
+                 placeholders=[],
+                 field_name='field',
+                 text_area=[],
+                 text_area_field_name=[],
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Override the field type since in the model is charfield
+        if not placeholders:
+            placeholders = ['http://www.example.com' for i in range(quantity + 1)]
         self.fields['url'] = forms.URLField(
             widget=forms.URLInput(
-                attrs={'placeholder': 'http://www.example.com'})
+                attrs={'placeholder': placeholders[0]})
         )
         for i in range(quantity):
             if isinstance(field_name, str):
                 self.fields['{}-{}'.format(field_name, i + 1)] = forms.URLField(
                     widget=forms.URLInput(
-                        attrs={'placeholder': 'http://www.example.com'})
+                        attrs={'placeholder': placeholders[i + 1]})
                 )
             else:
                 self.fields[field_name[i]] = forms.URLField(
                     widget=forms.URLInput(
-                        attrs={'placeholder': 'http://www.example.com'})
+                        attrs={'placeholder': placeholders[i + 1]})
                 )
         for i, e in enumerate(text_area):
             self.fields[text_area_field_name[i]] = forms.CharField(widget=forms.Textarea)

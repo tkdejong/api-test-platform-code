@@ -334,7 +334,84 @@
                     </div>
                 </div>
             </div>
+             <div class="card">
+                <div class="card-body">
+                    <p>
+                        Note: Shields.io caches the badge result for 5 minutes. Check the <a
+                            href="{% url 'apiv1session:testsession-shield' session.uuid %}">API</a> for
+                        direct access.</p>
+                    <span display="block" style='width: 250px;' class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                        <a href="{% url 'testsession:session_log' session.uuid %}">
+                            <img style='width:250px' alt=""
+                                src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %}">
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Markdown snippet</h5>
+                    <p>Paste the following in your README.md to show your badge on Github.</p>
+                    <?prettify lang=html linenums=true?>
+                        <pre class="prettyprint" id='gitSnippet'>
+                    <xmp>
+
+                    </xmp>
+                    </pre>
+                </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">HTML snippet</h5>
+                         <p>Paste the following in your HTML page to show your badge.</p>
+                        <?prettify lang=html linenums=true?>
+                            <pre class="prettyprint" id='htmlSnippet'>
+                        <xmp>
+                        </xmp>
+                    </pre>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     {% endblock %}
+
+{% block script %}
+<script>
+    var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %})]({{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %})'
+
+    var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
+            + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'testsession:session_log' session.uuid %}">\n'
+            + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&\n '
+            + 'url={{request.scheme}}://{{request.get_host}}{% url "apiv1session:testsession-shield" session.uuid %}"></span></a>'
+
+    function htmlEscape(s) {
+        s = s.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+        return s
+    }
+
+    function htmlReplace(s){
+        s=s.replace(
+        /&lt;script src[\s\S]*?&gt;&lt;\/script&gt;|&lt;!--\?[\s\S]*?--&gt;|&lt;pre\b[\s\S]*?&lt;\/pre&gt;/g,
+        '<span class="operative">$&<\/span>');
+        return s;
+    }
+
+    // this page's own source code
+    gitSnippet = htmlEscape(gitSnippet);
+    gitSnippet = htmlReplace(gitSnippet);
+
+
+    htmlSnippet = htmlEscape(htmlSnippet);
+    htmlSnippet = htmlReplace(htmlSnippet);
+
+
+    // insert into PRE
+    document.getElementById("gitSnippet").innerHTML = gitSnippet;
+    document.getElementById("htmlSnippet").innerHTML = htmlSnippet;
+
+</script>
+{% endblock %}

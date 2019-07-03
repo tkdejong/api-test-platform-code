@@ -525,3 +525,50 @@ class RunTest(CSRFExemptMixin, View):
         session_log.response_status = response.status_code
         session_log.response = json.dumps(response_dict)
         session_log.save()
+
+
+class ResultTestsessionViewShield(views.APIView):
+
+    def get(self, request, uuid=None):
+        session = get_object_or_404(Session, uuid=uuid)
+        scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
+        report = list(Report.objects.filter(session_log__session=session))
+        report_ordered = []
+        is_error = False
+        not_full = False
+
+        for case in scenario_case:
+            missing = False
+            for rp in report:
+                if rp.result == choices.HTTPCallChoiches.failed:
+                    is_error = True
+                if rp.scenario_case == case and rp.result != choices.HTTPCallChoiches.not_called:
+                    report_ordered.append(rp)
+                    missing = True
+                    break
+            if not missing:
+                not_full = True
+
+        if not scenario_case:
+            message = 'No results'
+            color = 'inactive'
+        elif is_error:
+            message = 'Failed'
+            color = 'red'
+        elif not_full:
+            message = 'No errors, not completed'
+            color = 'orange'
+        else:
+            message = 'Success'
+            color = 'green'
+            is_error = False
+
+        result = {
+            'schemaVersion': 1,
+            'label': 'VNG test platform client',
+            'message': message,
+            'color': color,
+            'isError': is_error,
+        }
+
+        return JsonResponse(result)
