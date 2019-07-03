@@ -203,9 +203,6 @@ class TestLog(WebTest):
         self.endpoint_echo_h.session.save()
         self.endpoint_echo_h.save()
 
-    def test_retrieve_no_logged(self):
-        call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), status=302)
-
     def test_retrieve_no_entries(self):
         call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
         self.assertTrue('Er zijn nog geen verzoeken' in call.text)
@@ -815,3 +812,40 @@ class TestMultipleParams(WebTest):
         report2 = Report.objects.filter(scenario_case=self.sc2).count()
         self.assertEqual(report1, 1)
         self.assertEqual(report2, 1)
+
+    def test2(self):
+        self.test()
+        session = Session.objects.all()[0]
+        reports = Report.objects.filter(session_log__session=session)
+        scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
+        for r in reports:
+            r.result = choices.HTTPCallChoiches.not_called
+            r.save()
+
+        call = self.app.get(reverse('apiv1session:testsession-shield',
+            kwargs={
+                'uuid': session.uuid
+            }
+        ))
+        self.assertEqual(call.json['message'], 'No errors, not completed')
+
+        reports[0].result = choices.HTTPCallChoiches.failed
+        reports[0].save()
+
+        call = self.app.get(reverse('apiv1session:testsession-shield',
+            kwargs={
+                'uuid': session.uuid
+            }
+        ))
+        self.assertEqual(call.json['message'], 'Failed')
+
+        for r in reports:
+            r.result = choices.HTTPCallChoiches.success
+            r.save()
+
+        call = self.app.get(reverse('apiv1session:testsession-shield',
+            kwargs={
+                'uuid': session.uuid
+            }
+        ))
+        self.assertEqual(call.json['message'], 'Success')
