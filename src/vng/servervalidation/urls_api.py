@@ -1,6 +1,7 @@
 
-from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
+from django.conf.urls import include
+from django.urls import path, re_path
 
 from . import api_views, apps
 from ..utils.schema import schema_view
@@ -14,6 +15,7 @@ router.register('provider-run-shield', api_views.ResultServerViewShield, base_na
 
 
 urlpatterns = [
+    re_path(r'schema/openapi(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('schema', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('provider-run/<int:pk>/trigger', api_views.TriggerServerRunView.as_view({'put': 'update'}), name='provider'),
     path('provider-run/<int:pk>/result', api_views.ResultServerView.as_view(), name='provider_result'),

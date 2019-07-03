@@ -11,7 +11,7 @@ from django.conf import settings
 from ..celery.celery import app
 from .models import PostmanTest, PostmanTestResult, Endpoint, ServerRun, ServerHeader
 from ..utils import choices
-from ..utils.newman import DidNotRunException, NewmanManager
+from ..utils.newman import NewmanManager
 
 
 logger = get_task_logger(__name__)

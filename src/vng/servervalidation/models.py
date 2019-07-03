@@ -38,6 +38,9 @@ class TestScenario(models.Model):
     def custom_header(self):
         return self.authorization == choices.AuthenticationChoices.header
 
+    class Meta:
+        ordering = ('name',)
+
 
 class TestScenarioUrl(models.Model):
 
