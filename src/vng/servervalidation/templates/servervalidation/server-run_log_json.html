@@ -1,7 +1,6 @@
 {% extends 'master.html' %}
-{% load i18n %}
 
-{% block title %}{% trans "Log view" %}{% endblock%}
+{% block title %}Log view{% endblock%}
 
 {% block content %}
 <script type="text/javascript">
@@ -16,7 +15,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                   {% trans "Log view" %}
+                    Log view
                 </div>
                 <div class="card-body">
                 <input type="button" class="btn btn-primary" value="Back to the details" onclick="location.href = '{% url 'server_run:server-run_detail_uuid' object.uuid %}';">

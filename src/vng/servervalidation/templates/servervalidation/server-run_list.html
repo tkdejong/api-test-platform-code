@@ -1,8 +1,8 @@
 {% extends 'master.html' %}
 {% load sniplates %}
-{% load i18n %}
 
-{% block title %}{% trans "Providers" %}{% endblock %}
+
+{% block title %}Providers{% endblock %}
 
 
 {% block content %}
@@ -12,8 +12,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                  {% trans "Provider tests" %}
-		  <a href="{% url 'server_run:server-run_create_item' %}" class="btn btn-success float-right"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
+                  Provider tests
+		  <a href="{% url 'server_run:server-run_create_item' %}" class="btn btn-success float-right"><i class="icon-note"></i> Start testrun</a>
                 </div>
                 <div class="card-body">
                     <table class="table">

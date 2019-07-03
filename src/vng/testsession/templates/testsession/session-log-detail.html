@@ -1,8 +1,7 @@
 {% extends 'master.html' %}
 {% load django_bootstrap_breadcrumbs %}
-{% load i18n %}
 
-{% block title %}{% trans "Test consumer - Detail session view" %}{% endblock%}
+{% block title %}Test consumer - Detailweergave test-sessie{% endblock%}
 
 {% block breadcrumb %}
 {% breadcrumb "Home" 'testsession:sessions' %}
@@ -17,19 +16,19 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Test consumers -" %} {{ object.session }}
+                    Test consumers - {{ object.session }}
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ object.date }}</h5>
                     <p class="card-text">
-                        <strong>{% trans "Request" %}: {{ object.request_path }}</strong>
+                        <strong>Request: {{ object.request_path }}</strong>
                     </p>
                     <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">{% trans "Key" %}</th>
-                                <th scope="col">{% trans "Value" %}</th>
+                                <th scope="col">Key</th>
+                                <th scope="col">Value</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,7 +50,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Request body" %}
+                    Request body
                 </div>
                 <div class="card-body">
                     <p class="card-text">
@@ -67,7 +66,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Response status:" %} {{ object.response_status }}
+                    Response status: {{ object.response_status }}
                 </div>
                 <div class="card-body">
                     <p class="card-text" id="translate"></p>

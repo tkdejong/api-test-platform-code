@@ -1,8 +1,8 @@
 {% extends 'master.html' %}
 {% load sniplates %}
-{% load i18n %}
 
-{% block title %}{% trans "Providers" %}{% endblock %}
+
+{% block title %}Providers{% endblock %}
 
 
 {% block content %}
@@ -12,10 +12,10 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
-                        {% trans "Providers" %}
+                        Providers
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">{% trans "Start a new provider-test" %}</h5>
+                        <h5 class="card-title">Start een nieuwe provider-test</h5>
                         {% load_widgets form='forms.html' %}
 
                         {% for field in form %}
@@ -37,11 +37,11 @@
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit">
-                                    <i class="fa fa-dot-circle-o"></i>{% trans "Submit" %}</button>
+                                    <i class="fa fa-dot-circle-o"></i>Submit</button>
                             </div>
                             <div class="col-auto">
                                 <button class="btn btn-sm btn-danger" type="reset">
-                                    <i class="fa fa-ban"></i>{% trans "Reset" %}</button>
+                                    <i class="fa fa-ban"></i> Reset</button>
                             </div>
                         </div>
                     </div>

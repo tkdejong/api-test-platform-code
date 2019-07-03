@@ -1,8 +1,7 @@
 {% extends 'master.html' %}
 {% load django_bootstrap_breadcrumbs %}
-{% load i18n %}
 
-{% block title %}{% trans "Session Report" %}{% endblock%}
+{% block title %}Session Report{% endblock%}
 
 {% block breadcrumb %}
     {% breadcrumb "Home" "/" %}
@@ -17,7 +16,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Scenario" %}
+                    Scenario
                 </div>
                 <div class="card-body">
                     <table class="table">
@@ -31,7 +30,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Scenario case" %}
+                    Scenario case
                 </div>
                 <div class="card-body">
                 {% if object_list %}
@@ -42,7 +41,7 @@
                     {% endfor %}
                 </table>
                 {% else %}
-                <p>{% trans "No requests have yet been received." %}</p>
+                <p>Er zijn geen verzoeken binnengekomen.</p>
                 {% endif %}
     </div>
 </article>

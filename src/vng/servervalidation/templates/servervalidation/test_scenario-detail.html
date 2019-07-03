@@ -1,8 +1,8 @@
 {% extends 'master.html' %}
 {% load sniplates %}
-{% load i18n %}
 
-{% block title %}{% trans "Test Scenario" %}{% endblock %}
+
+{% block title %}Test Scenario{% endblock %}
 
 
 {% block content %}
@@ -12,7 +12,7 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                 <div class="card-header">
-                        {% trans "Test Scenario" %} {{ object.name }}
+                        Test Scenario {{ object.name }}
                     </div>
                     <div class="card-body">
                         <p class="card-text">

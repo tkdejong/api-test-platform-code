@@ -1,9 +1,8 @@
 {% extends 'master.html' %}
 {% load sniplates %}
-{% load i18n %}
 {% load django_bootstrap_breadcrumbs %}
 
-{% block title %}{% trans "Server-run detail" %}{% endblock%}
+{% block title %}Server-run detail{% endblock%}
 
 {% block breadcrumb %}
 {% breadcrumb "Home" 'server_run:server-run_list' %}
@@ -17,7 +16,7 @@
         <div class="col-sm-6">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Provider test details" %}
+                    Provider test details
                 </div>
                 <div class="card-body">
                     <div class='table-responsive'>
@@ -34,13 +33,9 @@
             <div class="card">
                 <div class="card-body">
                     <p>
-                        {% url 'apiv1server:provider:api_server-run-shield-detail' object.uuid as addr%}
-                        {% blocktrans %}
-                            Note: Shields.io caches the badge result for 5 minutes. Check the <a
-                                href="{{url}}">API</a> for
-                            direct access.
-                        {% endblocktrans %}
-                    </p>
+                        Note: Shields.io caches the badge result for 5 minutes. Check the <a
+                            href="{% url 'apiv1server:api_server-run-shield' object.uuid %}">API</a> for
+                        direct access.</p>
                     <span display="block" style='width: 250px;' class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
                         <a href="{% url 'server_run:server-run_detail_uuid' object.uuid %}">
                             <img style='width:250px' alt=""
@@ -51,11 +46,9 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    {% blocktrans %}
-                        <h5 class="card-title">Markdown snippet</h5>
-                        <p>Paste the following in your README.md to show your badge on Github.</p>
-                        <?prettify lang=html linenums=true?>
-                    {% endblocktrans %}
+                    <h5 class="card-title">Markdown snippet</h5>
+                    <p>Paste the following in your README.md to show your badge on Github.</p>
+                    <?prettify lang=html linenums=true?>
                         <pre class="prettyprint" id='gitSnippet'>
                     <xmp>
 
@@ -65,11 +58,9 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        {% blocktrans %}
-                            <h5 class="card-title">HTML snippet</h5>
-                            <p>Paste the following in your HTML page to show your badge.</p>
-                            <?prettify lang=html linenums=true?>
-                        {% endblocktrans %}
+                        <h5 class="card-title">HTML snippet</h5>
+                         <p>Paste the following in your HTML page to show your badge.</p>
+                        <?prettify lang=html linenums=true?>
                             <pre class="prettyprint" id='htmlSnippet'>
                         <xmp>
                         </xmp>
@@ -85,21 +76,19 @@
             <div class="col-sm-6">
                 <div class="card">
                     <div class="card-header">
-                        {% blocktrans with c=forloop.counter%}
-                            Postman collection #{{c}} results details
-                        {% endblocktrans %}
+                        Postman collection #{{forloop.counter}} results details
                     </div>
                     <div class="card-body">
                         <div class='table-responsive'>
                             <table class="table">
                                 <thead>
-                                    <th>{% trans "Property" %}</th>
-                                    <th>{% trans "Value" %}</th>
+                                    <th>Property</th>
+                                    <th>Value</th>
                                 </thead>
                                 <tbody>
                                     <tr class="table-active">
                                         <td>
-                                            {% trans "Total calls" %}
+                                            Total calls
                                         </td>
                                         <td>
                                             {{ results.calls.total }}
@@ -107,7 +96,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            {% trans "Calls failed" %}
+                                            Calls failed
                                         </td>
                                         <td class="table-danger">
                                             {{ results.calls.failed }}
@@ -115,7 +104,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            {% trans "Calls successful" %}
+                                            Calls successful
                                         </td>
                                         <td class="table-success">
                                             {{ results.calls.success }}
@@ -123,7 +112,7 @@
                                     </tr>
                                     <tr class="table-active">
                                         <td>
-                                            {% trans "Total assertions" %}
+                                            Total assertions
                                         </td>
                                         <td>
                                             {{ results.assertions.total }}
@@ -131,7 +120,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            {% trans "Assertions failed" %}
+                                            Assertions failed
                                         </td>
                                         <td class="table-danger">
                                             {{ results.assertions.failed }}
@@ -139,7 +128,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            {% trans "Assertions passed" %}
+                                            Assertions passed
                                         </td>
                                         <td class="table-success">
                                             {{ results.assertions.passed }}
@@ -162,21 +151,21 @@
                 </div>
                 <div class="card">
                 <div class="card-header">
-                    {% trans "Supplier information" %}
+                    Supplier information
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <tbody>
                             <tr>
-                                <td scope="row"><strong>{% trans "Supplier name" %}</td>
+                                <td scope="row"><strong>Supplier name</td>
                                 <td>{{ object.supplier_name|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
-                                <td scope="row"><strong>{% trans "Software product" %}</td>
+                                <td scope="row"><strong>Software product</td>
                                 <td>{{ object.software_product|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
-                                <td scope="row"><strong>{% trans "Product role" %}</td>
+                                <td scope="row"><strong>Product role</td>
                                 <td>{{ object.product_role|default_if_none:''|urlize }}</td>
                             </tr>
                         </tbody>
@@ -186,7 +175,7 @@
                     <div class="card-footer">
                         <div class="row">
                             <div class="col-auto mr-auto">
-                                <a class="btn btn-primary" href="{% url 'server_run:server-run_info-update' object.uuid %}">{% trans "Update" %}</a>
+                                <a class="btn btn-primary" href="{% url 'server_run:server-run_info-update' object.uuid %}">Update</a>
                             </div>
                         </div>
                     </div>
@@ -204,8 +193,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                {% trans "Postman collection" %}
-                     <a
+                    Postman collection <a
                         href="{% url 'server_run:postman_download' postman.postman_test.pk %}">#{{ forloop.counter }}</a>
                 </div>
                 <div class="card-body">
@@ -290,16 +278,16 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Failure" %}
+                    Failure
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>{% trans "Name" %}</th>
-                                <th>{% trans "Error" %}</th>
-                                <th>{% trans "Test" %}</th>
-                                <th>{% trans "Message" %}</th>
+                                <th>Name</th>
+                                <th>Error</th>
+                                <th>Test</th>
+                                <th>Message</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -323,15 +311,15 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Assertions" %}
+                    Assertions
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>{% trans "Name call" %}</th>
-                                <th>{% trans "Name assertion" %}</th>
-                                <th>{% trans "Assertion" %}</th>
+                                <th>Name call</th>
+                                <th>Name assertion</th>
+                                <th>Assertion</th>
                             </tr>
                         </thead>
                         <tbody>
