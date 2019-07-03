@@ -10,6 +10,7 @@ from tinymce.models import HTMLField
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 from ordered_model.models import OrderedModel
 from django.core.files.base import ContentFile
@@ -22,8 +23,8 @@ from ..utils import choices, postman
 
 class TestScenario(models.Model):
 
-    name = models.CharField('Naam', max_length=200, unique=True)
-    authorization = models.CharField('Authorisatie', max_length=20, choices=choices.AuthenticationChoices.choices, default=choices.AuthenticationChoices.jwt)
+    name = models.CharField(_('name'), max_length=200, unique=True)
+    authorization = models.CharField(_('Authorization'), max_length=20, choices=choices.AuthenticationChoices.choices, default=choices.AuthenticationChoices.jwt)
     description = HTMLField()
 
     def __str__(self):
@@ -44,9 +45,10 @@ class TestScenario(models.Model):
 
 class TestScenarioUrl(models.Model):
 
-    name = models.CharField('Naam', max_length=200)
+    name = models.CharField(_('name'), max_length=200)
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
-    url = models.BooleanField(default=True, help_text='When enabled a single-line field is shown to the user when starting a session. When disabled a multi-line field is shown.')
+    url = models.BooleanField(default=True, help_text='''When enabled a single-line field is shown to the user
+    when starting a session. When disabled a multi-line field is shown.''')
     placeholder = models.CharField(max_length=100, blank=True, default='https://www.example.com')
 
     def __str__(self):
@@ -69,10 +71,10 @@ class PostmanTest(OrderedModel):
 class ServerRun(models.Model):
 
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
-    started = models.DateTimeField('Gestart op', default=timezone.now)
+    started = models.DateTimeField(_('Started at'), default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    stopped = models.DateTimeField('Gestopt op', null=True, default=None, blank=True)
-    last_exec = models.DateTimeField('Laatste uitvoering', null=True, default=None, blank=True)
+    stopped = models.DateTimeField(_('Stopped at'), null=True, default=None, blank=True)
+    last_exec = models.DateTimeField(_('Last run'), null=True, default=None, blank=True)
     status = models.CharField(max_length=20, choices=choices.StatusWithScheduledChoices.choices, default=choices.StatusWithScheduledChoices.starting)
     client_id = models.TextField(default=None, null=True, blank=True)
     secret = models.TextField(default=None, null=True, blank=True)

@@ -11,6 +11,7 @@ from django.core.files import File
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from ordered_model.models import OrderedModel
 
@@ -23,11 +24,11 @@ from ..utils import choices, postman
 
 class SessionType(models.Model):
 
-    name = models.CharField('Naam', max_length=200, unique=True)
-    standard = models.CharField('Standaard', max_length=200, null=True)
-    role = models.CharField('Rol', max_length=200, null=True)
-    application = models.CharField('Applicatie', max_length=200, null=True)
-    version = models.CharField('Versie', max_length=200, null=True)
+    name = models.CharField(_('Name'), max_length=200, unique=True)
+    standard = models.CharField(_('Standard'), max_length=200, null=True)
+    role = models.CharField(_('Role'), max_length=200, null=True)
+    application = models.CharField(_('Application'), max_length=200, null=True)
+    version = models.CharField(_('Version'), max_length=200, null=True)
     authentication = models.CharField(max_length=20, default=choices.AuthenticationChoices.no_auth, choices=choices.AuthenticationChoices.choices)
     description = HTMLField()
     client_id = models.TextField(default=None, null=True, blank=True)
@@ -38,8 +39,8 @@ class SessionType(models.Model):
     ZGW_images = models.BooleanField(default=False, blank=True)
 
     class Meta:
-        verbose_name = 'Sessie type'
-        verbose_name_plural = 'Sessie type'
+        verbose_name = _('Session Ttype')
+        verbose_name_plural = _('Sessions type')
         ordering = ('name',)
 
     def __str__(self):
@@ -72,8 +73,8 @@ class TestSession(models.Model):
     json_result = models.TextField(blank=True, null=True, default=None)
 
     class Meta:
-        verbose_name = 'Test Sessie'
-        verbose_name_plural = 'Test Sessie'
+        verbose_name = _('Test Session')
+        verbose_name_plural = _('Test Sessions')
 
     def save_test(self, file):
         name_file = str(uuid.uuid4())
@@ -169,12 +170,12 @@ class QueryParamsScenario(models.Model):
 class Session(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    name = models.CharField('Naam', max_length=30, unique=True, null=True)
-    session_type = models.ForeignKey(SessionType, verbose_name='Sessie type', on_delete=models.PROTECT)
-    started = models.DateTimeField('Gestart op', default=timezone.now)
-    stopped = models.DateTimeField('Gestopt op', null=True, blank=True)
+    name = models.CharField(_('Name'), max_length=30, unique=True, null=True)
+    session_type = models.ForeignKey(SessionType, verbose_name=_('Session type'), on_delete=models.PROTECT)
+    started = models.DateTimeField(_('Started at'), default=timezone.now)
+    stopped = models.DateTimeField(_('Stopped at'), null=True, blank=True)
     status = models.CharField(max_length=20, choices=choices.StatusChoices.choices, default=choices.StatusChoices.starting)
-    user = models.ForeignKey(User, verbose_name='Gebruiker', on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, verbose_name=_('User'), on_delete=models.SET_NULL, null=True)
     build_version = models.TextField(blank=True, null=True, default=None)
     error_message = models.TextField(blank=True, null=True, default=None)
     deploy_status = models.TextField(blank=True, null=True, default=None)
@@ -185,8 +186,8 @@ class Session(models.Model):
     product_role = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Sessie'
-        verbose_name_plural = 'Sessie'
+        verbose_name = _('Session')
+        verbose_name_plural = _('Sessions')
 
     @staticmethod
     def assign_name(id):
