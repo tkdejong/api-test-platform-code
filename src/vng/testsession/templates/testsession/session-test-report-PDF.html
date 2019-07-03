@@ -1,5 +1,7 @@
 {% load staticfiles %}
 {% load static %}
+{% load i18n %}
+
 {% with red="bgcolor='#FF0000' style='color:#ffffff' " %}
 {% with green="bgcolor='#1d8719' style='color:#ffffff'" %}
 <!DOCTYPE html>
@@ -7,20 +9,20 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Session test report</title>
+    <title>{% trans "Session test report" %}</title>
 </head>
 
 <body>
     <img src="/static/img/components/logo/logo.svg">
     <div>
-        <h1>Session test report</h1>
+        <h1>{% trans "Session test report" %}</h1>
 
         <table class='table-t'>
             <thead>
                 <tr>
-                    <td>HTTP method</td>
-                    <td>HTTP url</td>
-                    <td>Response</td>
+                    <td>{% trans "HTTP method" %}</td>
+                    <td>{% trans "HTTP url" %}</td>
+                    <td>{% trans "Response" %}</td>
                 </tr>
             </thead>
             <tbody>
