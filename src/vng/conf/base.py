@@ -207,7 +207,7 @@ LOCALE_PATHS = (
     os.path.join(DJANGO_PROJECT_DIR, 'conf', 'locale'),
     os.path.join(BASE_DIR, 'src', 'locale')
 )
-print(LOCALE_PATHS)
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
