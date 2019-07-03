@@ -100,6 +100,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
         no_url = len(data['test_scenario'].filter(url=True))
         data['form'] = CreateEndpointForm(
             quantity=len(data['test_scenario'].filter(url=True)) - 1,
+            placeholders=[t.placeholder for t in test_scenario_url],
             field_name=url_names[1:no_url],
             text_area=data['test_scenario'].filter(url=False),
             text_area_field_name=url_names[no_url:]
