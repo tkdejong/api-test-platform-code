@@ -205,7 +205,7 @@ USE_THOUSAND_SEPARATOR = True
 # Translations
 LOCALE_PATHS = (
     os.path.join(DJANGO_PROJECT_DIR, 'conf', 'locale'),
-    # os.path.join(BASE_DIR, 'src', 'locale')
+    os.path.join(BASE_DIR, 'src', 'locale')
 )
 
 # Static files (CSS, JavaScript, Images)

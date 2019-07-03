@@ -101,6 +101,13 @@
                 </table>
             {% endif %}
         </td>
+        <td>
+            <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                <a href="{% url 'testsession:session_log' session.uuid %}">
+                    <img style='height:30px ' alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %}">
+                </a>
+            </span>
+        </td>
     </tr>
 {% endwith %}
 {% endspaceless %}
