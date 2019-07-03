@@ -1,8 +1,9 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load i18n %}
 {% load django_bootstrap_breadcrumbs %}
 
-{% block title %}Server-run detail{% endblock%}
+{% block title %}{% trans "Server-run detail" %}{% endblock%}
 
 {% block breadcrumb %}
 {% breadcrumb "Home" 'server_run:server-run_list' %}
@@ -18,7 +19,7 @@
                 {% load_widgets form='forms.html' %}
                 <form class="" method="post">{% csrf_token %}
                     <div class="card-header">
-                        Update information
+                        {% trans "Update information" %}
                     </div>
                     <div class="card-body">
                         {% for field in form %}
@@ -29,7 +30,7 @@
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" >
-                                    <i class="fa fa-dot-circle-o"></i>Update</button>
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Update" %}</button>
                             </div>
                         </div>
                     </div>

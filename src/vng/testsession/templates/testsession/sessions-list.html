@@ -2,9 +2,10 @@
 {% load sniplates %}
 {% load django_bootstrap_breadcrumbs %}
 {% load subdomainurls %}
+{% load i18n %}
 
 
-{% block title %}Test consumer - Lijstweergave sessies{% endblock %}
+{% block title %}{% trans "Test consumer - list sessions view" %}{% endblock %}
 
 
 {% block content %}
@@ -14,8 +15,8 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                      Consumer test-sessies
-		      <a href="{% url 'testsession:session_create' %}" class="btn btn-success float-right"><i class="icon-note"></i> Start sessie</a>
+                    {% trans "Consumer test-session" %}
+		      <a href="{% url 'testsession:session_create' %}" class="btn btn-success float-right"><i class="icon-note"></i>{% trans "Start session" %}</a>
                     </div>
                     <div class="card-body">
                         <table class="table">

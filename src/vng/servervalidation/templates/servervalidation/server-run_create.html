@@ -1,7 +1,8 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load i18n %}
 
-{% block title %}Server run creation{% endblock%}
+{% block title %}{% trans "Server run creation" %}{% endblock%}
 
 
 {% block content %}
@@ -11,7 +12,7 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
-                        Create provider-testrun for scenario: {{ ts }}
+                        {% trans "Create provider-testrun for scenario:" %} {{ ts }}
                     </div>
                     <div class='card-body'>
                     {% load_widgets form='forms.html' %}
@@ -23,11 +24,11 @@
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit">
-                                    <i class="fa fa-dot-circle-o"></i>Start</button>
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Start" %}</button>
                             </div>
                             <div class="col-auto">
                                 <button class="btn btn-sm btn-danger" type="reset" onclick="location.href = {% url 'server_run:server-run_list' %};">
-                                    <i class="fa fa-ban"></i> Cancel</button>
+                                    <i class="fa fa-ban"></i> {% trans "Cancel" %}</button>
                             </div>
                         </div>
                     </div>
