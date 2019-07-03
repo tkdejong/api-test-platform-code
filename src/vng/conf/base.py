@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'elasticapm.contrib.django',
     'easy_thumbnails',
     'django_bootstrap_breadcrumbs',
+    'mobetta',
 
     # Project applications.
     'vng.accounts',
@@ -183,7 +184,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGES = (('en', _('English')),)
+LANGUAGES = (
+    ('en', _('English')),
+    ('nl', _('Nederlands')),
+)
 
 
 LANGUAGE_CODE = 'en'
