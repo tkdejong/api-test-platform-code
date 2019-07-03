@@ -7,13 +7,18 @@
 <tr>
     <td>Test Scenario</td>
     <td>
-        <ul>
-            {% for pc in server_run.test_scenario.postmantest_set.all %}
-            <li>
-                <a href="{% url 'server_run:postman_download' pc.pk %}">{{ server_run.test_scenario }}</a>
-            </li>
-            {% endfor %}
-        </ul>
+        <div class='col-xs-1'>
+            {% comment %} <div class='row'> {% endcomment %}
+
+                <a class="btn btn-info btn-margin" href="{% url 'server_run:testscenario-detail' server_run.test_scenario.pk  %}">Description</a>
+            {% comment %} </div> {% endcomment %}
+                {% for pc in server_run.test_scenario.postmantest_set.all %}
+                {% comment %} <div class='row'> {% endcomment %}
+                    <a class="btn btn-light btn-margin" href="{% url 'server_run:postman_download' pc.pk %}">Download {{ server_run.test_scenario }}</a>
+                {% comment %} </div> {% endcomment %}
+                {% endfor %}
+
+        </div>
     </td>
 </tr>
 {% for ep in server_run.endpoint_set.all %}
