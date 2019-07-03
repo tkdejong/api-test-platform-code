@@ -4,6 +4,8 @@ import vng.servervalidation.models as model
 from ordered_model.admin import OrderedModelAdmin
 from django_admin_relation_links import AdminChangeLinksMixin
 
+from ..utils.admin import AdminStaticFile
+
 
 def get_all_fields(mo):
     l = [field.name for field in mo._meta.fields]
@@ -24,25 +26,25 @@ class PostmanTestInline(admin.TabularInline):
 
 
 @admin.register(model.PostmanTest)
-class PostmanTestAdmin(AdminChangeLinksMixin, OrderedModelAdmin):
+class PostmanTestAdmin(AdminChangeLinksMixin, OrderedModelAdmin, AdminStaticFile):
     list_display = ['test_scenario', 'move_up_down_links',
                     'validation_file']
 
 
 @admin.register(model.PostmanTestResult)
-class PostmanTestResultAdmin(admin.ModelAdmin):
+class PostmanTestResultAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = ['id', 'postman_test', 'log', 'server_run', 'log_json']
 
 
 @admin.register(model.Endpoint)
-class EndpointAdmin(admin.ModelAdmin):
+class EndpointAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = ['test_scenario_url', 'jwt', 'server_run', 'url']
     list_filter = ['test_scenario_url', 'server_run', 'url']
     search_fields = ['test_scenario_url', 'server_run', 'url']
 
 
 @admin.register(model.ServerRun)
-class ServerRunAdmin(admin.ModelAdmin):
+class ServerRunAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = [
         'id',
         'uuid',
@@ -64,7 +66,7 @@ class ServerRunAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.TestScenario)
-class TestScenarioAdmin(admin.ModelAdmin):
+class TestScenarioAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = ['name', 'description']
     list_filter = ['name']
     search_fields = ['name']
@@ -73,7 +75,7 @@ class TestScenarioAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.TestScenarioUrl)
-class TestScenarioUrlAdmin(admin.ModelAdmin):
+class TestScenarioUrlAdmin(admin.ModelAdmin, AdminStaticFile):
     list_display = ['name', 'test_scenario']
     list_filter = ['name', 'test_scenario']
     search_fields = ['name', 'test_scenario']
