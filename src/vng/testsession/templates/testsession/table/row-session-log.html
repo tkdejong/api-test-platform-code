@@ -1,10 +1,8 @@
-{% load i18n %}
-
 {% spaceless %}
 <tr>
     <td>
         {{ log.date|time }}
-        <p style='padding: 4px;'><a class="btn btn-primary" href="{% url 'testsession:session_log-detail' session.uuid log.uuid %}">{% trans "Check details" %}</p>
+        <p style='padding: 4px;'><a class="btn btn-primary" href="{% url 'testsession:session_log-detail' session.uuid log.uuid %}">Bekijk details</p>
     </td>
     <td>{{ log.request_path }}</td>
     <td style="color: {% if log.response_status >= 200 and log.response_status < 400 %}green{% else %}red{% endif %};">

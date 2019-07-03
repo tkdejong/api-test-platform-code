@@ -1,9 +1,8 @@
 {% extends 'master.html' %}
 {% load django_bootstrap_breadcrumbs %}
 {% load subdomainurls %}
-{% load i18n %}
 
-{% block title %}{% trans "Test consumer - Detail session view" %} {% endblock%}
+{% block title %}Test consumer - Detailweergave test-sessie{% endblock%}
 
 {% block breadcrumb %}
 {% breadcrumb "Home" "testsession:sessions" %}
@@ -17,10 +16,10 @@
         <div class="col-sm-7">
             <div class="card">
                 <div class="card-header">
-                        {% trans "Test consumer" %} {{ session }}
+                        Test consumer {{ session }}
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">{% trans "Session type" %} {{ session.session_type.name }}</h5>
+                        <h5 class="card-title">Sessie type {{ session.session_type.name }}</h5>
                         <p class="card-text">
                             {{ session.session_type.description|safe }}
                         </p>
@@ -29,21 +28,21 @@
             <div class="card-deck">
                 <div class="card">
                     <div class="card-header">
-                        {% trans "Log" %}
+                        Log
                     </div>
                     <div class="card-body">
-                        <h4 class="card-title">{% trans "Started at" %}: {{ session.started|date }}</h4>
+                        <h4 class="card-title">Gestart op: {{ session.started|date }}</h4>
 
                         {% if session.is_stopped %}
                         {% for postman in session.exposedurl_set.all %}
                         {% if postman.test_session.get_json_obj %}
-                        <h4>{% trans "Postman Collection" %}</h4>
+                        <h4>Postman Collection</h4>
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col">{% trans "Time" %}</th>
-                                    <th scope="col">{% trans "Name" %}</th>
-                                    <th scope="col">{% trans "Result" %}</th>
+                                    <th scope="col">Tijd</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Resultaat</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,7 +88,7 @@
                                 <tr>
                                     <td>
                                         {% if forloop.counter == 1 %}
-                                        <u>{% trans "Tests" %}</u>
+                                        <u>Tests</u>
                                         {% endif %}
                                     </td>
                                     {% if 'error' in assertion %}
@@ -114,14 +113,14 @@
                         </table>
 
                         {% if postman.get_json_obj_info.run.failures %}
-                        <h4>{% trans "Failures" %}</h4>
+                        <h4>Failures</h4>
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>{% trans "Name" %}</th>
-                                    <th>{% trans "Error" %}</th>
-                                    <th>{% trans "Test" %}</th>
-                                    <th>{% trans "Message" %}</th>
+                                    <th>Name</th>
+                                    <th>Error</th>
+                                    <th>Test</th>
+                                    <th>Message</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -137,13 +136,13 @@
                         </table>
                         {% endif %}
                         {% if postman.get_json_obj %}
-                        <h4>{% trans "Assertions" %}</h4>
+                        <h4>Assertions</h4>
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>{% trans "Name" %}</th>
-                                    <th>{% trans "Request" %}</th>
-                                    <th>{% trans "Assertion" %}</th>
+                                    <th>Name</th>
+                                    <th>Request</th>
+                                    <th>Assertion</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -174,7 +173,9 @@
                             {% endfor %}
                         </table>
                         {% else %}
-                        <p>{% trans "No requests have yet been received." %}<p>
+                        <p>
+                            Er zijn nog geen verzoeken binnengekomen.
+                            <p>
                                 {% endif %}
 
 
@@ -186,9 +187,9 @@
 
                             {% if page_obj.has_previous %}
                             <li class="page-item"><a class="page-link"
-                                    href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
+                                    href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
                             {% else %}
-                            <li class="page-item disabled"><a class="page-link" href="#">{% trans "Previous" %}</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
                             {% endif %}
 
                             {% for i in paginator.page_range %}
@@ -201,11 +202,11 @@
 
                             {% if page_obj.has_next %}
                             <li class="page-item"><a class="page-link"
-                                    href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a>
+                                    href="?page={{ page_obj.next_page_number }}">Next</a>
                             </li>
                             {% else %}
 
-                            <li class="page-item disabled"><a class="page-link" href="#">{% trans "Next" %}</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
                             {% endif %}
                         </ul>
                     </nav>
@@ -217,7 +218,7 @@
         <div class="col-sm-5">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Endpoints & Rapports" %}
+                    Endpoints & Rapports
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -254,21 +255,21 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    {% trans "Supplier information" %}
+                    Supplier information
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <tbody>
                             <tr>
-                                <td scope="row"><strong>{% trans "Supplier name" %}</td>
+                                <td scope="row"><strong>Supplier name</td>
                                 <td>{{ session.supplier_name|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
-                                <td scope="row"><strong>{% trans "Software product" %}</td>
+                                <td scope="row"><strong>Software product</td>
                                 <td>{{ session.software_product|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
-                                <td scope="row"><strong>{% trans "Product role" %}</td>
+                                <td scope="row"><strong>Product role</td>
                                 <td>{{ session.product_role|default_if_none:''|urlize }}</td>
                             </tr>
                         </tbody>
@@ -278,7 +279,7 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-auto mr-auto">
-                            <a class="btn btn-primary" href="{% url 'testsession:session_update' session.id %}">{% trans "Update" %}</a>
+                            <a class="btn btn-primary" href="{% url 'testsession:session_update' session.id %}">Update</a>
                         </div>
                     </div>
                 </div>
@@ -286,19 +287,19 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    {% trans "Summary in a glance" %}
+                    Summary in a glance
                 </div>
                 <div class="card-body">
                     <div class='table-responsive'>
                         <table class="table">
                             <thead>
-                                <th>{% trans "Property" %}</th>
-                                <th>{% trans "Value" %}</th>
+                                <th>Property</th>
+                                <th>Value</th>
                             </thead>
                             <tbody>
                                 <tr class="table-active">
                                     <td>
-                                        {% trans "Total scenario cases" %}
+                                        Total scenario cases
                                     </td>
                                     <td>
                                         {{ total }}
@@ -306,7 +307,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        {% trans "Cases failed" %}
+                                        Cases failed
                                     </td>
                                     <td class="table-danger">
                                         {{ failed }}
@@ -314,7 +315,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        {% trans "Cases successful" %}
+                                        Cases successful
                                     </td>
                                     <td class="table-success">
                                         {{ success }}
@@ -322,7 +323,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        {% trans "Cases not called" %}
+                                        Cases not called
                                     </td>
                                     <td>
                                         {{ not_called }}

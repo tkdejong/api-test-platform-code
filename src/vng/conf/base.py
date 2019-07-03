@@ -2,7 +2,6 @@ import os
 
 # Django-hijack (and Django-hijack-admin)
 from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -63,7 +62,6 @@ INSTALLED_APPS = [
     'elasticapm.contrib.django',
     'easy_thumbnails',
     'django_bootstrap_breadcrumbs',
-    'mobetta',
 
     # Project applications.
     'vng.accounts',
@@ -104,7 +102,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'django.middleware.locale.LocaleMiddleware',
     'subdomains.middleware.SubdomainURLRoutingMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -147,7 +144,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n',
                 'vng.utils.context_processors.settings',
                 # REQUIRED FOR ADMIN INDEX
                 'django_admin_index.context_processors.dashboard',
@@ -184,13 +180,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGES = (
-    ('en', _('English')),
-    ('nl', _('Nederlands')),
-)
+LANGUAGES = (('nl', 'Nederlands'),)
 
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'nl'
 
 TIME_ZONE = 'Europe/Amsterdam'
 
@@ -205,7 +198,6 @@ USE_THOUSAND_SEPARATOR = True
 # Translations
 LOCALE_PATHS = (
     os.path.join(DJANGO_PROJECT_DIR, 'conf', 'locale'),
-    os.path.join(BASE_DIR, 'src', 'locale')
 )
 
 # Static files (CSS, JavaScript, Images)
