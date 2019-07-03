@@ -34,7 +34,7 @@
             <div class="card">
                 <div class="card-body">
                     <p>
-                        {% url 'apiv1server:provider:api_server-run-shield-detail' object.uuid as addr%}
+                        {% url 'apiv1server:api_server-run-shield-detail' object.uuid as addr%}
                         {% blocktrans %}
                             Note: Shields.io caches the badge result for 5 minutes. Check the <a
                                 href="{{url}}">API</a> for
