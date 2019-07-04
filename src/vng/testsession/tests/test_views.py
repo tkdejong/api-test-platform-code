@@ -306,10 +306,6 @@ class TestLog(WebTest):
                             headers=headers, user=self.endpoint_echo_h.session.user)
         self.assertEqual(call.json['headers']['authorization'], headers['authorization'])
 
-    def test_tasks(self):
-        align_sessions_data()
-        purge_sessions()
-
 class TestUrlParam(WebTest):
 
     def setUp(self):
