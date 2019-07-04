@@ -205,7 +205,7 @@ class TestLog(WebTest):
 
     def test_retrieve_no_entries(self):
         call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
-        self.assertTrue('Er zijn nog geen verzoeken' in call.text)
+        self.assertTrue('No requests have yet been received.' in call.text)
 
     def test_retrieve_no_entry(self):
         url = reverse_sub('run_test', self.exp_url.subdomain, kwargs={

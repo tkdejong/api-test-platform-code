@@ -26,7 +26,7 @@ class TestMultipleEndpoint(WebTest):
         form['test_scenario'] = self.ts.pk
         res = form.submit().follow()
 
-        form = res.forms[0]
+        form = res.forms[1]
         for name, _ in form.field_order:
             if name is not None and 'test_scenario' in name:
                 print(name)
@@ -185,7 +185,7 @@ class IntegrationTest(WebTest):
         form = call.forms[1]
         form['test_scenario'] = self.server_s.test_scenario.pk
         res = form.submit().follow()
-        form = res.forms[0]
+        form = res.forms[1]
         form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
         form['Client ID'] = 'client id'
         form['Secret'] = 'secret'
