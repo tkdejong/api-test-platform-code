@@ -75,6 +75,12 @@ class Dashboard(TemplateView):
             .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
             .count()
         )
+        context['sessions_active_docker'] = (
+            Session.objects
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
+            .filter(session_type__vngendpoint__docker_image__isnull=False)
+            .count()
+        )
         context['servers_scheduled'] = self.get_server_queryset()
         context['users'] = User.objects.all().count()
         return context

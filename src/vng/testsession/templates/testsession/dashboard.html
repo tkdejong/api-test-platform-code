@@ -18,7 +18,7 @@
                         <i class="icon-calendar"></i>
                     </div>
                     <div class="text-value">{{servers_scheduled}}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Servers Scheduled</small>
+                    <small class="text-muted text-uppercase font-weight-bold">Provider tests scheduled</small>
                 </div>
             </div>
         </div>
@@ -29,7 +29,18 @@
                         <i class="icon-list"></i>
                     </div>
                     <div class="text-value">{{sessions_active}}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Sessions active</small>
+                    <small class="text-muted text-uppercase font-weight-bold">Consumer session active</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-2">
+            <div class="card text-white bg-secondary">
+                <div class="card-body">
+                    <div class="h1 text-muted text-right mb-4">
+                        <i class="icon-speedometer"></i>
+                    </div>
+                    <div class="text-value">{{sessions_active_docker}}</div>
+                    <small class="text-muted text-uppercase font-weight-bold">Consumer session kubernetes</small>
                 </div>
             </div>
         </div>
