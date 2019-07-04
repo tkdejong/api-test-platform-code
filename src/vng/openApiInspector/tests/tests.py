@@ -38,7 +38,7 @@ class TestOpenApiInspector(WebTest):
 
     def test_view(self):
         call = self.app.get(reverse('open_api_inspector:openapi-inspection'))
-        form = call.forms[0]
+        form = call.forms[1]
         form['url'] = 'https://ref.tst.vng.cloud/ztc/api/v1/schema/openapi.json?v=3'
         call = form.submit().follow()
         self.assertIn("Resultaat", call.text)
@@ -46,21 +46,21 @@ class TestOpenApiInspector(WebTest):
 
     def test_view_error(self):
         call = self.app.get(reverse('open_api_inspector:openapi-inspection'))
-        form = call.forms[0]
+        form = call.forms[1]
         form['url'] = 'tss'
         call = form.submit()
-        self.assertIn("Voer een geldige URL in", call.text)
+        self.assertIn("Enter a valid URL.", call.text)
 
     def test_view_error1(self):
         call = self.app.get(reverse('open_api_inspector:openapi-inspection'))
-        form = call.forms[0]
+        form = call.forms[1]
         form['url'] = 'http://google.com'
         call = form.submit()
         self.assertIn("geen geldige JSON schema", call.text)
 
     def test_view_error2(self):
         call = self.app.get(reverse('open_api_inspector:openapi-inspection'))
-        form = call.forms[0]
+        form = call.forms[1]
         form['url'] = 'https://test.cc.co'
         call = form.submit()
         self.assertIn("Deze link is niet op te vragen", call.text)
