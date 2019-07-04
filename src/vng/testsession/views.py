@@ -61,13 +61,6 @@ class Dashboard(TemplateView):
 
     template_name = 'testsession/dashboard.html'
 
-    def get_server_queryset(self):
-        return ServerRun.objects.filter(user=self.request.user) \
-            .filter(scheduled=True) \
-            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
-            .order_by('-started') \
-            .count()
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['sessions_active'] = (
@@ -81,7 +74,11 @@ class Dashboard(TemplateView):
             .filter(session_type__vngendpoint__docker_image__isnull=False)
             .count()
         )
-        context['servers_scheduled'] = self.get_server_queryset()
+        context['servers_scheduled'] = ServerRun.objects.filter(user=self.request.user) \
+            .filter(scheduled=True) \
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
+            .order_by('-started') \
+            .count()
         context['users'] = User.objects.all().count()
         return context
 
