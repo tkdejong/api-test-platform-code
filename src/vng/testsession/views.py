@@ -16,7 +16,7 @@ from django.utils import timezone
 from django.views import View
 
 from vng.accounts.models import User
-from vng.servervalidation.models import ServerRun
+from vng.servervalidation.models import ServerRun, TestScenario
 
 from .models import (
     ScenarioCase, Session, SessionLog, ExposedUrl,
@@ -82,7 +82,9 @@ class Dashboard(TemplateView):
             .order_by('-started') \
             .filter(user=self.request.user) \
             .count()
-        context['users'] = User.objects.all().count()
+        context['session_types'] = SessionType.objects.all().count()
+        context['test_scenario'] = TestScenario.objects.all().count()
+
         return context
 
 
