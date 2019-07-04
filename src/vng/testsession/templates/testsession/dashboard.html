@@ -26,7 +26,6 @@
                                 <th scope='col'>{% trans "Session type" %}</th>
                                 <th scope='col'>{% trans "Available API URLs" %}</th>
                                 <th scope='col'>{% trans "Calls status" %}</th>
-                                <th scope='col'>{% trans "Postman result" %}</th>
                             </tr>
                             {% for session in object_list %}
                             {% include 'testsession/table/row-session_min.html' with session_related=session %}
