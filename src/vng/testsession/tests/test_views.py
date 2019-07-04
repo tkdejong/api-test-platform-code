@@ -16,7 +16,7 @@ from django_webtest import WebTest
 
 from vng.accounts.models import User
 
-from ..task import run_tests
+from ..task import run_tests, align_sessions_data, purge_sessions
 from ..api_views import RunTest
 from ..models import (
     Session, SessionType, SessionLog, Report,
@@ -305,7 +305,6 @@ class TestLog(WebTest):
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(self.endpoint_echo_h.subdomain)},
                             headers=headers, user=self.endpoint_echo_h.session.user)
         self.assertEqual(call.json['headers']['authorization'], headers['authorization'])
-
 
 class TestUrlParam(WebTest):
 

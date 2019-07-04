@@ -7,6 +7,7 @@ app_name = apps.AppConfig.__name__
 
 urlpatterns = [
     path('', views.SessionListView.as_view(), name='sessions'),
+    path('dashboard', views.Dashboard.as_view(), name='dashboard'),
     path('create/', views.SessionFormView.as_view(), name='session_create'),
     path('postman/<int:pk>/', views.PostmanDownloadView.as_view(), name='postman_download'),
     path('<int:session_id>/stop/', views.StopSession.as_view(), name='stop_session'),

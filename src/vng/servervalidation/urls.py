@@ -11,7 +11,7 @@ urlpatterns = [
     path('<int:test_id>/create/', views.CreateEndpoint.as_view(), name='server-run_create'),
     path('create/', views.ServerRunForm.as_view(), name='server-run_create_item'),
     path('postman/<int:pk>/', views.PostmanDownloadView.as_view(), name='postman_download'),
-    path('scheduled/', views.TestScenarioSelectScheduled.as_view(), name='server-run_list_scheduled'),
+    path('scheduled/', views.ServerRunListScheduled.as_view(), name='server-run_list_scheduled'),
     path('<int:server_id>/stop/', views.StopServer.as_view(), name='server-run_stop'),
     path('<int:server_id>/trigger/', views.TriggerServerRun.as_view(), name='server-run_trigger'),
     path('<uuid:uuid>/log_json/', views.ServerRunLogJsonView.as_view(), name='server-run_detail_log_json'),
@@ -20,5 +20,5 @@ urlpatterns = [
     path('<int:pk>/', views.ServerRunOutput.as_view(), name='server-run_detail'),
     path('<uuid:uuid>/update/', views.ServerRunOutputUpdate.as_view(), name='server-run_info-update'),
     path('<uuid:uuid>/', views.ServerRunOutputUuid.as_view(), name='server-run_detail_uuid'),
-    path('', views.TestScenarioSelect.as_view(), name='server-run_list'),
+    path('', views.ServerRunList.as_view(), name='server-run_list'),
 ]
