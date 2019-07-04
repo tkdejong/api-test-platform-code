@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
+from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -14,6 +15,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 
+from vng.accounts.models import User
 from vng.servervalidation.models import ServerRun
 
 from .models import (
@@ -55,28 +57,26 @@ class SessionListView(LoginRequiredMixin, ListView):
         return Session.objects.filter(user=self.request.user).order_by('-started')
 
 
-class Dashboard(SessionListView):
+class Dashboard(TemplateView):
 
     template_name = 'testsession/dashboard.html'
 
-    def get_queryset(self):
-        '''
-        Group all the exposed url by the session in order to display later all related url together
-        '''
-        return Session.objects.filter(user=self.request.user) \
-            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
-            .order_by('-started')
-
     def get_server_queryset(self):
         return ServerRun.objects.filter(user=self.request.user) \
-            .filter(scheduled=False) \
+            .filter(scheduled=True) \
             .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
-            .order_by('-started')
+            .order_by('-started') \
+            .count()
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['server_run_list'] = self.get_server_queryset()
-
+        context['sessions_active'] = (
+            Session.objects
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
+            .count()
+        )
+        context['servers_scheduled'] = self.get_server_queryset()
+        context['users'] = User.objects.all().count()
         return context
 
 
