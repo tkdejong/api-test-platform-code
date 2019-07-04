@@ -49,7 +49,7 @@ class TestOpenApiInspector(WebTest):
         form = call.forms[1]
         form['url'] = 'tss'
         call = form.submit()
-        self.assertIn("Voer een geldige URL in", call.text)
+        self.assertIn("Enter a valid URL.", call.text)
 
     def test_view_error1(self):
         call = self.app.get(reverse('open_api_inspector:openapi-inspection'))
