@@ -420,7 +420,7 @@ class TestSandboxMode(WebTest):
 
     def test_sandbox(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['session_type'].select(form['session_type'].options[-1][0])
         form['sandbox'] = True
         form.submit()
@@ -444,7 +444,7 @@ class TestSandboxMode(WebTest):
 
     def test_no_sandbox(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['session_type'].select(form['session_type'].options[-1][0])
         form['sandbox'] = False
         form.submit()
@@ -516,7 +516,7 @@ class TestAllProcedure(WebTest):
 
     def _test_create_session(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['session_type'].select(str(self.session_type.id))
         form.submit()
 
@@ -577,7 +577,7 @@ class TestAllProcedure(WebTest):
                 kwargs={'session_id': session.id}),
             user=self.user
         )
-        form = call.forms[0]
+        form = call.forms[1]
         form['supplier_name'] = 'test_name'
         form['software_product'] = 'test_software'
         form['product_role'] = 'test_product'

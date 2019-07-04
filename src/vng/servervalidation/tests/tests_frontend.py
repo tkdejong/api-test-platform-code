@@ -22,7 +22,7 @@ class TestMultipleEndpoint(WebTest):
 
     def test_run_collection(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['test_scenario'] = self.ts.pk
         res = form.submit().follow()
 
@@ -57,7 +57,7 @@ class TestCreation(WebTest):
         assert 'Started' not in str(call.body)
 
         call = self.app.get(reverse('server_run:server-run_create_item'), user='test')
-        form = call.forms[0]
+        form = call.forms[1]
         form['test_scenario'].force_value('9')
         form.submit()
         call = self.app.get(reverse('server_run:server-run_list'), user='test')
@@ -65,11 +65,11 @@ class TestCreation(WebTest):
 
     def test_scenarios(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['test_scenario'] = self.tsf.test_scenario.pk
 
         res = form.submit().follow()
-        form = res.forms[0]
+        form = res.forms[1]
         form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
         form['Client ID'] = 'client id'
         form['Secret'] = 'secret'
@@ -133,7 +133,7 @@ class TestUserRegistration(WebTest):
 
         # user registration
         call = self.app.get(reverse('registration_register'))
-        form = call.forms[0]
+        form = call.forms[1]
         form['username'] = 'test'
         form['email'] = 'test.gmail.com'
         form['password1'] = 'asdgja3u8lksa'
@@ -142,14 +142,14 @@ class TestUserRegistration(WebTest):
 
         # try to login before email confirmation
         call = self.app.get(reverse('auth_login'))
-        form = call.forms[0]
+        form = call.forms[1]
         form['username'] = 'test'
         form['password'] = 'password'
         form.submit(expect_errors=True)
 
         User.objects.create_user(username='test', password='12345678a').save()
         call = self.app.get(reverse('auth_login'))
-        form = call.forms[0]
+        form = call.forms[1]
         form['username'] = 'test'
         form['password'] = '12345678a'
         call = form.submit()
@@ -182,7 +182,7 @@ class IntegrationTest(WebTest):
 
     def test_badge(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['test_scenario'] = self.server_s.test_scenario.pk
         res = form.submit().follow()
         form = res.forms[0]
@@ -217,7 +217,7 @@ class IntegrationTest(WebTest):
                 kwargs={'uuid': new_server.uuid}),
             user=self.user
         )
-        form = call.forms[0]
+        form = call.forms[1]
         form['supplier_name'] = 'test_name'
         form['software_product'] = 'test_software'
         form['product_role'] = 'test_product'
