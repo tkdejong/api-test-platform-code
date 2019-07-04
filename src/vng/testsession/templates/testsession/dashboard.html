@@ -15,7 +15,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                    {% trans "Consumer test-session" %}
+                    <a href="{% url 'testsession:sessions' %}">{% trans "Consumer test-session" %}</a>
 		            </div>
                     <div class="card-body">
                         <table class="table">
@@ -40,7 +40,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                        {% trans "Provider tests" %}
+                        <a href="{% url 'server_run:server-run_list' %}">{% trans "Provider tests" %}</a>
                         </div>
                         <div class="card-body">
                             <table class="table">
