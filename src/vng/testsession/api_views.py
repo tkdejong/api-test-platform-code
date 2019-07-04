@@ -450,7 +450,6 @@ class RunTest(CSRFExemptMixin, View):
             else:
                 response = method(request_url, headers=request_header, allow_redirects=False)
             return response
-
         try:
             response = make_call()
         except Exception as e:
