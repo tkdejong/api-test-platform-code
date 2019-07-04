@@ -22,9 +22,9 @@ urlpatterns = router.urls
 urlpatterns += [
     re_path(r'schema/openapi(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('schema/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('testsession-run-shield/<uuid:uuid>', api_views.ResultTestsessionViewShield.as_view(), name='testsession-shield'),
-    path('testsessions/<int:pk>/stop', api_views.StopSessionView.as_view(), name='stop_session'),
-    path('testsessions/<int:pk>/result', api_views.ResultSessionView.as_view(), name='result_session'),
-    path('testsessions/<int:pk>/stop', api_views.StopSessionView.as_view(), name='stop_session'),
-    path('testsessions/<int:pk>/result', api_views.ResultSessionView.as_view(), name='result_session'),
+    path('testsession-run-shield/<uuid:uuid>/', api_views.ResultTestsessionViewShield.as_view(), name='testsession-shield'),
+    path('testsessions/<int:pk>/stop/', api_views.StopSessionView.as_view(), name='stop_session'),
+    path('testsessions/<int:pk>/result/', api_views.ResultSessionView.as_view(), name='result_session'),
+    path('testsessions/<int:pk>/stop/', api_views.StopSessionView.as_view(), name='stop_session'),
+    path('testsessions/<int:pk>/result/', api_views.ResultSessionView.as_view(), name='result_session'),
 ]
