@@ -8,11 +8,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 
+from vng.servervalidation.models import ServerRun
 
 from .models import (
     ScenarioCase, Session, SessionLog, ExposedUrl,
@@ -51,6 +53,31 @@ class SessionListView(LoginRequiredMixin, ListView):
         Group all the exposed url by the session in order to display later all related url together
         '''
         return Session.objects.filter(user=self.request.user).order_by('-started')
+
+
+class Dashboard(SessionListView):
+
+    template_name = 'testsession/dashboard.html'
+
+    def get_queryset(self):
+        '''
+        Group all the exposed url by the session in order to display later all related url together
+        '''
+        return Session.objects.filter(user=self.request.user) \
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
+            .order_by('-started')
+
+    def get_server_queryset(self):
+        return ServerRun.objects.filter(user=self.request.user) \
+            .filter(scheduled=False) \
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
+            .order_by('-started')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['server_run_list'] = self.get_server_queryset()
+
+        return context
 
 
 class SessionFormView(FormView):

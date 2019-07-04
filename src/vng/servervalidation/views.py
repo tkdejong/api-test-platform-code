@@ -19,7 +19,7 @@ from .models import (
 from .task import execute_test
 
 
-class TestScenarioSelect(LoginRequiredMixin, ListView):
+class ServerRunList(LoginRequiredMixin, ListView):
 
     template_name = 'servervalidation/server-run_list.html'
     context_object_name = 'server_run_list'
@@ -60,7 +60,7 @@ class ServerRunForm(CreateView):
         }))
 
 
-class TestScenarioSelectScheduled(TestScenarioSelect):
+class ServerRunListScheduled(ServerRunList):
 
     template_name = 'servervalidation/server-run_list_scheduled.html'
 

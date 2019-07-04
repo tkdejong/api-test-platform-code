@@ -1,0 +1,76 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load subdomainurls %}
+{% load i18n %}
+
+
+{% block title %}{% trans "Test consumer - list sessions view" %}{% endblock %}
+
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        {% if object_list %}
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                    {% trans "Consumer test-session" %}
+		            </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tr>
+                                <th scope='col'>{% trans "Session ID" %}</th>
+                                <th scope='col'>{% trans "Session status" %}</th>
+                                <th scope='col'>{% trans "Started at" %}</th>
+                                <th scope='col'>{% trans "Session type" %}</th>
+                                <th scope='col'>{% trans "Available API URLs" %}</th>
+                                <th scope='col'>{% trans "Calls status" %}</th>
+                                <th scope='col'>{% trans "Postman result" %}</th>
+                            </tr>
+                            {% for session in object_list %}
+                            {% include 'testsession/table/row-session_min.html' with session_related=session %}
+                            {% endfor %}
+                        </table>
+                        {% include 'components/pagination/pagination.html' %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if server_run_list %}
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                        {% trans "Provider tests" %}
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <tr>
+                                    <th scope='col'>{% trans "Sessie status" %}</th>
+                                    <th scope='col'>{% trans "Session ID" %}</th>
+                                    <th scope='col'>{% trans "Started at" %}</th>
+                                    <th scope='col'>{% trans "Test scenario" %}</th>
+                                    <th scope='col'>{% trans "Status" %}</th>
+                                    <th scope='col'>{% trans "Status details" %}</th>
+                                </tr>
+                                {% for server_run in server_run_list %}
+                                    {% include 'servervalidation/table/row-server-run_min.html' with server_run=server_run %}
+                                {% endfor %}
+                            </table>
+                    {% include 'components/pagination/pagination.html' %}
+                        </div>
+                    </div>
+                </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    window.url = window.location.origin + "/api/v1/status/"
+    window.attr_name = 'session_id'
+    window.status = 'deploy_status'
+    window.percentage = 'deploy_percentage'
+</script>
+{% endblock %}
