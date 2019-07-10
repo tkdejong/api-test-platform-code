@@ -20,7 +20,7 @@
                         {% trans "Test consumer" %} {{ session }}
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">{% trans "Session type" %}: {{ session.session_type.name }}</h5>
+                        <h5 class="card-title">{% trans "Session type" %}: {{ session.session_type.name }}
                         {% if session.status == choices.running %}
                             <span class="badge badge-pill badge-success">{% trans "Running" %}</span>
                         {% elif session.status == choices.starting %}
