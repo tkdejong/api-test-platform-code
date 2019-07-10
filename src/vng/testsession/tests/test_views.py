@@ -528,6 +528,7 @@ class TestAllProcedure(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
+        self.session = SessionFactory()
         self.session_type = VNGEndpointFactory(name='demo-api').session_type
 
     def _test_create_session(self):
@@ -546,6 +547,13 @@ class TestAllProcedure(WebTest):
         })
         call = self.app.post(url, user=self.session.user).follow()
         self.assertIn('Stopped', call.text)
+
+
+    def test_get_report_stats(self):
+        call = self.app.get(reverse('testsession:session_log',kwargs={
+            'uuid': self.session.uuid
+        }))
+        self.assertEqual(call.status, '200 OK')
 
     def test_report(self):
         self._test_create_session()
@@ -602,7 +610,7 @@ class TestAllProcedure(WebTest):
         self.assertEqual(session.product_role, 'test_product')
 
 
-    def get_schema(self):
+    def test_get_schema(self):
         call = self.app.get(reverse('apiv1session:schema-redoc'))
         self.assertEqual(call.status, '200 OK')
         call = self.app.get(reverse('apiv1session:schema-json',kwargs={
@@ -610,6 +618,7 @@ class TestAllProcedure(WebTest):
         }))
         self.assertEqual(call.status, '200 OK')
         
+  
 
 class TestLogNewman(WebTest):
 
