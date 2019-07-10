@@ -96,7 +96,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
         data['ts'] = ts
         data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=ts)
-        test_scenario_url = TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario)
+        test_scenario_url = TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario).order_by('-url')
         url_names = [tsu.name for tsu in test_scenario_url]
         no_url = len(data['test_scenario'].filter(url=True))
         data['form'] = CreateEndpointForm(
