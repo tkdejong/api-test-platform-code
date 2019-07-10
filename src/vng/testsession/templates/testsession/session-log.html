@@ -33,7 +33,7 @@
                             <span class="badge badge-pill badge-dark">{{session.status}}</span>
                         {% endif %}
                         <p class="card-text">
-                            {{ session.session_type.description|safe }}
+                            <a class="btn btn-info btn-margin" href="{% url 'testsession:session_type-detail' session.session_type.pk  %}">Description</a>
                         </p>
                     </div>
                 </div>

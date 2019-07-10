@@ -7,6 +7,7 @@ import uuid
 from datetime import timedelta, datetime
 from celery.utils.log import get_task_logger
 
+from django.db.models import Q
 from django.utils.timezone import make_aware
 
 from vng.k8s_manager.kubernetes import *
@@ -63,7 +64,7 @@ def purge_sessions():
     for session in \
             Session.objects.filter(started__lte=make_aware(datetime.now()) - timedelta(days=1)) \
             .filter(status=choices.StatusChoices.running) \
-            .filter(exposedurl__vng_endpoint__docker_image__isnull=False):
+            .filter(Q(exposedurl__vng_endpoint__docker_image__isnull=False) | Q(session_type__ZGW_images=True)):
         purged = True
         stop_session(session.pk)
     return purged
