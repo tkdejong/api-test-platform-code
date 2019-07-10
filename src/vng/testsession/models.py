@@ -140,7 +140,7 @@ class ScenarioCase(OrderedModel):
     Wildcards can be added, e.g. '/test/{uuid}/stop'
     will match the URL '/test/c5429dcc-6955-4e22-9832-08d52205f633/stop'.
     ''')
-    http_method = models.CharField(max_length=20, choices=choices.HTTPMethodChoiches.choices, default=choices.HTTPMethodChoiches.GET)
+    http_method = models.CharField(max_length=20, choices=choices.HTTPMethodChoices.choices, default=choices.HTTPMethodChoices.GET)
     vng_endpoint = models.ForeignKey(VNGEndpoint, on_delete=models.PROTECT)
     order_with_respect_to = 'vng_endpoint__session_type'
 
@@ -284,16 +284,16 @@ class Report(models.Model):
 
     scenario_case = models.ForeignKey(ScenarioCase, on_delete=models.CASCADE)
     session_log = models.ForeignKey(SessionLog, on_delete=models.CASCADE)
-    result = models.CharField(max_length=20, choices=choices.HTTPCallChoiches.choices, default=choices.HTTPCallChoiches.not_called)
+    result = models.CharField(max_length=20, choices=choices.HTTPCallChoices.choices, default=choices.HTTPCallChoices.not_called)
 
     def is_success(self):
-        return self.result == choices.HTTPCallChoiches.success
+        return self.result == choices.HTTPCallChoices.success
 
     def is_failed(self):
-        return self.result == choices.HTTPCallChoiches.failed
+        return self.result == choices.HTTPCallChoices.failed
 
     def is_not_called(self):
-        return self.result == choices.HTTPCallChoiches.not_called
+        return self.result == choices.HTTPCallChoices.not_called
 
     def __str__(self):
         return 'Case: {} - Log: {} - Result: {}'.format(self.scenario_case, self.session_log, self.result)

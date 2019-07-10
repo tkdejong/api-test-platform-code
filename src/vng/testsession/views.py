@@ -130,7 +130,11 @@ class SessionLogView(ListView):
         context = super().get_context_data(*args, **kwargs)
         session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         stats = session.get_report_stats()
-
+        _choices = dict(choices.StatusChoices.choices)
+        _choices['error_deploy'] = choices.StatusChoices.error_deploy
+        context.update({
+            'choices': _choices,
+        })
         context.update({
             'session': session,
             'success': stats[0],
@@ -219,7 +223,7 @@ class SessionReport(OwnerSingleObject):
                     is_in = True
                     break
             if not is_in:
-                report_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoiches.not_called))
+                report_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoices.not_called))
 
         context.update({
             'session': self.session,

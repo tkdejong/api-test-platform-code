@@ -20,7 +20,18 @@
                         {% trans "Test consumer" %} {{ session }}
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">{% trans "Session type" %} {{ session.session_type.name }}</h5>
+                        <h5 class="card-title">{% trans "Session type" %}: {{ session.session_type.name }}
+                        {% if session.status == choices.running %}
+                            <span class="badge badge-pill badge-success">{% trans "Running" %}</span>
+                        {% elif session.status == choices.starting %}
+                            <span class="badge badge-pill badge-light">{% trans "Starting" %}</span>
+                        {% elif session.status == choices.stopped %}
+                            <span class="badge badge-pill badge-secondary">{% trans "Stopped" %}</span>
+                        {% elif session.status == choices.error_deploy %}
+                            <span class="badge badge-pill badge-danger">{% trans "Error during deployment" %}</span>
+                        {% else %}
+                            <span class="badge badge-pill badge-dark">{{session.status}}</span>
+                        {% endif %}
                         <p class="card-text">
                             {{ session.session_type.description|safe }}
                         </p>

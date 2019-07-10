@@ -91,7 +91,7 @@ class ScenarioCaseFactory(Dmf):
         model = ScenarioCase
 
     url = 'unknown/23'
-    http_method = choices.HTTPMethodChoiches.GET
+    http_method = choices.HTTPMethodChoices.GET
     vng_endpoint = factory.SubFactory(VNGEndpointFactory)
 
 

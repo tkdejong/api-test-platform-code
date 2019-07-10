@@ -152,7 +152,7 @@ class ResultSessionView(views.APIView):
             if len(report) == 0:
                 return {'result': 'Geen oproep uitgevoerd'}
             for rp in report:
-                if rp.result == choices.HTTPCallChoiches.failed:
+                if rp.result == choices.HTTPCallChoices.failed:
                     return {'result': 'mislukt'}
             if len(report) < len(scenario_cases):
                 return {'result': 'Gedeeltelijk succesvol'}
@@ -304,13 +304,13 @@ class RunTest(CSRFExemptMixin, View):
                     is_failed = False
                     for a, b in self.error_codes:
                         if status_code >= a and status_code <= b:
-                            report.result = choices.HTTPCallChoiches.failed
+                            report.result = choices.HTTPCallChoices.failed
                             report.session_log = session_log
                             is_failed = True
                             break
                     if not is_failed and not report.is_failed() or (session.sandbox and not is_failed):
                         report.session_log = session_log
-                        report.result = choices.HTTPCallChoiches.success
+                        report.result = choices.HTTPCallChoices.success
                     logger.info("Saving report: %s", report.result)
                     report.save()
                     break
@@ -539,9 +539,9 @@ class ResultTestsessionViewShield(views.APIView):
         for case in scenario_case:
             missing = False
             for rp in report:
-                if rp.result == choices.HTTPCallChoiches.failed:
+                if rp.result == choices.HTTPCallChoices.failed:
                     is_error = True
-                if rp.scenario_case == case and rp.result != choices.HTTPCallChoiches.not_called:
+                if rp.scenario_case == case and rp.result != choices.HTTPCallChoices.not_called:
                     report_ordered.append(rp)
                     missing = True
                     break
