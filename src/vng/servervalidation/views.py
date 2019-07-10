@@ -32,6 +32,7 @@ class ServerRunList(LoginRequiredMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
         data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
+        data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
         for sr in data['server_run_list']:
             sr.success = sr.get_execution_result()
         if 'server_run_scheduled' in self.request.session:

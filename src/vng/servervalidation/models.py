@@ -95,6 +95,9 @@ class ServerRun(models.Model):
     def is_running(self):
         return self.status == choices.StatusChoices.running
 
+    def is_error(self):
+        return self.status == choices.StatusChoices.error_deploy
+
     def get_execution_result(self):
         ptr_set = self.postmantestresult_set.all()
         if len(ptr_set) == 0:
