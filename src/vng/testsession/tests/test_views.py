@@ -22,6 +22,7 @@ from ..models import (
     Session, SessionType, SessionLog, Report,
     ScenarioCase, VNGEndpoint, ExposedUrl, TestSession
 )
+from ..permission import IsOwner
 
 from .factories import (
     SessionFactory, SessionTypeFactory, VNGEndpointDockerFactory, ExposedUrlEchoFactory, VNGEndpointEchoFactory,
@@ -306,6 +307,7 @@ class TestLog(WebTest):
                             headers=headers, user=self.endpoint_echo_h.session.user)
         self.assertEqual(call.json['headers']['authorization'], headers['authorization'])
 
+
 class TestUrlParam(WebTest):
 
     def setUp(self):
@@ -326,6 +328,15 @@ class TestUrlParam(WebTest):
         self.vng_endpoint_p.url = 'https://postman-echo.com/'
         self.vng_endpoint.save()
         self.vng_endpoint_p.save()
+
+    def test_permissions(self):
+        permissions = IsOwner()
+        res = permissions.has_object_permission(
+            type('req',(object,),{'user':self.session.user}),
+            {},
+            self.session 
+        )
+        self.assertEqual(res, True)
 
     def test_query_params_no_match(self):
         report = len(Report.objects.filter(scenario_case=self.scenario_case))
