@@ -60,7 +60,10 @@ def align_sessions_data():
 def purge_sessions():
     align_sessions_data()
     purged = False
-    for session in Session.objects.filter(started__lte=make_aware(datetime.now()) - timedelta(days=1)).filter(status=choices.StatusChoices.running):
+    for session in \
+            Session.objects.filter(started__lte=make_aware(datetime.now()) - timedelta(days=1)) \
+            .filter(status=choices.StatusChoices.running) \
+            .filter(exposedurl__vng_endpoint__docker_image__isnull=False):
         purged = True
         stop_session(session.pk)
     return purged
