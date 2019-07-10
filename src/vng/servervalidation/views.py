@@ -82,7 +82,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
         self.server = ServerRun(
             user=self.request.user,
             test_scenario=ts,
-            scheduled=self.request.session['server_run_scheduled'],
+            scheduled=self.request.session.get('server_run_scheduled', False),
             supplier_name=self.request.session['supplier_name'],
             software_product=self.request.session['software_product'],
             product_role=self.request.session['product_role']
