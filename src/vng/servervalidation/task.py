@@ -87,7 +87,7 @@ def execute_test(server_run_pk, scheduled=False, email=False):
             param = {}
             for ep in endpoints:
                 param[ep.test_scenario_url.name] = ep.url
-                nm.replace_parameters(param)
+            nm.replace_parameters(param)
             file = nm.execute_test()
             file_json = nm.execute_test_json()
             ptr = PostmanTestResult(
