@@ -101,7 +101,8 @@ def execute_test(server_run_pk, scheduled=False, email=False):
 
         server_run.status_exec = 'Completed'
     except Exception as e:
-        logger.info(e)
+        logger.warning(e)
+        server_run.status = choices.StatusChoices.error_deploy
         server_run.status_exec = 'An error occurred'
     server_run.percentage_exec = 100
     if not scheduled:
