@@ -83,9 +83,9 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             user=self.request.user,
             test_scenario=ts,
             scheduled=self.request.session.get('server_run_scheduled', False),
-            supplier_name=self.request.session['supplier_name'],
-            software_product=self.request.session['software_product'],
-            product_role=self.request.session['product_role']
+            supplier_name=self.request.session.get('supplier_name', ''),
+            software_product=self.request.session.get('software_product', ''),
+            product_role=self.request.session.get('product_role', '')
         )
 
     def get_context_data(self, **kwargs):
