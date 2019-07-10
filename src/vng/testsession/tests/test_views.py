@@ -332,11 +332,17 @@ class TestUrlParam(WebTest):
     def test_permissions(self):
         permissions = IsOwner()
         res = permissions.has_object_permission(
-            type('req',(object,),{'user':self.session.user}),
-            {},
+            type('req',(object,),{'user':self.session.user})(),
+            type('view',(object,),{'user_path':['user']})(),
             self.session 
         )
         self.assertEqual(res, True)
+        res = permissions.has_object_permission(
+            type('req',(object,),{'user':UserFactory()})(),
+            type('view',(object,),{'user_path':['user']})(),
+            self.session 
+        )
+        self.assertEqual(res, False)
 
     def test_query_params_no_match(self):
         report = len(Report.objects.filter(scenario_case=self.scenario_case))
