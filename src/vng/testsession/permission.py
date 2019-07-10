@@ -17,6 +17,6 @@ class IsOwner(permissions.BasePermission):
             if hasattr(view, 'user_path'):
                 for path in getattr(view, 'user_path'):
                     o = getattr(o, path)
-            if o.user != request.user:
-                return False
+                if o != request.user:
+                    return False
         return True
