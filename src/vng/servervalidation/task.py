@@ -1,5 +1,6 @@
 import uuid
 from zds_client import ClientAuth
+import traceback
 
 from django.core.files import File
 from django.utils import timezone
@@ -103,7 +104,7 @@ def execute_test(server_run_pk, scheduled=False, email=False):
     except Exception as e:
         logger.warning(e)
         server_run.status = choices.StatusChoices.error_deploy
-        server_run.status_exec = 'An error occurred'
+        server_run.status_exec = traceback.format_exc()
     server_run.percentage_exec = 100
     if not scheduled:
         server_run.status = choices.StatusWithScheduledChoices.stopped
