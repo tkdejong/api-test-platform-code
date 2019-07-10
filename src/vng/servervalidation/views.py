@@ -32,6 +32,7 @@ class ServerRunList(LoginRequiredMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
         data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
+        data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
         for sr in data['server_run_list']:
             sr.success = sr.get_execution_result()
         if 'server_run_scheduled' in self.request.session:
@@ -81,10 +82,10 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
         self.server = ServerRun(
             user=self.request.user,
             test_scenario=ts,
-            scheduled=self.request.session['server_run_scheduled'],
-            supplier_name=self.request.session['supplier_name'],
-            software_product=self.request.session['software_product'],
-            product_role=self.request.session['product_role']
+            scheduled=self.request.session.get('server_run_scheduled', False),
+            supplier_name=self.request.session.get('supplier_name', ''),
+            software_product=self.request.session.get('software_product', ''),
+            product_role=self.request.session.get('product_role', '')
         )
 
     def get_context_data(self, **kwargs):
