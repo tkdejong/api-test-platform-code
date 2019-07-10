@@ -602,6 +602,15 @@ class TestAllProcedure(WebTest):
         self.assertEqual(session.product_role, 'test_product')
 
 
+    def get_schema(self):
+        call = self.app.get(reverse('apiv1session:schema-redoc'))
+        self.assertEqual(call.status, '200 OK')
+        call = self.app.get(reverse('apiv1session:schema-json',kwargs={
+            'format':'.json'
+        }))
+        self.assertEqual(call.status, '200 OK')
+        
+
 class TestLogNewman(WebTest):
 
     def setUp(self):
