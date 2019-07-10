@@ -316,7 +316,7 @@ class TestUrlParam(WebTest):
         self.exposed_url = ExposedUrlFactory(session=self.session, vng_endpoint=self.vng_endpoint)
         self.qp_p = QueryParamsScenarioFactory()
         self.scenario_case_p = self.qp_p.scenario_case
-        self.scenario_case_p.http_method = choices.HTTPMethodChoiches.PUT
+        self.scenario_case_p.http_method = choices.HTTPMethodChoices.PUT
         self.scenario_case_p.save()
         self.vng_endpoint_p = self.scenario_case_p.vng_endpoint
         self.session_p = SessionFactory(session_type=self.vng_endpoint_p.session_type)
@@ -433,13 +433,13 @@ class TestSandboxMode(WebTest):
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user, status=[404])
         report = Report.objects.get(scenario_case=self.sc)
 
-        self.assertEqual(choices.HTTPCallChoiches.failed, report.result)
+        self.assertEqual(choices.HTTPCallChoices.failed, report.result)
         url = reverse_sub('run_test', eu.subdomain, kwargs={
             'relative_url': 'status/200'
         })
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user)
         report = Report.objects.get(scenario_case=self.sc)
-        self.assertEqual(choices.HTTPCallChoiches.success, report.result)
+        self.assertEqual(choices.HTTPCallChoices.success, report.result)
 
     def test_no_sandbox(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
@@ -457,13 +457,13 @@ class TestSandboxMode(WebTest):
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user, status=[404])
         report = Report.objects.get(scenario_case=self.sc)
 
-        self.assertEqual(choices.HTTPCallChoiches.failed, report.result)
+        self.assertEqual(choices.HTTPCallChoices.failed, report.result)
         url = reverse_sub('run_test', eu.subdomain, kwargs={
             'relative_url': 'status/200'
         })
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user)
         report = Report.objects.get(scenario_case=self.sc)
-        self.assertEqual(choices.HTTPCallChoiches.failed, report.result)
+        self.assertEqual(choices.HTTPCallChoices.failed, report.result)
 
     def test_create_sandbox_default(self):
         session = {
@@ -818,7 +818,7 @@ class TestMultipleParams(WebTest):
         reports = Report.objects.filter(session_log__session=session)
         scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
         for r in reports:
-            r.result = choices.HTTPCallChoiches.not_called
+            r.result = choices.HTTPCallChoices.not_called
             r.save()
 
         call = self.app.get(reverse('apiv1session:testsession-shield',
@@ -828,7 +828,7 @@ class TestMultipleParams(WebTest):
         ))
         self.assertEqual(call.json['message'], 'No errors, not completed')
 
-        reports[0].result = choices.HTTPCallChoiches.failed
+        reports[0].result = choices.HTTPCallChoices.failed
         reports[0].save()
 
         call = self.app.get(reverse('apiv1session:testsession-shield',
@@ -839,7 +839,7 @@ class TestMultipleParams(WebTest):
         self.assertEqual(call.json['message'], 'Failed')
 
         for r in reports:
-            r.result = choices.HTTPCallChoiches.success
+            r.result = choices.HTTPCallChoices.success
             r.save()
 
         call = self.app.get(reverse('apiv1session:testsession-shield',
