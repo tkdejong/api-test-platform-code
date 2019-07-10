@@ -22,6 +22,7 @@ from ..models import (
     Session, SessionType, SessionLog, Report,
     ScenarioCase, VNGEndpoint, ExposedUrl, TestSession
 )
+from ..permission import IsOwner
 
 from .factories import (
     SessionFactory, SessionTypeFactory, VNGEndpointDockerFactory, ExposedUrlEchoFactory, VNGEndpointEchoFactory,
@@ -306,6 +307,7 @@ class TestLog(WebTest):
                             headers=headers, user=self.endpoint_echo_h.session.user)
         self.assertEqual(call.json['headers']['authorization'], headers['authorization'])
 
+
 class TestUrlParam(WebTest):
 
     def setUp(self):
@@ -326,6 +328,21 @@ class TestUrlParam(WebTest):
         self.vng_endpoint_p.url = 'https://postman-echo.com/'
         self.vng_endpoint.save()
         self.vng_endpoint_p.save()
+
+    def test_permissions(self):
+        permissions = IsOwner()
+        res = permissions.has_object_permission(
+            type('req',(object,),{'user':self.session.user})(),
+            type('view',(object,),{'user_path':['user']})(),
+            self.session 
+        )
+        self.assertEqual(res, True)
+        res = permissions.has_object_permission(
+            type('req',(object,),{'user':UserFactory()})(),
+            type('view',(object,),{'user_path':['user']})(),
+            self.session 
+        )
+        self.assertEqual(res, False)
 
     def test_query_params_no_match(self):
         report = len(Report.objects.filter(scenario_case=self.scenario_case))
@@ -511,6 +528,7 @@ class TestAllProcedure(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
+        self.session = SessionFactory()
         self.session_type = VNGEndpointFactory(name='demo-api').session_type
 
     def _test_create_session(self):
@@ -529,6 +547,13 @@ class TestAllProcedure(WebTest):
         })
         call = self.app.post(url, user=self.session.user).follow()
         self.assertIn('Stopped', call.text)
+
+
+    def test_get_report_stats(self):
+        call = self.app.get(reverse('testsession:session_log',kwargs={
+            'uuid': self.session.uuid
+        }))
+        self.assertEqual(call.status, '200 OK')
 
     def test_report(self):
         self._test_create_session()
@@ -584,6 +609,16 @@ class TestAllProcedure(WebTest):
         session = Session.objects.latest('id')
         self.assertEqual(session.product_role, 'test_product')
 
+
+    def test_get_schema(self):
+        call = self.app.get(reverse('apiv1session:schema-redoc'))
+        self.assertEqual(call.status, '200 OK')
+        call = self.app.get(reverse('apiv1session:schema-json',kwargs={
+            'format':'.json'
+        }))
+        self.assertEqual(call.status, '200 OK')
+        
+  
 
 class TestLogNewman(WebTest):
 

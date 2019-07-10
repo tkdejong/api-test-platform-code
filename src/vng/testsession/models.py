@@ -238,9 +238,6 @@ class ExposedUrl(models.Model):
     test_session = models.ForeignKey(TestSession, blank=True, null=True, default=None, on_delete=models.CASCADE)
     docker_url = models.CharField(max_length=200, blank=True, null=True, default=None)
 
-    def get_uuid_url(self):
-        return re.search('([^/]+)', self.subdomain).group(1)
-
     def __str__(self):
         return '{} {}'.format(self.session, self.vng_endpoint)
 
