@@ -107,7 +107,8 @@ def execute_test(server_run_pk, scheduled=False, email=False):
         server_run.status_exec = traceback.format_exc()
     server_run.percentage_exec = 100
     if not scheduled:
-        server_run.status = choices.StatusWithScheduledChoices.stopped
+        if server_run.status != choices.StatusChoices.error_deploy:
+            server_run.status = choices.StatusWithScheduledChoices.stopped
         server_run.stopped = timezone.now()
     else:
         server_run.last_exec = timezone.now()
