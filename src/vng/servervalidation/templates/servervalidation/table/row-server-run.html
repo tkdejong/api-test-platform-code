@@ -67,6 +67,9 @@
             </div>
             {% endif %}
         {% endif %}
+        {% if server_run.status == choices.error_deploy %}
+            {{server_run.status_exec}}
+        {% endif %}
     </td>
     <td>
         <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
