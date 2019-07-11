@@ -39,7 +39,7 @@ class SessionType(models.Model):
     ZGW_images = models.BooleanField(default=False, blank=True)
 
     class Meta:
-        verbose_name = _('Session Ttype')
+        verbose_name = _('Session Type')
         verbose_name_plural = _('Sessions type')
         ordering = ('name',)
 
