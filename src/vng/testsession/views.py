@@ -303,3 +303,8 @@ class SessionTypeDetail(DetailView):
 
     model = SessionType
     template_name = 'testsession/session_type-detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['scenario_cases'] = ScenarioCase.objects.filter(vng_endpoint__session_type=context['sessiontype'])
+        return context
