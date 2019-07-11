@@ -37,6 +37,7 @@ class SessionType(models.Model):
     database = models.BooleanField(help_text='Check if the a postgres db is needed in the Kubernetes cluster', default=False)
     db_data = models.TextField(default=None, null=True, blank=True)
     ZGW_images = models.BooleanField(default=False, blank=True)
+    active = models.BooleanField(blank=True, default=True)
 
     class Meta:
         verbose_name = _('Session Ttype')
