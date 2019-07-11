@@ -2,7 +2,7 @@ from django_webtest import WebTest
 from django.urls import reverse
 
 
-class TestOpenApiInspector(WebTest):
+class TestOpenApiInspector:
 
     def setUp(self):
         self.url = reverse('apiv1inspector:openAPIinspection')
