@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'registration',
     'subdomains',
+    'mathfilters',
     # 'django.contrib.admindocs',
     # 'django.contrib.humanize',
     # 'django.contrib.sitemaps',
