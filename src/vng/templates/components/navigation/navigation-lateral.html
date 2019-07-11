@@ -5,10 +5,10 @@
         {% if user.is_authenticated %}
         <li class="nav-item">
 	  <a class="nav-link" href="{% url 'testsession:dashboard' %}">
-	    <i class="nav-icon icon-speedometer"></i>Dashboard</a>
+	    <i class="nav-icon icon-speedometer"></i>{% trans "Dashboard" %}</a>
 	</li>
 
-        <li class="nav-title">Test Consumer</li>
+        <li class="nav-title">{% trans "Test Consumer" %}</li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'testsession:sessions' %}">
               <i class="nav-icon icon-list"></i>{% trans "Consumer session" %}
@@ -19,7 +19,7 @@
             <a class="nav-link" href="{% url 'testsession:session_create' %}">
               <i class="nav-icon icon-note"></i>{% trans "Start session" %}</a>
 	</li>
-	<li class="nav-title">Test Provider</li>
+	<li class="nav-title">{% trans "Test Provider" %}</li>
 	<li class="nav-item">
 	  <a class="nav-link" href="{% url 'server_run:server-run_list' %}">
 	    <i class="nav-icon icon-list"></i>
@@ -42,7 +42,7 @@
                 <i class="nav-icon icon-magnifier"></i>OpenAPI Inspection</a>
         </li>
     </li>
-    <li class="nav-title">Documenten</li>
+    <li class="nav-title">{% trans "Documentation" %}</li>
         <li class="nav-item ">
             <a class="nav-link" href="https://github.com/VNG-Realisatie/api-testvoorziening">
                 <i class="nav-icon icon-info"></i>{% trans "Documentation" %}</a>
