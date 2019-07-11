@@ -1,4 +1,6 @@
 {% load i18n %}
+{% load mathfilters %}
+
 {% spaceless %}
     {% if is_paginated %}
             <ul class="pagination">
@@ -11,19 +13,20 @@
                         <a class="page-link" href="#">{{ _('Previous') }}</a>
                     </li>
                 {% endif %}
-
                 {% for i in paginator.page_range %}
-                    {% if page_obj.number == i %}
-                        <li class="page-item active">
-                            <span class="page-link">
-                                {{ i }}
-                                <span class="sr-only">(current)</span>
-                            </span>
-                        </li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-                        </li>
-                    {% endif %}
+                    {% with page_obj.number|sub:i|abs as diff %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    {{ i }}
+                                    <span class="sr-only">(current)</span>
+                                </span>
+                            </li>
+                        {% elif diff < 5 %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                            </li>
+                        {% endif %}
+                    {% endwith %}
                 {% endfor %}
 
                 {% if page_obj.has_next %}
