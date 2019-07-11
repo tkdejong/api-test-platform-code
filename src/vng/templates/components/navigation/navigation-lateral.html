@@ -36,12 +36,13 @@
 	    Start testrun</a>
 	</li>
         {% endif %}
-	<li class="nav-title">OpenAPI</li>
+    {% comment %} Disable since not mature enough {% endcomment %}
+	{% comment %} <li class="nav-title">OpenAPI</li>
         <li class="nav-item ">
             <a class="nav-link" href="{% url 'open_api_inspector:openapi-inspection' %}">
                 <i class="nav-icon icon-magnifier"></i>OpenAPI Inspection</a>
         </li>
-    </li>
+    </li> {% endcomment %}
     <li class="nav-title">Documenten</li>
         <li class="nav-item ">
             <a class="nav-link" href="https://github.com/VNG-Realisatie/api-testvoorziening">
