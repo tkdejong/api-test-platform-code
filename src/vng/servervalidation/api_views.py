@@ -97,7 +97,7 @@ class ResultServerViewShield(views.APIView):
             color = 'red'
         result = {
             'schemaVersion': 1,
-            'label': 'VNG test platform',
+            'label': 'API Test Platform',
             'message': message,
             'color': color,
             'isError': is_error,
