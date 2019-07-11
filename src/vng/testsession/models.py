@@ -169,7 +169,7 @@ class QueryParamsScenario(models.Model):
 
 class Session(models.Model):
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(_('Name'), max_length=30, unique=True, null=True)
     session_type = models.ForeignKey(SessionType, verbose_name=_('Session type'), on_delete=models.PROTECT)
     started = models.DateTimeField(_('Started at'), default=timezone.now)
