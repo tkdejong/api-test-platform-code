@@ -71,7 +71,8 @@ INSTALLED_APPS = [
     'vng.testsession',
     'vng.apiAuthentication',
     'vng.servervalidation',
-    'vng.openApiInspector',
+    # Disabled for the moment, enable if want to use its functionalities
+    # 'vng.openApiInspector',
     'vng.celery',
     'vng.k8s_manager',
 
