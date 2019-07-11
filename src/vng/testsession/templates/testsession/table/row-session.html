@@ -80,7 +80,7 @@
             {% endif %}
         </td>
         <td>
-            {% if not session.is_stopped and not session.is_shutting_down %}
+            {% if session.is_running %}
                 <form method="POST" action="{% url 'testsession:stop_session' session.id %}">
                     {% csrf_token %}
                     <input type="submit" type="button" class="btn btn-primary" value="Stop">

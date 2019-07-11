@@ -618,7 +618,6 @@ class TestAllProcedure(WebTest):
         }))
         self.assertEqual(call.status, '200 OK')
         
-  
 
 class TestLogNewman(WebTest):
 
