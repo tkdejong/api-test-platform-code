@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class CreateServerRunForm(forms.ModelForm):
 
-    test_scenario = CustomModelChoiceField(TestScenario.objects.all(), widget=forms.RadioSelect, empty_label=None)
+    test_scenario = CustomModelChoiceField(TestScenario.objects.filter(active=True), widget=forms.RadioSelect, empty_label=None)
 
     class Meta:
         model = ServerRun

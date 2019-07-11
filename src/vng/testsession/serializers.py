@@ -71,7 +71,7 @@ class SessionSerializer(serializers.ModelSerializer):
 
     session_type = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=SessionType.objects.all(),
+        queryset=SessionType.objects.filter(active=True),
     )
 
     class Meta:
