@@ -1,3 +1,11 @@
-.card {
+.card.card-short {
   height: 180px;
+}
+
+a.unvisited,
+a.unvisited:hover,
+a.unvisited:visited,
+a.unvisited:active {
+  text-decoration: none;
+  color: inherit;
 }

@@ -12,58 +12,68 @@
 <div id="ui-view">
     <div class="row">
         <div class="col-sm-6 col-md-2">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <div class="h1 text-muted text-right mb-4">
-                        <i class="icon-calendar"></i>
+            <a href="{% url 'server_run:server-run_list_scheduled' %}" class="unvisited">
+                <div class="card card-short text-white bg-info">
+                    <div class="card-body">
+                        <div class="h1 text-muted text-right mb-4">
+                            <i class="icon-calendar"></i>
+                        </div>
+                        <div class="text-value">{{servers_scheduled}}</div>
+                        <small class="text-muted text-uppercase font-weight-bold">Provider tests scheduled</small>
                     </div>
-                    <div class="text-value">{{servers_scheduled}}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Provider tests scheduled</small>
                 </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-md-2">
+            <div class="card card-short text-white bg-success">
+                <a href="{% url 'testsession:sessions' %}" class="unvisited">
+                    <div class="card-body">
+                        <div class="h1 text-muted text-right mb-4">
+                            <i class="icon-list"></i>
+                        </div>
+                        <div class="text-value">{{sessions_active}}</div>
+                        <small class="text-muted text-uppercase font-weight-bold">Consumer session active</small>
+                    </div>
+                </a>
             </div>
         </div>
         <div class="col-sm-6 col-md-2">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <div class="h1 text-muted text-right mb-4">
-                        <i class="icon-list"></i>
+            <div class="card card-short text-white bg-secondary">
+                <a href="{% url 'testsession:sessions' %}" class="unvisited">
+                    <div class="card-body">
+                        <div class="h1 text-muted text-right mb-4">
+                            <i class="icon-speedometer"></i>
+                        </div>
+                        <div class="text-value">{{sessions_active_docker}}</div>
+                        <small class="text-muted text-uppercase font-weight-bold">Consumer session kubernetes</small>
                     </div>
-                    <div class="text-value">{{sessions_active}}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Consumer session active</small>
-                </div>
+                </a>
             </div>
         </div>
         <div class="col-sm-6 col-md-2">
-            <div class="card text-white bg-secondary">
-                <div class="card-body">
-                    <div class="h1 text-muted text-right mb-4">
-                        <i class="icon-speedometer"></i>
+            <div class="card card-short text-white bg-warning">
+                <a href="{% url 'testsession:session_create' %}" class="unvisited">
+                    <div class="card-body">
+                        <div class="h1 text-muted text-right mb-4">
+                            <i class="icon-list"></i>
+                        </div>
+                        <div class="text-value">{{session_types}}</div>
+                        <small class="text-muted text-uppercase font-weight-bold">Session types</small>
                     </div>
-                    <div class="text-value">{{sessions_active_docker}}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Consumer session kubernetes</small>
-                </div>
+                </a>
             </div>
         </div>
         <div class="col-sm-6 col-md-2">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <div class="h1 text-muted text-right mb-4">
-                        <i class="icon-list"></i>
+            <div class="card card-short text-white bg-danger">
+                <a href="{% url 'server_run:server-run_create_item' %}" class="unvisited">
+                    <div class="card-body">
+                        <div class="h1 text-muted text-right mb-4">
+                            <i class="icon-list"></i>
+                        </div>
+                        <div class="text-value">{{test_scenario}}</div>
+                        <small class="text-muted text-uppercase font-weight-bold">Test scenario</small>
                     </div>
-                    <div class="text-value">{{session_types}}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Session types</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-2">
-            <div class="card text-white bg-danger">
-                <div class="card-body">
-                    <div class="h1 text-muted text-right mb-4">
-                        <i class="icon-list"></i>
-                    </div>
-                    <div class="text-value">{{test_scenario}}</div>
-                    <small class="text-muted text-uppercase font-weight-bold">Test scenario</small>
-                </div>
+                </a>
             </div>
         </div>
     </div>
