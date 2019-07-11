@@ -555,7 +555,7 @@ class ResultTestsessionViewShield(views.APIView):
             message = 'Failed'
             color = 'red'
         elif not_full:
-            message = 'No errors, not completed'
+            message = 'Not completed'
             color = 'orange'
         else:
             message = 'Success'
@@ -564,7 +564,7 @@ class ResultTestsessionViewShield(views.APIView):
 
         result = {
             'schemaVersion': 1,
-            'label': 'VNG test platform client',
+            'label': 'API Test Platform',
             'message': message,
             'color': color,
             'isError': is_error,
