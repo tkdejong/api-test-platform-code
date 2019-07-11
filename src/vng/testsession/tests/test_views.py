@@ -16,12 +16,13 @@ from django_webtest import WebTest
 
 from vng.accounts.models import User
 
-from ..task import run_tests
+from ..task import run_tests, align_sessions_data, purge_sessions
 from ..api_views import RunTest
 from ..models import (
     Session, SessionType, SessionLog, Report,
     ScenarioCase, VNGEndpoint, ExposedUrl, TestSession
 )
+from ..permission import IsOwner
 
 from .factories import (
     SessionFactory, SessionTypeFactory, VNGEndpointDockerFactory, ExposedUrlEchoFactory, VNGEndpointEchoFactory,
@@ -203,12 +204,9 @@ class TestLog(WebTest):
         self.endpoint_echo_h.session.save()
         self.endpoint_echo_h.save()
 
-    def test_retrieve_no_logged(self):
-        call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), status=302)
-
     def test_retrieve_no_entries(self):
         call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
-        self.assertTrue('Er zijn nog geen verzoeken' in call.text)
+        self.assertTrue('No requests have yet been received.' in call.text)
 
     def test_retrieve_no_entry(self):
         url = reverse_sub('run_test', self.exp_url.subdomain, kwargs={
@@ -320,7 +318,7 @@ class TestUrlParam(WebTest):
         self.exposed_url = ExposedUrlFactory(session=self.session, vng_endpoint=self.vng_endpoint)
         self.qp_p = QueryParamsScenarioFactory()
         self.scenario_case_p = self.qp_p.scenario_case
-        self.scenario_case_p.http_method = choices.HTTPMethodChoiches.PUT
+        self.scenario_case_p.http_method = choices.HTTPMethodChoices.PUT
         self.scenario_case_p.save()
         self.vng_endpoint_p = self.scenario_case_p.vng_endpoint
         self.session_p = SessionFactory(session_type=self.vng_endpoint_p.session_type)
@@ -330,6 +328,21 @@ class TestUrlParam(WebTest):
         self.vng_endpoint_p.url = 'https://postman-echo.com/'
         self.vng_endpoint.save()
         self.vng_endpoint_p.save()
+
+    def test_permissions(self):
+        permissions = IsOwner()
+        res = permissions.has_object_permission(
+            type('req',(object,),{'user':self.session.user})(),
+            type('view',(object,),{'user_path':['user']})(),
+            self.session 
+        )
+        self.assertEqual(res, True)
+        res = permissions.has_object_permission(
+            type('req',(object,),{'user':UserFactory()})(),
+            type('view',(object,),{'user_path':['user']})(),
+            self.session 
+        )
+        self.assertEqual(res, False)
 
     def test_query_params_no_match(self):
         report = len(Report.objects.filter(scenario_case=self.scenario_case))
@@ -423,7 +436,7 @@ class TestSandboxMode(WebTest):
 
     def test_sandbox(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['session_type'].select(form['session_type'].options[-1][0])
         form['sandbox'] = True
         form.submit()
@@ -437,17 +450,17 @@ class TestSandboxMode(WebTest):
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user, status=[404])
         report = Report.objects.get(scenario_case=self.sc)
 
-        self.assertEqual(choices.HTTPCallChoiches.failed, report.result)
+        self.assertEqual(choices.HTTPCallChoices.failed, report.result)
         url = reverse_sub('run_test', eu.subdomain, kwargs={
             'relative_url': 'status/200'
         })
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user)
         report = Report.objects.get(scenario_case=self.sc)
-        self.assertEqual(choices.HTTPCallChoiches.success, report.result)
+        self.assertEqual(choices.HTTPCallChoices.success, report.result)
 
     def test_no_sandbox(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['session_type'].select(form['session_type'].options[-1][0])
         form['sandbox'] = False
         form.submit()
@@ -461,13 +474,13 @@ class TestSandboxMode(WebTest):
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user, status=[404])
         report = Report.objects.get(scenario_case=self.sc)
 
-        self.assertEqual(choices.HTTPCallChoiches.failed, report.result)
+        self.assertEqual(choices.HTTPCallChoices.failed, report.result)
         url = reverse_sub('run_test', eu.subdomain, kwargs={
             'relative_url': 'status/200'
         })
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(eu.subdomain)}, user=session.user)
         report = Report.objects.get(scenario_case=self.sc)
-        self.assertEqual(choices.HTTPCallChoiches.failed, report.result)
+        self.assertEqual(choices.HTTPCallChoices.failed, report.result)
 
     def test_create_sandbox_default(self):
         session = {
@@ -515,11 +528,12 @@ class TestAllProcedure(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
+        self.session = SessionFactory()
         self.session_type = VNGEndpointFactory(name='demo-api').session_type
 
     def _test_create_session(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
-        form = call.forms[0]
+        form = call.forms[1]
         form['session_type'].select(str(self.session_type.id))
         form.submit()
 
@@ -533,6 +547,13 @@ class TestAllProcedure(WebTest):
         })
         call = self.app.post(url, user=self.session.user).follow()
         self.assertIn('Stopped', call.text)
+
+
+    def test_get_report_stats(self):
+        call = self.app.get(reverse('testsession:session_log',kwargs={
+            'uuid': self.session.uuid
+        }))
+        self.assertEqual(call.status, '200 OK')
 
     def test_report(self):
         self._test_create_session()
@@ -580,7 +601,7 @@ class TestAllProcedure(WebTest):
                 kwargs={'session_id': session.id}),
             user=self.user
         )
-        form = call.forms[0]
+        form = call.forms[1]
         form['supplier_name'] = 'test_name'
         form['software_product'] = 'test_software'
         form['product_role'] = 'test_product'
@@ -588,6 +609,15 @@ class TestAllProcedure(WebTest):
         session = Session.objects.latest('id')
         self.assertEqual(session.product_role, 'test_product')
 
+
+    def test_get_schema(self):
+        call = self.app.get(reverse('apiv1session:schema-redoc'))
+        self.assertEqual(call.status, '200 OK')
+        call = self.app.get(reverse('apiv1session:schema-json',kwargs={
+            'format':'.json'
+        }))
+        self.assertEqual(call.status, '200 OK')
+        
 
 class TestLogNewman(WebTest):
 
@@ -815,3 +845,40 @@ class TestMultipleParams(WebTest):
         report2 = Report.objects.filter(scenario_case=self.sc2).count()
         self.assertEqual(report1, 1)
         self.assertEqual(report2, 1)
+
+    def test2(self):
+        self.test()
+        session = Session.objects.all()[0]
+        reports = Report.objects.filter(session_log__session=session)
+        scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
+        for r in reports:
+            r.result = choices.HTTPCallChoices.not_called
+            r.save()
+
+        call = self.app.get(reverse('apiv1session:testsession-shield',
+            kwargs={
+                'uuid': session.uuid
+            }
+        ))
+        self.assertEqual(call.json['message'], 'No errors, not completed')
+
+        reports[0].result = choices.HTTPCallChoices.failed
+        reports[0].save()
+
+        call = self.app.get(reverse('apiv1session:testsession-shield',
+            kwargs={
+                'uuid': session.uuid
+            }
+        ))
+        self.assertEqual(call.json['message'], 'Failed')
+
+        for r in reports:
+            r.result = choices.HTTPCallChoices.success
+            r.save()
+
+        call = self.app.get(reverse('apiv1session:testsession-shield',
+            kwargs={
+                'uuid': session.uuid
+            }
+        ))
+        self.assertEqual(call.json['message'], 'Success')

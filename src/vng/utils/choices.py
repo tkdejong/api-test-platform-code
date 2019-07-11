@@ -24,13 +24,13 @@ class ResultChoices(DjangoChoices):
     failed = ChoiceItem("Failed")
 
 
-class HTTPCallChoiches(DjangoChoices):
+class HTTPCallChoices(DjangoChoices):
     success = ChoiceItem("Succesvol")
     failed = ChoiceItem("Niet succesvol")
     not_called = ChoiceItem("Niet uitgevoerd")
 
 
-class HTTPMethodChoiches(DjangoChoices):
+class HTTPMethodChoices(DjangoChoices):
     POST = ChoiceItem("POST")
     GET = ChoiceItem("GET")
     PUT = ChoiceItem("PUT")

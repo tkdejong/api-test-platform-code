@@ -9,7 +9,6 @@ def get_error_codes():
 
 
 def get_outcome_json(_json, file=False):
-
     if file:
         json_obj = json.load(_json)
     else:

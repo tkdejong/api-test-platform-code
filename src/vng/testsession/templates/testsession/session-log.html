@@ -1,8 +1,9 @@
 {% extends 'master.html' %}
 {% load django_bootstrap_breadcrumbs %}
 {% load subdomainurls %}
+{% load i18n %}
 
-{% block title %}Test consumer - Detailweergave test-sessie{% endblock%}
+{% block title %}{% trans "Test consumer - Detail session view" %} {% endblock%}
 
 {% block breadcrumb %}
 {% breadcrumb "Home" "testsession:sessions" %}
@@ -16,33 +17,44 @@
         <div class="col-sm-7">
             <div class="card">
                 <div class="card-header">
-                        Test consumer {{ session }}
+                        {% trans "Test consumer" %} {{ session }}
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Sessie type {{ session.session_type.name }}</h5>
+                        <h5 class="card-title">{% trans "Session type" %}: {{ session.session_type.name }}
+                        {% if session.status == choices.running %}
+                            <span class="badge badge-pill badge-success">{% trans "Running" %}</span>
+                        {% elif session.status == choices.starting %}
+                            <span class="badge badge-pill badge-light">{% trans "Starting" %}</span>
+                        {% elif session.status == choices.stopped %}
+                            <span class="badge badge-pill badge-secondary">{% trans "Stopped" %}</span>
+                        {% elif session.status == choices.error_deploy %}
+                            <span class="badge badge-pill badge-danger">{% trans "Error during deployment" %}</span>
+                        {% else %}
+                            <span class="badge badge-pill badge-dark">{{session.status}}</span>
+                        {% endif %}
                         <p class="card-text">
-                            {{ session.session_type.description|safe }}
+                            <a class="btn btn-info btn-margin" href="{% url 'testsession:session_type-detail' session.session_type.pk  %}">{% trans "Description" %}</a>
                         </p>
                     </div>
                 </div>
             <div class="card-deck">
                 <div class="card">
                     <div class="card-header">
-                        Log
+                        {% trans "Log" %}
                     </div>
                     <div class="card-body">
-                        <h4 class="card-title">Gestart op: {{ session.started|date }}</h4>
+                        <h4 class="card-title">{% trans "Started at" %}: {{ session.started|date }}</h4>
 
                         {% if session.is_stopped %}
                         {% for postman in session.exposedurl_set.all %}
                         {% if postman.test_session.get_json_obj %}
-                        <h4>Postman Collection</h4>
+                        <h4>{% trans "Postman Collection" %}</h4>
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col">Tijd</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Resultaat</th>
+                                    <th scope="col">{% trans "Time" %}</th>
+                                    <th scope="col">{% trans "Name" %}</th>
+                                    <th scope="col">{% trans "Result" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,7 +100,7 @@
                                 <tr>
                                     <td>
                                         {% if forloop.counter == 1 %}
-                                        <u>Tests</u>
+                                        <u>{% trans "Tests" %}</u>
                                         {% endif %}
                                     </td>
                                     {% if 'error' in assertion %}
@@ -113,14 +125,14 @@
                         </table>
 
                         {% if postman.get_json_obj_info.run.failures %}
-                        <h4>Failures</h4>
+                        <h4>{% trans "Failures" %}</h4>
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Error</th>
-                                    <th>Test</th>
-                                    <th>Message</th>
+                                    <th>{% trans "Name" %}</th>
+                                    <th>{% trans "Error" %}</th>
+                                    <th>{% trans "Test" %}</th>
+                                    <th>{% trans "Message" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -136,13 +148,13 @@
                         </table>
                         {% endif %}
                         {% if postman.get_json_obj %}
-                        <h4>Assertions</h4>
+                        <h4>{% trans "Assertions" %}</h4>
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Request</th>
-                                    <th>Assertion</th>
+                                    <th>{% trans "Name" %}</th>
+                                    <th>{% trans "Request" %}</th>
+                                    <th>{% trans "Assertion" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -173,9 +185,7 @@
                             {% endfor %}
                         </table>
                         {% else %}
-                        <p>
-                            Er zijn nog geen verzoeken binnengekomen.
-                            <p>
+                        <p>{% trans "No requests have yet been received." %}<p>
                                 {% endif %}
 
 
@@ -187,9 +197,9 @@
 
                             {% if page_obj.has_previous %}
                             <li class="page-item"><a class="page-link"
-                                    href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                                    href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a></li>
                             {% else %}
-                            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#">{% trans "Previous" %}</a></li>
                             {% endif %}
 
                             {% for i in paginator.page_range %}
@@ -202,11 +212,11 @@
 
                             {% if page_obj.has_next %}
                             <li class="page-item"><a class="page-link"
-                                    href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a>
                             </li>
                             {% else %}
 
-                            <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#">{% trans "Next" %}</a></li>
                             {% endif %}
                         </ul>
                     </nav>
@@ -218,7 +228,7 @@
         <div class="col-sm-5">
             <div class="card">
                 <div class="card-header">
-                    Endpoints & Rapports
+                    {% trans "Endpoints & Rapports" %}
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -242,11 +252,11 @@
                         <div class="col-sm-12">
                             <br />
                             <p>
-                                <input type="button" class="btn btn-primary" value="Rapport"
+                                <input type="button" class="btn btn-primary" value="{% trans "Report" %}"
                                     onclick="location.href = '{% url 'testsession:session_report' session.uuid %}';">
                             </p>
                             <p>
-                                <input type="button" class="btn btn-primary" value="Rapport (PDF)"
+                                <input type="button" class="btn btn-primary" value="{% trans "Report (PDF)" %}"
                                     onclick="location.href = '{% url 'testsession:session_report-pdf' session.uuid %}';">
                             </p>
                         </div>
@@ -255,49 +265,51 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                Information
-            </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <tbody>
-                        <tr>
-                            <td scope="row"><strong>Supplier name</td>
-                            <td>{{ session.supplier_name|default_if_none:''|urlize }}</td>
-                        </tr>
-                        <tr>
-                            <td scope="row"><strong>Software product</td>
+                    {% trans "Supplier information" %}
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td scope="row"><strong>{% trans "Supplier name" %}</td>
+                                <td>{{ session.supplier_name|default_if_none:''|urlize }}</td>
+                            </tr>
+                            <tr>
+                                <td scope="row"><strong>{% trans "Software product" %}</td>
                                 <td>{{ session.software_product|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
-                                <td scope="row"><strong>Product role</td>
-                                    <td>{{ session.product_role|default_if_none:''|urlize }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-auto mr-auto">
-                                <a class="btn btn-primary" href="{% url 'testsession:session_update' session.id %}">Update</a>
-                            </div>
+                                <td scope="row"><strong>{% trans "Product role" %}</td>
+                                <td>{{ session.product_role|default_if_none:''|urlize }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% if request.user.is_authenticated %}
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-auto mr-auto">
+                            <a class="btn btn-primary" href="{% url 'testsession:session_update' session.id %}">{% trans "Update" %}</a>
                         </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header">
-                        Summary in a glance
-                    </div>
+                {% endif %}
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Summary in a glance" %}
+                </div>
                 <div class="card-body">
                     <div class='table-responsive'>
                         <table class="table">
                             <thead>
-                                <th>Property</th>
-                                <th>Value</th>
+                                <th>{% trans "Property" %}</th>
+                                <th>{% trans "Value" %}</th>
                             </thead>
                             <tbody>
                                 <tr class="table-active">
                                     <td>
-                                        Total scenario cases
+                                        {% trans "Total scenario cases" %}
                                     </td>
                                     <td>
                                         {{ total }}
@@ -305,7 +317,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        Cases failed
+                                        {% trans "Cases failed" %}
                                     </td>
                                     <td class="table-danger">
                                         {{ failed }}
@@ -313,7 +325,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        Cases successful
+                                        {% trans "Cases successful" %}
                                     </td>
                                     <td class="table-success">
                                         {{ success }}
@@ -321,7 +333,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        Cases not called
+                                        {% trans "Cases not called" %}
                                     </td>
                                     <td>
                                         {{ not_called }}
@@ -332,7 +344,84 @@
                     </div>
                 </div>
             </div>
+             <div class="card">
+                <div class="card-body">
+                    <p>
+                        Note: Shields.io caches the badge result for 5 minutes. Check the <a
+                            href="{% url 'apiv1session:testsession-shield' session.uuid %}">API</a> for
+                        direct access.</p>
+                    <span display="block" style='width: 250px;' class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                        <a href="{% url 'testsession:session_log' session.uuid %}">
+                            <img style='width:250px' alt=""
+                                src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %}">
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Markdown snippet</h5>
+                    <p>Paste the following in your README.md to show your badge on Github.</p>
+                    <?prettify lang=html linenums=true?>
+                        <pre class="prettyprint" id='gitSnippet'>
+                    <xmp>
+
+                    </xmp>
+                    </pre>
+                </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">HTML snippet</h5>
+                         <p>Paste the following in your HTML page to show your badge.</p>
+                        <?prettify lang=html linenums=true?>
+                            <pre class="prettyprint" id='htmlSnippet'>
+                        <xmp>
+                        </xmp>
+                    </pre>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     {% endblock %}
+
+{% block script %}
+<script>
+    var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %})]({{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %})'
+
+    var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
+            + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'testsession:session_log' session.uuid %}">\n'
+            + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&\n '
+            + 'url={{request.scheme}}://{{request.get_host}}{% url "apiv1session:testsession-shield" session.uuid %}"></span></a>'
+
+    function htmlEscape(s) {
+        s = s.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+        return s
+    }
+
+    function htmlReplace(s){
+        s=s.replace(
+        /&lt;script src[\s\S]*?&gt;&lt;\/script&gt;|&lt;!--\?[\s\S]*?--&gt;|&lt;pre\b[\s\S]*?&lt;\/pre&gt;/g,
+        '<span class="operative">$&<\/span>');
+        return s;
+    }
+
+    // this page's own source code
+    gitSnippet = htmlEscape(gitSnippet);
+    gitSnippet = htmlReplace(gitSnippet);
+
+
+    htmlSnippet = htmlEscape(htmlSnippet);
+    htmlSnippet = htmlReplace(htmlSnippet);
+
+
+    // insert into PRE
+    document.getElementById("gitSnippet").innerHTML = gitSnippet;
+    document.getElementById("htmlSnippet").innerHTML = htmlSnippet;
+
+</script>
+{% endblock %}

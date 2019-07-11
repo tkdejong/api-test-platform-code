@@ -1,8 +1,8 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load i18n %}
 
-
-{% block title %}Providers{% endblock %}
+{% block title %}{% trans "Providers" %}{% endblock %}
 
 
 {% block content %}
@@ -12,8 +12,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                  Scheduled tests
-		  <a href="{% url 'server_run:server-run_create_item' %}" class="btn btn-success float-right"><i class="icon-note"></i> Start testrun</a>
+                  {% trans "Scheduled tests" %}
+		  <a href="{% url 'server_run:server-run_create_item' %}" class="btn btn-success float-right"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
                 </div>
                 <table class="table">
                     {% include 'servervalidation/table/header-server-run-scheduled.html' only %}

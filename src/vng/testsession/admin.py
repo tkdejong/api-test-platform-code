@@ -1,6 +1,7 @@
 from ordered_model.admin import OrderedModelAdmin
 from django.contrib import admin
 
+
 import vng.testsession.models as model
 
 from .forms import SessionTypeFormAdmin

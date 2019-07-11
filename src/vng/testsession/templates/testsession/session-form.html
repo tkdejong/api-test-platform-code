@@ -1,9 +1,8 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load i18n %}
 
-
-{% block title %}Providers{% endblock %}
-
+{% block title %}{% trans "Start Consumer test-session" %}{% endblock %}
 
 {% block content %}
 <div id="ui-view">
@@ -12,10 +11,10 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
-                        Test consumer
+                        {% trans "Test consumer" %}
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Start een nieuwe consumer test-sessie</h5>
+                        <h5 class="card-title">{% trans "Start a new consumer test session" %}</h5>
                         {% load_widgets form='forms.html' %}
 
                         {% for field in form %}
@@ -23,8 +22,8 @@
                                 <div id='id_test_scenario' style="padding:20px">
                                     {% for radio in field %}
                                         <div class='row'>
-                                            {{radio.tag}}&nbsp;
-                                            <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">{{ radio.choice_label.name }}</a>
+                                            {{radio.tag}}&nbsp;{{ radio.choice_label.name }} [
+                                            <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">info</a>]
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -37,12 +36,12 @@
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit">
-                                    <i class="fa fa-dot-circle-o"></i>Start</button>
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Start" %}</button>
                             </div>
                             <div class="col-auto">
                                 </div>
                                     <button class="btn btn-sm btn-danger" type="reset">
-                                        <i class="fa fa-ban"></i> Reset</button>
+                                        <i class="fa fa-ban"></i>{% trans "Reset" %}</button>
                                 </div>
                             </div>
                         </div>

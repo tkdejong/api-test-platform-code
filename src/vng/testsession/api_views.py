@@ -152,7 +152,7 @@ class ResultSessionView(views.APIView):
             if len(report) == 0:
                 return {'result': 'Geen oproep uitgevoerd'}
             for rp in report:
-                if rp.result == choices.HTTPCallChoiches.failed:
+                if rp.result == choices.HTTPCallChoices.failed:
                     return {'result': 'mislukt'}
             if len(report) < len(scenario_cases):
                 return {'result': 'Gedeeltelijk succesvol'}
@@ -304,13 +304,13 @@ class RunTest(CSRFExemptMixin, View):
                     is_failed = False
                     for a, b in self.error_codes:
                         if status_code >= a and status_code <= b:
-                            report.result = choices.HTTPCallChoiches.failed
+                            report.result = choices.HTTPCallChoices.failed
                             report.session_log = session_log
                             is_failed = True
                             break
                     if not is_failed and not report.is_failed() or (session.sandbox and not is_failed):
                         report.session_log = session_log
-                        report.result = choices.HTTPCallChoiches.success
+                        report.result = choices.HTTPCallChoices.success
                     logger.info("Saving report: %s", report.result)
                     report.save()
                     break
@@ -419,7 +419,7 @@ class RunTest(CSRFExemptMixin, View):
         return parsed
 
     def build_url(self, eu, arguments):
-        ru = self.kwargs['relative_url']
+        self.kwargs['relative_url']
         if eu.vng_endpoint.url is not None:
             request_url = '{}/{}?{}'.format(eu.vng_endpoint.url, self.kwargs['relative_url'], arguments)
         else:
@@ -450,7 +450,6 @@ class RunTest(CSRFExemptMixin, View):
             else:
                 response = method(request_url, headers=request_header, allow_redirects=False)
             return response
-
         try:
             response = make_call()
         except Exception as e:
@@ -465,10 +464,7 @@ class RunTest(CSRFExemptMixin, View):
 
         self.save_call(request, request_method_name, request.subdomain,
                        self.kwargs['relative_url'], session, response.status_code, session_log)
-        if response.encoding:
-            reply = HttpResponse(self.parse_response(response, request, eu.vng_endpoint.url, endpoints), status=response.status_code)
-        else:
-            reply = HttpResponse(response, status=response.status_code)
+        reply = HttpResponse(self.parse_response(response, request, eu.vng_endpoint.url, endpoints), status=response.status_code)
         white_headers = ['Content-type', 'location']
         for h in white_headers:
             if h in response.headers:
@@ -528,3 +524,50 @@ class RunTest(CSRFExemptMixin, View):
         session_log.response_status = response.status_code
         session_log.response = json.dumps(response_dict)
         session_log.save()
+
+
+class ResultTestsessionViewShield(views.APIView):
+
+    def get(self, request, uuid=None):
+        session = get_object_or_404(Session, uuid=uuid)
+        scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
+        report = list(Report.objects.filter(session_log__session=session))
+        report_ordered = []
+        is_error = False
+        not_full = False
+
+        for case in scenario_case:
+            missing = False
+            for rp in report:
+                if rp.result == choices.HTTPCallChoices.failed:
+                    is_error = True
+                if rp.scenario_case == case and rp.result != choices.HTTPCallChoices.not_called:
+                    report_ordered.append(rp)
+                    missing = True
+                    break
+            if not missing:
+                not_full = True
+
+        if not scenario_case:
+            message = 'No results'
+            color = 'inactive'
+        elif is_error:
+            message = 'Failed'
+            color = 'red'
+        elif not_full:
+            message = 'No errors, not completed'
+            color = 'orange'
+        else:
+            message = 'Success'
+            color = 'green'
+            is_error = False
+
+        result = {
+            'schemaVersion': 1,
+            'label': 'VNG test platform client',
+            'message': message,
+            'color': color,
+            'isError': is_error,
+        }
+
+        return JsonResponse(result)

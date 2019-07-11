@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.views import View
-from django.views.generic import DetailView, CreateView, FormView, UpdateView
+from django.views.generic import DetailView, CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.core.exceptions import PermissionDenied
 
@@ -19,7 +19,7 @@ from .models import (
 from .task import execute_test
 
 
-class TestScenarioSelect(LoginRequiredMixin, ListView):
+class ServerRunList(LoginRequiredMixin, ListView):
 
     template_name = 'servervalidation/server-run_list.html'
     context_object_name = 'server_run_list'
@@ -29,10 +29,10 @@ class TestScenarioSelect(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user).filter(scheduled=False).order_by('-started')
 
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        server_list = self.get_queryset()
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
         data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
+        data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
         for sr in data['server_run_list']:
             sr.success = sr.get_execution_result()
         if 'server_run_scheduled' in self.request.session:
@@ -61,7 +61,7 @@ class ServerRunForm(CreateView):
         }))
 
 
-class TestScenarioSelectScheduled(TestScenarioSelect):
+class ServerRunListScheduled(ServerRunList):
 
     template_name = 'servervalidation/server-run_list_scheduled.html'
 
@@ -75,19 +75,17 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
     form_class = CreateEndpointForm
 
     def get_success_url(self):
-        return reverse('server_run:server-run_detail_uuid', kwargs={
-            'uuid': self.server.uuid
-        })
+        return reverse('server_run:server-run_list')
 
     def fetch_server(self):
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
         self.server = ServerRun(
             user=self.request.user,
             test_scenario=ts,
-            scheduled=self.request.session['server_run_scheduled'],
-            supplier_name=self.request.session['supplier_name'],
-            software_product=self.request.session['software_product'],
-            product_role=self.request.session['product_role']
+            scheduled=self.request.session.get('server_run_scheduled', False),
+            supplier_name=self.request.session.get('supplier_name', ''),
+            software_product=self.request.session.get('software_product', ''),
+            product_role=self.request.session.get('product_role', '')
         )
 
     def get_context_data(self, **kwargs):
@@ -98,11 +96,12 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
         data['ts'] = ts
         data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=ts)
-        test_scenario_url = TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario)
+        test_scenario_url = TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario).order_by('-url')
         url_names = [tsu.name for tsu in test_scenario_url]
         no_url = len(data['test_scenario'].filter(url=True))
         data['form'] = CreateEndpointForm(
             quantity=len(data['test_scenario'].filter(url=True)) - 1,
+            placeholders=[t.placeholder for t in test_scenario_url],
             field_name=url_names[1:no_url],
             text_area=data['test_scenario'].filter(url=False),
             text_area_field_name=url_names[no_url:]
@@ -124,7 +123,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             self.server.client_id = form.data['Client ID']
             self.server.secret = form.data['Secret']
         elif self.server.test_scenario.custom_header():
-            server_header = ServerHeader(server_run=self.server, header_key='Authorization', header_value=form.data['Authorization header'])
+            ServerHeader(server_run=self.server, header_key='Authorization', header_value=form.data['Authorization header']).save()
         self.server.save()
         self.endpoints = []
         tsu = list(TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario))
@@ -138,7 +137,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
                 ep.save()
                 self.endpoints.append(ep)
         form.instance.server_run = self.server
-        if len(tsu) > 0:
+        if tsu:
             form.instance.test_scenario_url = tsu[0]
         if self.server.scheduled:
             self.server.status = choices.StatusWithScheduledChoices.scheduled
@@ -149,7 +148,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             ep = form.instance
             ep.server_run = self.server
             ep.save()
-        except IntegrityError as e:
+        except IntegrityError:
             form.add_error(None, 'Endpoint url not configured, contact the admin.')
             return super().form_invalid(form)
         self.endpoints.append(ep)
@@ -190,8 +189,8 @@ class ServerRunOutputUpdate(UpdateView):
             kwargs={'uuid': self.object.uuid}
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
@@ -218,8 +217,8 @@ class ServerRunOutputUuid(DetailView):
             kwargs={'uuid': self.object.uuid}
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
@@ -283,8 +282,8 @@ class ServerRunPdfView(PDFGenerator, ServerRunOutputUuid):
 
     template_name = 'servervalidation/server-run-PDF.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
         for ptm in context['postman_result']:
             ptm.json = ptm.get_json_obj()
@@ -310,7 +309,7 @@ class PostmanDownloadView(View):
             return response
 
 
-class SessionTypeDetail(DetailView):
+class TestScenarioDetail(DetailView):
 
     model = TestScenario
     template_name = 'servervalidation/test_scenario-detail.html'

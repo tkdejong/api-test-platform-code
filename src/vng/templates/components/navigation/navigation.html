@@ -5,10 +5,11 @@
             {% include './navigation-list-item.html' with view_name='testsession:sessions' label=_('Test consumer') request=request only %}
 	    {% include './navigation-list-item.html' with view_name='server_run:server-run_list' label=_('Test provider') request=request only %}
 	    {% else %}
-	    {% include './navigation-list-item.html' with view_name='auth_login' label=_('Login') request=request only %}	    
-	    {% include './navigation-list-item.html' with view_name='registration_register' label=_('Registreer') request=request only %}	    
+	    {% include './navigation-list-item.html' with view_name='auth_login' label=_('Login') request=request only %}
+	    {% include './navigation-list-item.html' with view_name='registration_register' label=_('Register') request=request only %}
             {% endif %}
-            {% include './navigation-list-item.html' with view_name='open_api_inspector:openapi-inspection' label=_('OpenAPI inspection') request=request only %}
+            {% comment %} Disable since not mature enough {% endcomment %}
+            {% comment %} {% include './navigation-list-item.html' with view_name='open_api_inspector:openapi-inspection' label=_('OpenAPI inspection') request=request only %} {% endcomment %}
             {% if user.is_superuser %}
             {% include './navigation-list-item.html' with view_name='admin:index' label=_('Admin') request=request only %}
             {% endif %}

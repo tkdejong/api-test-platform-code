@@ -7,12 +7,16 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
+from django.views.generic import TemplateView
 from django.views.generic.list import ListView
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 
+from vng.accounts.models import User
+from vng.servervalidation.models import ServerRun, TestScenario
 
 from .models import (
     ScenarioCase, Session, SessionLog, ExposedUrl,
@@ -22,9 +26,7 @@ from .models import (
 from .task import bootstrap_session, stop_session
 from .forms import SessionForm
 from ..utils import choices
-from ..utils.views import (
-    OwnerMultipleObjects, OwnerSingleObject, PDFGenerator
-)
+from ..utils.views import OwnerSingleObject, PDFGenerator
 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +55,37 @@ class SessionListView(LoginRequiredMixin, ListView):
         Group all the exposed url by the session in order to display later all related url together
         '''
         return Session.objects.filter(user=self.request.user).order_by('-started')
+
+
+class Dashboard(TemplateView):
+
+    template_name = 'testsession/dashboard.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['sessions_active'] = (
+            Session.objects
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
+            .filter(user=self.request.user)
+            .count()
+        )
+        context['sessions_active_docker'] = (
+            Session.objects
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
+            .filter(session_type__vngendpoint__docker_image__isnull=False)
+            .filter(user=self.request.user)
+            .count()
+        )
+        context['servers_scheduled'] = ServerRun.objects.filter(user=self.request.user) \
+            .filter(scheduled=True) \
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
+            .order_by('-started') \
+            .filter(user=self.request.user) \
+            .count()
+        context['session_types'] = SessionType.objects.all().count()
+        context['test_scenario'] = TestScenario.objects.all().count()
+
+        return context
 
 
 class SessionFormView(FormView):
@@ -84,12 +117,11 @@ class SessionLogDetailView(OwnerSingleObject):
     user_field = 'session__user'
 
 
-class SessionLogView(OwnerMultipleObjects):
+class SessionLogView(ListView):
 
     template_name = 'testsession/session-log.html'
     context_object_name = 'log_list'
     paginate_by = 200
-    field_name = 'session__user'
 
     def get_queryset(self):
         return SessionLog.objects.filter(session__uuid=self.kwargs['uuid']).order_by('date')
@@ -98,7 +130,11 @@ class SessionLogView(OwnerMultipleObjects):
         context = super().get_context_data(*args, **kwargs)
         session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         stats = session.get_report_stats()
-
+        _choices = dict(choices.StatusChoices.choices)
+        _choices['error_deploy'] = choices.StatusChoices.error_deploy
+        context.update({
+            'choices': _choices,
+        })
         context.update({
             'session': session,
             'success': stats[0],
@@ -187,7 +223,7 @@ class SessionReport(OwnerSingleObject):
                     is_in = True
                     break
             if not is_in:
-                report_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoiches.not_called))
+                report_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoices.not_called))
 
         context.update({
             'session': self.session,

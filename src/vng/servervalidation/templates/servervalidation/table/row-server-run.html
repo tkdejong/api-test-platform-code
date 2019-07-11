@@ -1,3 +1,4 @@
+{% load i18n %}
 {% spaceless %}
     <tr>
         <td>
@@ -5,13 +6,13 @@
         </td>
         <td>
             {% if server_run.status == choices.running %}
-                <span class="badge badge-pill badge-success">Running</span>
+                <span class="badge badge-pill badge-success">{% trans "Running" %}</span>
             {% elif server_run.status == choices.starting %}
-                <span class="badge badge-pill badge-light">Starting</span>
+                <span class="badge badge-pill badge-light">{% trans "Starting" %}</span>
             {% elif server_run.status == choices.stopped %}
-                <span class="badge badge-pill badge-secondary">Stopped</span>
+                <span class="badge badge-pill badge-secondary">{% trans "Stopped" %}</span>
             {% elif server_run.status == choices.error_deploy %}
-                <span class="badge badge-pill badge-danger">Error during deployment</span>
+                <span class="badge badge-pill badge-danger">{% trans "Error during deployment" %}</span>
             {% else %}
                 <span class="badge badge-pill badge-dark">{{ server_run.status }}</span>
             {% endif %}
@@ -39,38 +40,41 @@
             {% endif %}
         {% endwith %}
     </td>
-    {% if server_run.is_running %}
-        <td id='starting' server_run_id='{{server_run.id}}'>
-    {% else %}
-        <td>
-    {% endif %}
-        {% if not server_run.is_stopped and not server_run.is_running %}
+        {% if server_run.is_running %}
+            <td class='starting' server_run_id='{{server_run.id}}'>
+        {% else %}
+            <td>
+        {% endif %}
+        {% if not server_run.is_stopped and not server_run.is_running and not server_run.is_error %}
         <form method="POST" action="{% url 'server_run:server-run_stop' server_run.id %}">
             {% csrf_token %}
             <input type="submit" class="btn btn-primary" value="Stop">
         </form>
         {% endif %}
-        {% if not server_run.is_stopped and not server_run.scheduled %}
+        {% if not server_run.is_stopped and not server_run.scheduled and not server_run.is_error %}
             {% if server_run.percentage_exec and server_run.status_exec %}
             <div class="progress-group">
                 <div class="progress-group-header">
                     <i class="cui-cloud progress-group-icon"></i>
-                    <div id="statuslabel"></div>
-                    <div class="ml-auto font-weight-bold" id="progressbar-indicator">43%</div>
+                    <div class="statuslabel"></div>
+                    <div class="ml-auto font-weight-bold progressbar-indicator"></div>
                 </div>
                 <div class="progress-group-bars">
                     <div class="progress progress-xs">
-                    <div class="progress-bar bg-success" id="progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
             {% endif %}
         {% endif %}
+        {% if server_run.status == choices.error_deploy %}
+            {{server_run.status_exec}}
+        {% endif %}
     </td>
     <td>
         <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
             <a href="{% url 'server_run:server-run_detail_uuid' server_run.uuid %}">
-                <img style='height:30px ' alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:provider:api_server-run-shield-detail' server_run.uuid %}">
+                <img style='height:30px ' alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:api_server-run-shield' server_run.uuid %}">
             </a>
         </span>
     </td>

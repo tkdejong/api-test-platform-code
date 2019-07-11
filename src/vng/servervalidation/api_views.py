@@ -78,13 +78,11 @@ class TriggerServerRunView(viewsets.ViewSet):
         return JsonResponse({"asd": pk})
 
 
-class ResultServerViewShield(
-        mixins.RetrieveModelMixin,
-        viewsets.GenericViewSet):
+class ResultServerViewShield(views.APIView):
 
     @swagger_auto_schema(responses={200: ServerRunResultShield})
-    def retrieve(self, request, pk=None):
-        server = ServerRun.objects.get(uuid=pk)
+    def get(self, request, uuid=None):
+        server = get_object_or_404(ServerRun, uuid=uuid)
         res = server.get_execution_result()
         is_error = True
         if res is None:

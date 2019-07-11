@@ -1,0 +1,998 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-07-11 10:20+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: accounts/models.py:14
+msgid "username"
+msgstr ""
+
+#: accounts/models.py:15
+msgid "Verplicht. Maximaal 150 tekens."
+msgstr ""
+
+#: accounts/models.py:17
+msgid "A user with that username already exists."
+msgstr ""
+
+#: accounts/models.py:20
+msgid "first name"
+msgstr ""
+
+#: accounts/models.py:21
+msgid "last name"
+msgstr ""
+
+#: accounts/models.py:22
+msgid "email address"
+msgstr ""
+
+#: accounts/models.py:24
+msgid "staff status"
+msgstr ""
+
+#: accounts/models.py:25
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: accounts/models.py:28
+msgid "active"
+msgstr ""
+
+#: accounts/models.py:30
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: accounts/models.py:34
+msgid "date joined"
+msgstr ""
+
+#: accounts/models.py:42
+msgid "user"
+msgstr ""
+
+#: accounts/models.py:43
+msgid "users"
+msgstr ""
+
+#: conf/base.py:188
+msgid "English"
+msgstr ""
+
+#: conf/base.py:189
+msgid "Nederlands"
+msgstr ""
+
+#: servervalidation/models.py:26 servervalidation/models.py:48
+msgid "name"
+msgstr ""
+
+#: servervalidation/models.py:27
+msgid "Authorization"
+msgstr ""
+
+#: servervalidation/models.py:74
+#: servervalidation/templates/servervalidation/table/header-server-run.html:6
+#: testsession/models.py:175
+#: testsession/templates/testsession/session-log.html:46
+#: testsession/templates/testsession/table/header-session.html:7
+msgid "Started at"
+msgstr ""
+
+#: servervalidation/models.py:76 testsession/models.py:176
+msgid "Stopped at"
+msgstr ""
+
+#: servervalidation/models.py:77
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:9
+#: servervalidation/templates/servervalidation/table/table-server-run.html:54
+msgid "Last run"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:12
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11044
+msgid "Server Report"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11051
+#: servervalidation/templates/servervalidation/table/table-server-run.html:5
+#: testsession/models.py:189
+msgid "Session"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11056
+#: servervalidation/templates/servervalidation/table/table-server-run.html:10
+#: servervalidation/templates/servervalidation/test_scenario-detail.html:5
+#: servervalidation/templates/servervalidation/test_scenario-detail.html:15
+msgid "Test Scenario"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11076
+#: servervalidation/templates/servervalidation/table/table-server-run.html:38
+msgid "Started"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11081
+#: servervalidation/templates/servervalidation/table/row-server-run-scheduled.html:14
+#: servervalidation/templates/servervalidation/table/row-server-run.html:13
+#: testsession/templates/testsession/session-log.html:29
+#: testsession/templates/testsession/table/row-session.html:16
+msgid "Stopped"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11088
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11119
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:8
+#: servervalidation/templates/servervalidation/table/header-server-run.html:8
+#: servervalidation/templates/servervalidation/table/table-server-run.html:50
+#: servervalidation/templates/servervalidation/table/table-server-run.html:76
+#: testsession/templates/testsession/table/header-session-report.html:9
+msgid "Status"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11090
+#: servervalidation/templates/servervalidation/table/table-server-run.html:52
+msgid "Run automatically at"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11093
+msgid "Latest run at"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11099
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:10
+#: servervalidation/templates/servervalidation/table/header-server-run.html:10
+#: servervalidation/templates/servervalidation/table/table-server-run.html:59
+msgid "Action"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11112
+msgid "Run now"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11131
+msgid "Results"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11182
+#: testsession/templates/testsession/session-log.html:103
+msgid "Tests"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11213
+#: testsession/templates/testsession/session-log.html:128
+msgid "Failures"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11217
+#: servervalidation/templates/servervalidation/server-run_detail.html:299
+#: testsession/models.py:27 testsession/models.py:173
+#: testsession/templates/testsession/session-log.html:56
+#: testsession/templates/testsession/session-log.html:132
+#: testsession/templates/testsession/session-log.html:155
+msgid "Name"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11218
+#: servervalidation/templates/servervalidation/server-run_detail.html:300
+#: testsession/templates/testsession/session-log.html:133
+msgid "Error"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11219
+#: servervalidation/templates/servervalidation/server-run_detail.html:301
+#: testsession/templates/testsession/session-log.html:134
+msgid "Test"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11220
+#: servervalidation/templates/servervalidation/server-run_detail.html:302
+#: testsession/templates/testsession/session-log.html:135
+msgid "Message"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11240
+#: servervalidation/templates/servervalidation/server-run_detail.html:326
+#: testsession/templates/testsession/session-log.html:151
+msgid "Assertions"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11244
+#: servervalidation/templates/servervalidation/server-run_detail.html:332
+msgid "Name call"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11245
+#: servervalidation/templates/servervalidation/server-run_detail.html:333
+msgid "Name assertion"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-PDF.html:11246
+#: servervalidation/templates/servervalidation/server-run_detail.html:334
+#: testsession/templates/testsession/session-log.html:157
+msgid "Assertion"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-form.html:5
+#: servervalidation/templates/servervalidation/server-run-form.html:15
+#: servervalidation/templates/servervalidation/server-run_list.html:5
+#: servervalidation/templates/servervalidation/server-run_list_scheduled.html:5
+msgid "Providers"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-form.html:18
+msgid "Start a new provider-test"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-form.html:40
+#: templates/forms.html:118 templates/registration/registration_form.html:29
+#: templates/registration/resend_activation_form.html:10
+msgid "Submit"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run-form.html:44
+#: testsession/templates/testsession/session-form.html:44
+msgid "Reset"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_create.html:5
+msgid "Server run creation"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_create.html:15
+msgid "Create provider-testrun for scenario:"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_create.html:27
+#: testsession/templates/testsession/session-form.html:39
+msgid "Start"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_create.html:31
+msgid "Cancel"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:6
+#: servervalidation/templates/servervalidation/server-run_update.html:6
+msgid "Server-run detail"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:20
+msgid "Provider test details"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:38
+#, python-format
+msgid ""
+"\n"
+"                            Note: Shields.io caches the badge result for 5 "
+"minutes. Check the <a\n"
+"                                href=\"%(url)s\">API</a> for\n"
+"                            direct access.\n"
+"                        "
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:54
+msgid ""
+"\n"
+"                        <h5 class=\"card-title\">Markdown snippet</h5>\n"
+"                        <p>Paste the following in your README.md to show "
+"your badge on Github.</p>\n"
+"                        <?prettify lang=html linenums=true?>\n"
+"                    "
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:68
+msgid ""
+"\n"
+"                            <h5 class=\"card-title\">HTML snippet</h5>\n"
+"                            <p>Paste the following in your HTML page to show "
+"your badge.</p>\n"
+"                            <?prettify lang=html linenums=true?>\n"
+"                        "
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:88
+#, python-format
+msgid ""
+"\n"
+"                            Postman collection #%(c)s results details\n"
+"                        "
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:96
+#: testsession/templates/testsession/session-log.html:306
+msgid "Property"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:97
+#: testsession/templates/testsession/session-log-detail.html:32
+#: testsession/templates/testsession/session-log.html:307
+msgid "Value"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:102
+msgid "Total calls"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:110
+msgid "Calls failed"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:118
+msgid "Calls successful"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:126
+msgid "Total assertions"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:134
+msgid "Assertions failed"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:142
+msgid "Assertions passed"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:165
+#: testsession/templates/testsession/session-log.html:268
+msgid "Supplier information"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:171
+#: testsession/templates/testsession/session-log.html:274
+msgid "Supplier name"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:175
+#: testsession/templates/testsession/session-log.html:278
+msgid "Software product"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:179
+#: testsession/templates/testsession/session-log.html:282
+msgid "Product role"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:189
+#: servervalidation/templates/servervalidation/server-run_update.html:33
+#: testsession/templates/testsession/session-log.html:292
+#: testsession/templates/testsession/session-update.html:34
+msgid "Update"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:207
+msgid "Postman collection"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_detail.html:293
+msgid "Failure"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_list.html:15
+msgid "Provider tests"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_list.html:16
+#: servervalidation/templates/servervalidation/server-run_list_scheduled.html:16
+msgid "Start testrun"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_list_scheduled.html:15
+msgid "Scheduled tests"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_log_json.html:4
+#: servervalidation/templates/servervalidation/server-run_log_json.html:19
+msgid "Log view"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/server-run_update.html:22
+#: testsession/templates/testsession/session-update.html:23
+msgid "Update information"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:4
+#: servervalidation/templates/servervalidation/table/header-server-run.html:5
+#: testsession/templates/testsession/table/header-session.html:5
+msgid "Session ID"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:5
+#: testsession/templates/testsession/table/header-session.html:6
+msgid "Session status"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:6
+msgid "Schedule"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:7
+#: servervalidation/templates/servervalidation/table/header-server-run.html:7
+msgid "Test scenario"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/header-server-run-scheduled.html:11
+#: servervalidation/templates/servervalidation/table/header-server-run.html:11
+#: testsession/templates/testsession/table/header-session.html:13
+msgid "Badge"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/header-server-run.html:4
+msgid "Sessie status"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/header-server-run.html:9
+msgid "Status details"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/row-server-run-scheduled.html:10
+#: servervalidation/templates/servervalidation/table/row-server-run.html:9
+#: testsession/templates/testsession/session-log.html:25
+#: testsession/templates/testsession/table/row-session.html:12
+msgid "Running"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/row-server-run-scheduled.html:12
+#: servervalidation/templates/servervalidation/table/row-server-run.html:11
+#: testsession/templates/testsession/session-log.html:27
+#: testsession/templates/testsession/table/row-session.html:14
+msgid "Starting"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/row-server-run-scheduled.html:16
+#: servervalidation/templates/servervalidation/table/row-server-run.html:15
+#: testsession/templates/testsession/session-log.html:31
+#: testsession/templates/testsession/table/row-session.html:18
+msgid "Error during deployment"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/row-server-run-scheduled.html:22
+msgid "Every day"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/row-server-run-scheduled.html:49
+#: servervalidation/templates/servervalidation/table/table-server-run.html:69
+msgid "Fire now"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/table-server-run.html:81
+#: testsession/templates/testsession/session-log.html:43
+msgid "Log"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/table-server-run.html:85
+msgid "Visualize HTML log"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/table-server-run.html:86
+msgid "Visualize JSON log"
+msgstr ""
+
+#: servervalidation/templates/servervalidation/table/table-server-run.html:87
+msgid "Visualize PDF report"
+msgstr ""
+
+#: templates/admin/base_site.html:4 templates/admin/base_site.html:54
+msgid "Administration"
+msgstr ""
+
+#: templates/admin/base_site__admintools.html:4
+msgid "admin"
+msgstr ""
+
+#: templates/admin/base_site__admintools.html:17
+msgid "administration"
+msgstr ""
+
+#: templates/components/copy/copy.html:26
+msgid "Copy to clipboard"
+msgstr ""
+
+#: templates/components/hero/hero.html:5
+msgid "Smart cities banner image"
+msgstr ""
+
+#: templates/components/navigation/navigation-lateral.html:8
+msgid "Dashboard"
+msgstr ""
+
+#: templates/components/navigation/navigation-lateral.html:11
+msgid "Test Consumer"
+msgstr ""
+
+#: templates/components/navigation/navigation-lateral.html:14
+msgid "Consumer session"
+msgstr ""
+
+#: templates/components/navigation/navigation-lateral.html:20
+#: testsession/templates/testsession/sessions-list.html:19
+msgid "Start session"
+msgstr ""
+
+#: templates/components/navigation/navigation-lateral.html:22
+msgid "Test Provider"
+msgstr ""
+
+#: templates/components/navigation/navigation-lateral.html:45
+#: templates/components/navigation/navigation-lateral.html:48
+msgid "Documentation"
+msgstr ""
+
+#: templates/components/navigation/navigation.html:5
+#: testsession/templates/testsession/session-form.html:14
+#: testsession/templates/testsession/session-log.html:20
+msgid "Test consumer"
+msgstr ""
+
+#: templates/components/navigation/navigation.html:6
+msgid "Test provider"
+msgstr ""
+
+#: templates/components/navigation/navigation.html:8
+msgid "Login"
+msgstr ""
+
+#: templates/components/navigation/navigation.html:9
+#: templates/components/user/user.html:26
+msgid "Register"
+msgstr ""
+
+#: templates/components/navigation/navigation.html:11
+msgid "OpenAPI inspection"
+msgstr ""
+
+#: templates/components/navigation/navigation.html:13
+msgid "Admin"
+msgstr ""
+
+#: templates/components/pagination/pagination.html:7
+#: templates/components/pagination/pagination.html:11
+#: testsession/templates/testsession/session-log.html:200
+#: testsession/templates/testsession/session-log.html:202
+msgid "Previous"
+msgstr ""
+
+#: templates/components/pagination/pagination.html:31
+#: templates/components/pagination/pagination.html:36
+#: testsession/templates/testsession/session-log.html:215
+#: testsession/templates/testsession/session-log.html:219
+msgid "Next"
+msgstr ""
+
+#: templates/components/user/user.html:41
+msgid "Change language"
+msgstr ""
+
+#: templates/registration/activate.html:4
+msgid "Activation Failure"
+msgstr ""
+
+#: templates/registration/activate.html:7
+msgid "Account activation failed."
+msgstr ""
+
+#: templates/registration/activation_complete.html:4
+msgid "Your account has been activated."
+msgstr ""
+
+#: templates/registration/activation_complete.html:8
+msgid "Your account is now active, log in to use all the features."
+msgstr ""
+
+#: templates/registration/activation_complete_admin_pending.html:4
+msgid "Account Activated"
+msgstr ""
+
+#: templates/registration/activation_complete_admin_pending.html:8
+msgid "Your account is now activated."
+msgstr ""
+
+#: templates/registration/activation_complete_admin_pending.html:10
+msgid "Once a site administrator activates your account you can login."
+msgstr ""
+
+#: templates/registration/activation_email.txt:2
+#, python-format
+msgid ""
+"\n"
+"U heeft zich aangemeld voor een account op het API test-platform van VNG.\n"
+"\n"
+"Mocht u dit niet hebben gedaan dan kunt u dit bericht negeren. Uw e-"
+"mailadres wordt automatisch verwijderd.\n"
+"\n"
+"Om dit account te accepteren klik op de volgende link binnen "
+"%(expiration_days)s dagen:\n"
+msgstr ""
+
+#: templates/registration/activation_email.txt:12
+msgid ""
+"\n"
+"\n"
+"met vriendelijke groet,\n"
+"\n"
+"VNG API test-platform beheer\n"
+msgstr ""
+
+#: templates/registration/activation_email_subject.txt:1
+msgid "Account aangemaakt op"
+msgstr ""
+
+#: templates/registration/logout.html:4
+msgid "Logged out"
+msgstr ""
+
+#: templates/registration/logout.html:7
+msgid "Successfully logged out"
+msgstr ""
+
+#: templates/registration/password_change_done.html:4
+msgid "Password changed"
+msgstr ""
+
+#: templates/registration/password_change_done.html:7
+msgid "Password successfully changed!"
+msgstr ""
+
+#: templates/registration/password_change_form.html:4
+#: templates/registration/password_change_form.html:10
+msgid "Change password"
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:4
+msgid "Password reset complete"
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:8
+msgid "Your password has been reset!"
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:9
+#, python-format
+msgid "You may now <a href=\"%(login_url)s\">log in</a>"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:10
+msgid "Bevestig wachtwoord reset"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:25
+msgid "Opslaan"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:28
+#: templates/registration/registration_complete.html:16
+msgid ""
+"U heeft een e-mail ontvangen met de te volgen stappen om het registreren te "
+"voltooien."
+msgstr ""
+
+#: templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:8
+msgid "Greetings"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:10
+#, python-format
+msgid ""
+"\n"
+"You are receiving this email because you (or someone pretending to be you)\n"
+"requested that your password be reset on the %(domain)s site. If you do not\n"
+"wish to reset your password, please ignore this message.\n"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:16
+msgid ""
+"\n"
+"To reset your password, please click the following link, or copy and paste "
+"it\n"
+"into your web browser.\n"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:25
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:28
+msgid "Best regards"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:29
+msgid "Management"
+msgstr ""
+
+#: templates/registration/password_reset_form.html:4
+#: templates/registration/password_reset_form.html:24
+msgid "Reset wachtwoord"
+msgstr ""
+
+#: templates/registration/registration_closed.html:4
+msgid "Registration is closed"
+msgstr ""
+
+#: templates/registration/registration_closed.html:7
+msgid "Sorry, but registration is closed at this moment. Come back later."
+msgstr ""
+
+#: templates/registration/registration_complete.html:4
+msgid "Activation email sent"
+msgstr ""
+
+#: templates/registration/registration_form.html:5
+msgid "Register for an account"
+msgstr ""
+
+#: templates/registration/resend_activation_complete.html:4
+msgid "Account Activation Resent"
+msgstr ""
+
+#: templates/registration/resend_activation_complete.html:8
+#, python-format
+msgid ""
+"\n"
+"  We have sent an email to %(email)s with further instructions.\n"
+"  "
+msgstr ""
+
+#: templates/registration/resend_activation_form.html:4
+msgid "Resend Activation Email"
+msgstr ""
+
+#: testsession/forms.py:19
+msgid "Client_id and secret must be provided with this authentication method"
+msgstr ""
+
+#: testsession/forms.py:22
+msgid "Header must be provided with this authentication method"
+msgstr ""
+
+#: testsession/models.py:28
+#: testsession/templates/testsession/session-report-PDF.html:24
+#: testsession/templates/testsession/table/header-scenario-report.html:14
+msgid "Standard"
+msgstr ""
+
+#: testsession/models.py:29
+#: testsession/templates/testsession/session-report-PDF.html:28
+#: testsession/templates/testsession/table/header-scenario-report.html:18
+msgid "Role"
+msgstr ""
+
+#: testsession/models.py:30
+#: testsession/templates/testsession/session-report-PDF.html:32
+#: testsession/templates/testsession/table/header-scenario-report.html:22
+msgid "Application"
+msgstr ""
+
+#: testsession/models.py:31
+#: testsession/templates/testsession/session-report-PDF.html:36
+#: testsession/templates/testsession/table/header-scenario-report.html:26
+msgid "Version"
+msgstr ""
+
+#: testsession/models.py:42
+msgid "Session Ttype"
+msgstr ""
+
+#: testsession/models.py:43
+msgid "Sessions type"
+msgstr ""
+
+#: testsession/models.py:76
+msgid "Test Session"
+msgstr ""
+
+#: testsession/models.py:77
+msgid "Test Sessions"
+msgstr ""
+
+#: testsession/models.py:174
+#: testsession/templates/testsession/session-log.html:23
+#: testsession/templates/testsession/table/header-session.html:8
+msgid "Session type"
+msgstr ""
+
+#: testsession/models.py:178
+msgid "User"
+msgstr ""
+
+#: testsession/models.py:190
+msgid "Sessions"
+msgstr ""
+
+#: testsession/templates/testsession/dashboard.html:8
+#: testsession/templates/testsession/sessions-list.html:8
+msgid "Test consumer - list sessions view"
+msgstr ""
+
+#: testsession/templates/testsession/session-form.html:5
+msgid "Start Consumer test-session"
+msgstr ""
+
+#: testsession/templates/testsession/session-form.html:17
+msgid "Start a new consumer test session"
+msgstr ""
+
+#: testsession/templates/testsession/session-log-detail.html:5
+#: testsession/templates/testsession/session-log.html:6
+msgid "Test consumer - Detail session view"
+msgstr ""
+
+#: testsession/templates/testsession/session-log-detail.html:20
+msgid "Test consumers -"
+msgstr ""
+
+#: testsession/templates/testsession/session-log-detail.html:25
+#: testsession/templates/testsession/session-log.html:156
+#: testsession/templates/testsession/table/header-session-log.html:6
+msgid "Request"
+msgstr ""
+
+#: testsession/templates/testsession/session-log-detail.html:31
+msgid "Key"
+msgstr ""
+
+#: testsession/templates/testsession/session-log-detail.html:54
+msgid "Request body"
+msgstr ""
+
+#: testsession/templates/testsession/session-log-detail.html:70
+msgid "Response status:"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:51
+msgid "Postman Collection"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:55
+#: testsession/templates/testsession/table/header-session-log.html:5
+msgid "Time"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:57
+#: testsession/templates/testsession/table/header-session-report.html:8
+msgid "Result"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:188
+#: testsession/templates/testsession/session-report.html:45
+msgid "No requests have yet been received."
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:231
+msgid "Endpoints & Rapports"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:300
+msgid "Summary in a glance"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:312
+msgid "Total scenario cases"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:320
+msgid "Cases failed"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:328
+msgid "Cases successful"
+msgstr ""
+
+#: testsession/templates/testsession/session-log.html:336
+msgid "Cases not called"
+msgstr ""
+
+#: testsession/templates/testsession/session-report-PDF.html:12
+#: testsession/templates/testsession/session-report-PDF.html:18
+#: testsession/templates/testsession/session-report.html:5
+#: testsession/templates/testsession/session-test-report.html:4
+msgid "Session Report"
+msgstr ""
+
+#: testsession/templates/testsession/session-report-PDF.html:20
+#: testsession/templates/testsession/session-report.html:20
+msgid "Scenario"
+msgstr ""
+
+#: testsession/templates/testsession/session-report-PDF.html:42
+msgid "Scenario cases"
+msgstr ""
+
+#: testsession/templates/testsession/session-report.html:34
+msgid "Scenario case"
+msgstr ""
+
+#: testsession/templates/testsession/session-test-report-PDF.html:12
+#: testsession/templates/testsession/session-test-report-PDF.html:18
+#: testsession/templates/testsession/session-test-report.html:11
+msgid "Session test report"
+msgstr ""
+
+#: testsession/templates/testsession/session-test-report-PDF.html:23
+msgid "HTTP method"
+msgstr ""
+
+#: testsession/templates/testsession/session-test-report-PDF.html:24
+msgid "HTTP url"
+msgstr ""
+
+#: testsession/templates/testsession/session-test-report-PDF.html:25
+msgid "Response"
+msgstr ""
+
+#: testsession/templates/testsession/session-update.html:7
+msgid "Test consumer - detail session view"
+msgstr ""
+
+#: testsession/templates/testsession/session_type-detail.html:6
+msgid "Session Type"
+msgstr ""
+
+#: testsession/templates/testsession/session_type-detail.html:16
+msgid "Session type "
+msgstr ""
+
+#: testsession/templates/testsession/sessions-list.html:18
+msgid "Consumer test-session"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session-log.html:7
+msgid "Response status"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session-report.html:5
+msgid "Http method"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session-report.html:6
+msgid "Endpoint"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session-report.html:7
+msgid "Query params"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session.html:9
+msgid "Available API URLs"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session.html:10
+msgid "Calls status"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session.html:11
+msgid "Postman result"
+msgstr ""
+
+#: testsession/templates/testsession/table/header-session.html:12
+msgid "Actions"
+msgstr ""
+
+#: testsession/templates/testsession/table/row-session-log.html:7
+msgid "Check details"
+msgstr ""
+
+#: testsession/tests/test_views.py:90
+msgid "Unable to log in with provided credentials."
+msgstr ""

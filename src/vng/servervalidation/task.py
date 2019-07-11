@@ -1,5 +1,6 @@
 import uuid
 from zds_client import ClientAuth
+import traceback
 
 from django.core.files import File
 from django.utils import timezone
@@ -11,7 +12,7 @@ from django.conf import settings
 from ..celery.celery import app
 from .models import PostmanTest, PostmanTestResult, Endpoint, ServerRun, ServerHeader
 from ..utils import choices
-from ..utils.newman import DidNotRunException, NewmanManager
+from ..utils.newman import NewmanManager
 
 
 logger = get_task_logger(__name__)
@@ -86,7 +87,7 @@ def execute_test(server_run_pk, scheduled=False, email=False):
             param = {}
             for ep in endpoints:
                 param[ep.test_scenario_url.name] = ep.url
-                nm.replace_parameters(param)
+            nm.replace_parameters(param)
             file = nm.execute_test()
             file_json = nm.execute_test_json()
             ptr = PostmanTestResult(
@@ -101,11 +102,13 @@ def execute_test(server_run_pk, scheduled=False, email=False):
 
         server_run.status_exec = 'Completed'
     except Exception as e:
-        logger.info(e)
-        server_run.status_exec = 'An error occurred'
+        logger.warning(e)
+        server_run.status = choices.StatusChoices.error_deploy
+        server_run.status_exec = traceback.format_exc()
     server_run.percentage_exec = 100
     if not scheduled:
-        server_run.status = choices.StatusWithScheduledChoices.stopped
+        if server_run.status != choices.StatusChoices.error_deploy:
+            server_run.status = choices.StatusWithScheduledChoices.stopped
         server_run.stopped = timezone.now()
     else:
         server_run.last_exec = timezone.now()

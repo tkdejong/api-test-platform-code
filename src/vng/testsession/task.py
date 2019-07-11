@@ -7,6 +7,7 @@ import uuid
 from datetime import timedelta, datetime
 from celery.utils.log import get_task_logger
 
+from django.db.models import Q
 from django.utils.timezone import make_aware
 
 from vng.k8s_manager.kubernetes import *
@@ -26,7 +27,7 @@ def stop_session(session_pk):
     session = Session.objects.get(pk=session_pk)
     if session.status == choices.StatusChoices.stopped:
         return
-    run_tests.delay(session.pk)
+    run_tests(session.pk)
     eu = ExposedUrl.objects.filter(session=session)
     for e_url in eu:
         if e_url.vng_endpoint.url is None:
@@ -50,7 +51,7 @@ def align_sessions_data():
     for session in Session.objects.all():
         for item in data.get('items'):
             metadata = item.get('metadata')
-            if metadata and session.name in metadata.get('name'):
+            if metadata and metadata.get('name') and session.name in metadata.get('name'):
                 continue
         session.status = choices.StatusChoices.stopped
         session.save()
@@ -60,7 +61,10 @@ def align_sessions_data():
 def purge_sessions():
     align_sessions_data()
     purged = False
-    for session in Session.objects.filter(started__lte=make_aware(datetime.now()) - timedelta(days=1)).filter(status=choices.StatusChoices.running):
+    for session in \
+            Session.objects.filter(started__lte=make_aware(datetime.now()) - timedelta(days=1)) \
+            .filter(status=choices.StatusChoices.running) \
+            .filter(Q(exposedurl__vng_endpoint__docker_image__isnull=False) | Q(session_type__ZGW_images=True)):
         purged = True
         stop_session(session.pk)
     return purged
@@ -138,11 +142,12 @@ def ZGW_deploy(session):
         app=session.name,
         containers=containers
     ).execute()
-    ip = external_ip_pooling(k8s, session, max_percentage=40)
+    ip = external_ip_pooling(k8s, session, n_trial=30, max_percentage=40)
     if ip is None:
         update_session_status(session, 'Impossible to deploy successfully, IP address not allocated')
         session.status = choices.StatusChoices.error_deploy
         session.save()
+        return
     for ex in exposed_urls:
         ex.docker_url = ip
         ex.save()
@@ -207,7 +212,7 @@ def bootstrap_session(session_pk, purged=False):
     In case there is one or multiple docker images linked, it starts all of them
     '''
     session = Session.objects.get(pk=session_pk)
-    if session.session_type.name == 'ZGW':
+    if session.session_type.ZGW_images:
         ZGW_deploy(session)
         return
     update_session_status(session, 'Verbinding maken met Kubernetes', 1)
@@ -252,7 +257,6 @@ def bootstrap_session(session_pk, purged=False):
                 public_port=ep.port,
                 private_port=ep.port,
                 variables=variables
-                # filename= TODO: add filename to each endpoint
             )
             containers.append(container)
     if len(containers) != 0:
@@ -299,7 +303,7 @@ def run_tests(session_pk):
             })
         else:
             newman.replace_parameters({
-                ep.name: eu.docker_url
+                ep.name: '{}:{}{}'.format(eu.docker_url, ep.port, ep.path)
             })
         result = newman.execute_test()
         ts = TestSession()

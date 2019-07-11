@@ -11,6 +11,7 @@ from django.core.files import File
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from ordered_model.models import OrderedModel
 
@@ -23,11 +24,11 @@ from ..utils import choices, postman
 
 class SessionType(models.Model):
 
-    name = models.CharField('Naam', max_length=200, unique=True)
-    standard = models.CharField('Standaard', max_length=200, null=True)
-    role = models.CharField('Rol', max_length=200, null=True)
-    application = models.CharField('Applicatie', max_length=200, null=True)
-    version = models.CharField('Versie', max_length=200, null=True)
+    name = models.CharField(_('Name'), max_length=200, unique=True)
+    standard = models.CharField(_('Standard'), max_length=200, null=True)
+    role = models.CharField(_('Role'), max_length=200, null=True)
+    application = models.CharField(_('Application'), max_length=200, null=True)
+    version = models.CharField(_('Version'), max_length=200, null=True)
     authentication = models.CharField(max_length=20, default=choices.AuthenticationChoices.no_auth, choices=choices.AuthenticationChoices.choices)
     description = HTMLField()
     client_id = models.TextField(default=None, null=True, blank=True)
@@ -35,13 +36,25 @@ class SessionType(models.Model):
     header = models.TextField(default=None, null=True, blank=True)
     database = models.BooleanField(help_text='Check if the a postgres db is needed in the Kubernetes cluster', default=False)
     db_data = models.TextField(default=None, null=True, blank=True)
+    ZGW_images = models.BooleanField(default=False, blank=True)
 
     class Meta:
-        verbose_name = 'Sessie type'
-        verbose_name_plural = 'Sessie type'
+        verbose_name = _('Session Ttype')
+        verbose_name_plural = _('Sessions type')
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.ZGW_images:
+            VNGEndpoint(name='ZRC', session_type=self).save()
+            VNGEndpoint(name='NRC', session_type=self).save()
+            VNGEndpoint(name='ZTC', session_type=self).save()
+            VNGEndpoint(name='BRC', session_type=self).save()
+            VNGEndpoint(name='DRC', session_type=self).save()
+            VNGEndpoint(name='AC', session_type=self).save()
 
 
 class InjectHeader(models.Model):
@@ -60,8 +73,8 @@ class TestSession(models.Model):
     json_result = models.TextField(blank=True, null=True, default=None)
 
     class Meta:
-        verbose_name = 'Test Sessie'
-        verbose_name_plural = 'Test Sessie'
+        verbose_name = _('Test Session')
+        verbose_name_plural = _('Test Sessions')
 
     def save_test(self, file):
         name_file = str(uuid.uuid4())
@@ -127,7 +140,7 @@ class ScenarioCase(OrderedModel):
     Wildcards can be added, e.g. '/test/{uuid}/stop'
     will match the URL '/test/c5429dcc-6955-4e22-9832-08d52205f633/stop'.
     ''')
-    http_method = models.CharField(max_length=20, choices=choices.HTTPMethodChoiches.choices, default=choices.HTTPMethodChoiches.GET)
+    http_method = models.CharField(max_length=20, choices=choices.HTTPMethodChoices.choices, default=choices.HTTPMethodChoices.GET)
     vng_endpoint = models.ForeignKey(VNGEndpoint, on_delete=models.PROTECT)
     order_with_respect_to = 'vng_endpoint__session_type'
 
@@ -156,13 +169,13 @@ class QueryParamsScenario(models.Model):
 
 class Session(models.Model):
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
-    name = models.CharField('Naam', max_length=30, unique=True, null=True)
-    session_type = models.ForeignKey(SessionType, verbose_name='Sessie type', on_delete=models.PROTECT)
-    started = models.DateTimeField('Gestart op', default=timezone.now)
-    stopped = models.DateTimeField('Gestopt op', null=True, blank=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    name = models.CharField(_('Name'), max_length=30, unique=True, null=True)
+    session_type = models.ForeignKey(SessionType, verbose_name=_('Session type'), on_delete=models.PROTECT)
+    started = models.DateTimeField(_('Started at'), default=timezone.now)
+    stopped = models.DateTimeField(_('Stopped at'), null=True, blank=True)
     status = models.CharField(max_length=20, choices=choices.StatusChoices.choices, default=choices.StatusChoices.starting)
-    user = models.ForeignKey(User, verbose_name='Gebruiker', on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, verbose_name=_('User'), on_delete=models.SET_NULL, null=True)
     build_version = models.TextField(blank=True, null=True, default=None)
     error_message = models.TextField(blank=True, null=True, default=None)
     deploy_status = models.TextField(blank=True, null=True, default=None)
@@ -173,8 +186,8 @@ class Session(models.Model):
     product_role = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Sessie'
-        verbose_name_plural = 'Sessie'
+        verbose_name = _('Session')
+        verbose_name_plural = _('Sessions')
 
     @staticmethod
     def assign_name(id):
@@ -225,9 +238,6 @@ class ExposedUrl(models.Model):
     test_session = models.ForeignKey(TestSession, blank=True, null=True, default=None, on_delete=models.CASCADE)
     docker_url = models.CharField(max_length=200, blank=True, null=True, default=None)
 
-    def get_uuid_url(self):
-        return re.search('([^/]+)', self.subdomain).group(1)
-
     def __str__(self):
         return '{} {}'.format(self.session, self.vng_endpoint)
 
@@ -271,16 +281,16 @@ class Report(models.Model):
 
     scenario_case = models.ForeignKey(ScenarioCase, on_delete=models.CASCADE)
     session_log = models.ForeignKey(SessionLog, on_delete=models.CASCADE)
-    result = models.CharField(max_length=20, choices=choices.HTTPCallChoiches.choices, default=choices.HTTPCallChoiches.not_called)
+    result = models.CharField(max_length=20, choices=choices.HTTPCallChoices.choices, default=choices.HTTPCallChoices.not_called)
 
     def is_success(self):
-        return self.result == choices.HTTPCallChoiches.success
+        return self.result == choices.HTTPCallChoices.success
 
     def is_failed(self):
-        return self.result == choices.HTTPCallChoiches.failed
+        return self.result == choices.HTTPCallChoices.failed
 
     def is_not_called(self):
-        return self.result == choices.HTTPCallChoiches.not_called
+        return self.result == choices.HTTPCallChoices.not_called
 
     def __str__(self):
         return 'Case: {} - Log: {} - Result: {}'.format(self.scenario_case, self.session_log, self.result)
