@@ -1,10 +1,8 @@
-var path = require('path');
 var paths = require('./build/paths');
 var webpackConfig = require('./webpack.config.js');
 
-
 // Add istanbul-instrumenter to webpack configuration
-webpackConfig.module.loaders.push({
+webpackConfig.module.rules.push({
     test: /\.js$/,
     include: __dirname + '/' + paths.jsSrcDir,
     loader: 'istanbul-instrumenter-loader',
@@ -24,15 +22,14 @@ preprocessors[paths.jsSpecEntry] = [
 
 
 // The main configuration
-var configuration = function(config) {
+var configuration = function (config) {
     config.set({
         frameworks: [
-            'jasmine-jquery',
-            'jasmine-ajax',
-            'jasmine'
+            'mocha'
         ],
 
         files: [
+            'node_modules/@babel/polyfill/dist/polyfill.js',
             paths.jsSpecEntry
         ],
 
@@ -44,23 +41,31 @@ var configuration = function(config) {
             noInfo: true
         },
 
-        reporters: ['spec', 'coverage-istanbul', 'junit'],
+        reporters: ['coverage', 'junit', 'spec'],
 
-        browsers: ['Chromium', 'Firefox'],
-
-        coverageIstanbulReporter: {
-            reports: ['clover', 'text-summary'],
-            dir: paths.coverageDir,
-            fixWebpackSourcePaths: true,
+        coverageReporter: {
+            dir: 'reports/jstests/',
+            reporters: [{
+                    type: 'html'
+                },
+                {
+                    type: 'text'
+                },
+                {
+                    type: 'text-summary'
+                },
+            ]
         },
 
         junitReporter: {
-            outputDir: paths.coverageDir,
-            outputFile: 'test-results.xml',
+            outputDir: 'reports/jstests/',
+            outputFile: 'junit.xml',
             useBrowserName: false,
-        }
+        },
+
+        // browsers: ['Chromium', 'Firefox', 'PhantomJS'],
+        browsers: ['Chromium'],
     });
 };
-
 
 module.exports = configuration;

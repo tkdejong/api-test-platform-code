@@ -1,7 +1,7 @@
 {
-   "comments":false,
-   "compact":true,
-   "presets":[
-      "env"
-   ]
+    "comments": false,
+    "compact": true,
+    "presets": [
+        "@babel/preset-env"
+    ]
 }
