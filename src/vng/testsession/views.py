@@ -201,7 +201,7 @@ class StopSession(OwnerSingleObject, View):
         return HttpResponseRedirect(reverse('testsession:sessions'))
 
 
-class SessionReport(OwnerSingleObject):
+class SessionReport(DetailView):
 
     model = ScenarioCase
     template_name = 'testsession/session-report.html'
