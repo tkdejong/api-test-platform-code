@@ -22,6 +22,16 @@
             </div>
             <div class="card">
                 <div class="card-header">
+                    {% trans "Scenario" %}
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        {% include 'testsession/table/header-scenario-report.html' with scenario=object only %}
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
                     {% trans "Session type " %}{{ object.name }}
                 </div>
                 <div class="card-body">
