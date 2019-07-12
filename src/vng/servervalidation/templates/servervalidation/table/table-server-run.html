@@ -44,10 +44,10 @@
 {% if server_run.scheduled and not server_run.is_stopped and request.user.is_authenticated and server_run.user == request.user %}
 <tr>
     <td>{% trans "Status" %}</td>
-    <td>{{ server_run.status }}
+    <td>{{ server_run.status }}<br />
     {% trans "Run automatically at" %} <span class="badge badge-secondary">00:01</span>
     {% if server_run.last_exec %}
-        {% trans "Last run" %}<span class="badge badge-secondary">{{server_run.last_exec}}</span>
+        <br />{% trans "Last run" %}<span class="badge badge-secondary">{{server_run.last_exec}}</span>
     {% endif %}
     </td>
 </tr>

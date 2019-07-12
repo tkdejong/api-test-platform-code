@@ -62,18 +62,24 @@ class CreateEndpointForm(forms.ModelForm):
             placeholders = ['http://www.example.com' for i in range(quantity + 1)]
         self.fields['url'] = forms.URLField(
             widget=forms.URLInput(
-                attrs={'placeholder': placeholders[0]})
+                attrs={'placeholder': placeholders[0]}),
+            initial=placeholders[0]
         )
         for i in range(quantity):
             if isinstance(field_name, str):
                 self.fields['{}-{}'.format(field_name, i + 1)] = forms.URLField(
                     widget=forms.URLInput(
-                        attrs={'placeholder': placeholders[i + 1]})
+                        attrs={'placeholder': placeholders[i + 1]}),
+                    initial=placeholders[i + 1]
                 )
             else:
                 self.fields[field_name[i]] = forms.URLField(
                     widget=forms.URLInput(
-                        attrs={'placeholder': placeholders[i + 1]})
+                        attrs={'placeholder': placeholders[i + 1]}),
+                    initial=placeholders[i + 1]
                 )
-        for i, e in enumerate(text_area):
-            self.fields[text_area_field_name[i]] = forms.CharField(widget=forms.Textarea)
+        for j, e in enumerate(text_area):
+            self.fields[text_area_field_name[j]] = forms.CharField(
+                widget=forms.Textarea(),
+                initial=placeholders[quantity + 1 + j]
+            )

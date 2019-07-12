@@ -17,9 +17,12 @@ from ordered_model.models import OrderedModel
 
 from filer.fields.file import FilerFileField
 
-from vng.accounts.models import User
+import vng.postman.utils as postman
 
-from ..utils import choices, postman
+from vng.accounts.models import User
+from vng.postman.choices import ResultChoices
+
+from ..utils import choices
 
 
 class SessionType(models.Model):
@@ -40,7 +43,7 @@ class SessionType(models.Model):
     active = models.BooleanField(blank=True, default=True)
 
     class Meta:
-        verbose_name = _('Session Ttype')
+        verbose_name = _('Session Type')
         verbose_name_plural = _('Sessions type')
         ordering = ('name',)
 
