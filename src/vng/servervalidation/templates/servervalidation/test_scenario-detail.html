@@ -39,29 +39,53 @@
                 {% endfor %}
             </div>
             {% for pt in object.postmantest_set.all %}
-                <div class="card">
-                    <div class="card-header">
-                        {% trans "Info" %}: {{ pt.validation_file|info_name }}
-                    </div>
-                    <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <th>{% trans "Name" %}</th>
-                            <th>{% trans "Method" %}</th>
-                            <th>{% trans "Url" %}</th>
-                        </thead>
-                        <tbody>
-                            {% for call in pt.validation_file|info_calls %}
-                                <tr>
-                                    <td>{{ call.name }}</td>
-                                    <td>{{ call|build_method }}</td>
-                                    <td>{{ call|build_url }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
+                {% with pt.validation_file|info_calls as calls %}
+                    {% if calls %}
+                        <div class="card">
+                            <div class="card-header">
+                                {% trans "Info" %}: {{ pt.validation_file|info_name }}
+                            </div>
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead class="thead-light">
+                                        <th>{% trans "Name" %}</th>
+                                        <th>{% trans "Method" %}</th>
+                                        <th>{% trans "Url" %}</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for call in calls %}
+                                            <tr>
+                                                <td>{{ call.name }}</td>
+                                                <td>{{ call|build_method }}</td>
+                                                <td>{{ call|build_url }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <thead class="thead-light">
+                                        <th>{% trans "Name call" %}</th>
+                                        <th>{% trans "Method" %}</th>
+                                        <th>{% trans "Url" %}</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for call in calls %}
+                                            {% if 'event' in call %}
+                                                <tr>
+                                                    <td>{{ call.name }}</td>
+                                                    <td>{{ call|build_method }}</td>
+                                                    <td>
+                                                        <pre class="prettyprint">{{call|build_script}}</pre>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endwith %}
             {% endfor %}
         </div>
     </div>

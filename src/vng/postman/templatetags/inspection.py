@@ -1,6 +1,7 @@
 import json
 
 from django import template
+from django.utils.translation import ugettext_lazy as _
 
 register = template.Library()
 
@@ -34,3 +35,11 @@ def build_url(value):
 @register.filter
 def build_method(value):
     return value['request']['method']
+
+
+@register.filter
+def build_script(value):
+    test = list(filter(lambda x: x['listen'] == 'test', value['event']))
+    if test:
+        return '\n'.join(test[0]['script']['exec'])
+    return _('No script available')
