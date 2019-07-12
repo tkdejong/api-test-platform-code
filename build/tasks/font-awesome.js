@@ -1,8 +1,6 @@
-const fs = require('fs');
-const log = require('fancy-log');
-const gulp = require('gulp');
-const paths = require('../paths');
-const argv = require('yargs').argv;
+'use strict';
+var gulp = require('gulp');
+var paths = require('../paths');
 
 
 /**
@@ -10,14 +8,10 @@ const argv = require('yargs').argv;
  * Run using "gulp font-awesome"
  * Moves Font Awesome font files to paths.fontDir
  */
-gulp.task('font-awesome', () => {
-    fs.stat('node_modules/font-awesome/fonts', e => {
-        if (e && argv._.indexOf('font-awesome') > -1) {
-            log.info('Not copying Font Awesome as it\'s not installed...');
-            return;
-        }
+function fontAwesome() {
+    return gulp.src('node_modules/font-awesome/fonts/*')
+        .pipe(gulp.dest(paths.fontsDir));
+};
 
-        return gulp.src('node_modules/font-awesome/fonts/*')
-            .pipe(gulp.dest(paths.fontsDir));
-    });
-});
+gulp.task('font-awesome', fontAwesome);
+exports.fontAwesome = fontAwesome;
