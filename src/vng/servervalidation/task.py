@@ -9,6 +9,8 @@ from django.template.loader import render_to_string
 from celery.utils.log import get_task_logger
 from django.conf import settings
 
+from vng.postman.choices import ResultChoices
+
 from ..celery.celery import app
 from .models import PostmanTest, PostmanTestResult, Endpoint, ServerRun, ServerHeader
 from ..utils import choices
@@ -98,7 +100,7 @@ def execute_test(server_run_pk, scheduled=False, email=False):
             ptr.save_json(file_name, File(file_json))
             ptr.status = ptr.get_outcome_json()
             ptr.save()
-            failure = failure or (ptr.status == choices.ResultChoices.failed)
+            failure = failure or (ptr.status == ResultChoices.failed)
 
         server_run.status_exec = 'Completed'
     except Exception as e:

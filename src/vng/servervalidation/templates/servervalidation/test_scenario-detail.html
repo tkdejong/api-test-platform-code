@@ -1,6 +1,7 @@
 {% extends 'master.html' %}
 {% load sniplates %}
 {% load i18n %}
+{% load inspection %}
 
 {% block title %}{% trans "Test Scenario" %}{% endblock %}
 
@@ -19,6 +20,73 @@
                     </p>
                 </div>
             </div>
+            <div class="row">
+                {% for pt in object.postmantest_set.all %}
+                    <div class="col-6 col-lg-3">
+                        <div class="card">
+                            <div class="card-body p-0 d-flex align-items-center">
+                                <i class="cui-bookmark fa bg-info p-4 font-2xl mr-3"></i>
+                                <div>
+                                    <div class="text-value-sm text-info">
+                                    <a href="{{ MEDIA_URL }}{{ pt.validation_file.url }}">{{ pt.validation_file|truncatechars:22 }}</a>
+
+                                    </div>
+                                    <div class="text-muted text-uppercase font-weight-bold small">{% trans "Analyze the postman collection" %}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% for pt in object.postmantest_set.all %}
+                {% with pt.validation_file|info_calls as calls %}
+                    {% if calls %}
+                        <div class="card">
+                            <div class="card-header">
+                                {% trans "Info" %}: {{ pt.validation_file|info_name }}
+                            </div>
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead class="thead-light">
+                                        <th>{% trans "Name" %}</th>
+                                        <th>{% trans "Method" %}</th>
+                                        <th>{% trans "Url" %}</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for call in calls %}
+                                            <tr>
+                                                <td>{{ call.name }}</td>
+                                                <td>{{ call|build_method }}</td>
+                                                <td>{{ call|build_url }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <table class="table">
+                                    <thead class="thead-light">
+                                        <th>{% trans "Name call" %}</th>
+                                        <th>{% trans "Url" %}</th>
+                                        <th>{% trans "Code snippet" %}</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for call in calls %}
+                                            {% if 'event' in call %}
+                                                <tr>
+                                                    <td>{{ call.name }}</td>
+                                                    <td>{{ call|build_url }}</td>
+                                                    <td>
+                                                        <pre class="prettyprint">{{call|build_script}}</pre>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
         </div>
     </div>
     {% endblock %}

@@ -18,6 +18,7 @@ class NewmanManager:
     REPORT_FOLDER = settings.MEDIA_ROOT + '/newman'
     newman_path = os.path.join(settings.BASE_DIR, 'node_modules', 'newman', 'bin', 'newman.js')
     RUN_HTML_REPORT = ('{} run --reporters html {} -r htmlextra '
+                       '--timeout-request 10 '
                        '--reporter-htmlextra-darkTheme '
                        '--reporter-htmlextra-testPaging '
                        '--reporter-htmlextra-title '
