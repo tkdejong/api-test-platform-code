@@ -75,7 +75,9 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
     form_class = CreateEndpointForm
 
     def get_success_url(self):
-        return reverse('server_run:server-run_list')
+        return reverse('server_run:server-run_list_scheduled')\
+            if self.request.session.get('server_run_scheduled', False) \
+            else reverse('server_run:server-run_list')
 
     def fetch_server(self):
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
