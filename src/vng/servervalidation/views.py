@@ -10,7 +10,9 @@ from django.views.generic import DetailView, CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.core.exceptions import PermissionDenied
 
-from ..utils import choices, postman
+import vng.postman.utils as postman
+
+from ..utils import choices
 from ..utils.views import OwnerSingleObject, PDFGenerator
 from .forms import CreateServerRunForm, CreateEndpointForm
 from .models import (
