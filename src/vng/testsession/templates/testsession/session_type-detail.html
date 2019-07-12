@@ -10,18 +10,55 @@
 <div id="ui-view">
     <div class="row">
         <div class="col-sm-8 offset-sm-2">
-            <form class="" method="post">{% csrf_token %}
-                <div class="card">
+            <div class="card">
                 <div class="card-header">
-                        {% trans "Session type " %}{{ object.name }}
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">
-                            {{ object.description|safe }}
-                        </p>
-                    </div>
+                    {% trans "Session type " %}{{ object.name }}
                 </div>
-            </form>
+                <div class="card-body">
+                    <p class="card-text">
+                        {{ object.description|safe }}
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Scenario" %}
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        {% include 'testsession/table/header-scenario-report.html' with scenario=object only %}
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Session type " %}{{ object.name }}
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="table__heading">{% trans "Http method" %}</th>
+                                <th class="table__heading">{% trans "Url" %}</th>
+                                <th class="table__heading">{% trans "Query params" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sc in scenario_cases %}
+                                <tr>
+                                    <td>{{sc.http_method}}</td>
+                                    <td>{{sc.url}}</td>
+                                    <td>
+                                    {% for qp in sc.queryparamsscenario_set.all %}
+                                        {{qp.name}}: {{qp.expected_value}}
+                                    {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
     {% endblock %}
