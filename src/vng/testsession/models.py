@@ -17,9 +17,12 @@ from ordered_model.models import OrderedModel
 
 from filer.fields.file import FilerFileField
 
-from vng.accounts.models import User
+import vng.postman.utils as postman
 
-from ..utils import choices, postman
+from vng.accounts.models import User
+from vng.postman.choices import ResultChoices
+
+from ..utils import choices
 
 
 class SessionType(models.Model):

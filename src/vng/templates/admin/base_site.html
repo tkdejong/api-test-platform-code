@@ -11,7 +11,7 @@
     {% if settings.ENVIRONMENT and settings.ENVIRONMENT != 'production' %}
         <!-- Environment notice -->
         <style type="text/css">
-            body:before {
+            {% comment %} body:before {
                 display: block;
                 line-height: 35px;
                 text-align: center;
@@ -45,7 +45,7 @@
 
             .breadcrumbs {
                 top: 95px !important;
-            }
+            } {% endcomment %}
         </style>
     {% endif %}
 {% endblock %}

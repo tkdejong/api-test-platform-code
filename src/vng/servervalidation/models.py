@@ -17,8 +17,10 @@ from django.core.files.base import ContentFile
 from filer.fields.file import FilerFileField
 
 from vng.accounts.models import User
+import vng.postman.utils as postman
+from vng.postman.choices import ResultChoices
 
-from ..utils import choices, postman
+from ..utils import choices
 
 
 class TestScenario(models.Model):
@@ -125,7 +127,7 @@ class PostmanTestResult(models.Model):
     log = models.FileField(settings.MEDIA_FOLDER_FILES['servervalidation_log'], blank=True, null=True, default=None)
     log_json = models.FileField(settings.MEDIA_FOLDER_FILES['servervalidation_log'], blank=True, null=True, default=None)
     server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=choices.ResultChoices.choices, default=None, null=True)
+    status = models.CharField(max_length=10, choices=ResultChoices.choices, default=None, null=True)
 
     def __str__(self):
         if self.status is None:
@@ -134,9 +136,9 @@ class PostmanTestResult(models.Model):
             return '{} - {}'.format(self.pk, self.status)
 
     def is_success(self):
-        if self.status == choices.ResultChoices.success:
+        if self.status == ResultChoices.success:
             return 1
-        if self.status == choices.ResultChoices.failed:
+        if self.status == ResultChoices.failed:
             return -1
         else:
             return 0
@@ -184,8 +186,8 @@ class PostmanTestResult(models.Model):
             for line in f:
                 if 'Total failed tests' in line:
                     if '0' in line:
-                        return choices.ResultChoices.success
-        return choices.ResultChoices.failed
+                        return ResultChoices.success
+        return ResultChoices.failed
 
     def get_outcome_json(self):
         with open(self.log_json.path) as jfile:

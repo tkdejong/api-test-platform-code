@@ -16,10 +16,11 @@ from rest_framework.authentication import (
 )
 from drf_yasg.utils import swagger_auto_schema
 
+import vng.postman.utils as ptm
+
 from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield
 from .models import ServerRun, PostmanTestResult
 from .task import execute_test
-from ..utils import postman as ptm
 from ..utils import choices
 
 

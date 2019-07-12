@@ -1,10 +1,7 @@
-'use strict';
-var gulp = require('gulp');
+const gulp = require('gulp');
+const {
+    build
+} = require('./build');
 
-
-/**
- * Default task
- * Run using "gulp"
- * Runs "build" task
- */
-gulp.task('default', ['build']);
+gulp.task('default', build);
+exports.default = build;

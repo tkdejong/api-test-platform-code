@@ -38,7 +38,7 @@
                 <table class="table">
                     {% include 'testsession/table/header-session-report.html' only %}
                     {% for rp in object_list %}
-                        {% include 'testsession/table/row-session-report.html' with report=rp only %}
+                    {% include 'testsession/table/row-session-report.html' with report=rp only %}
                     {% endfor %}
                 </table>
                 {% else %}

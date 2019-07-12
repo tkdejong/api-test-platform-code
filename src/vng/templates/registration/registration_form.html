@@ -11,7 +11,7 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
-                        Registratieformulier
+                        {% trans "Registration Form" %}
                     </div>
                     <div class="card-body">
                         {% load_widgets form='forms.html' %}
