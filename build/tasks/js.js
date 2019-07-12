@@ -10,11 +10,14 @@ var webpackConfig = require('../../webpack.config.js');
  * Run using "gulp js"
  * Runs webpack to compile javascript
  */
-gulp.task('js', function() {
-    return gulp.src('')
+function js() {
+    return gulp.src(paths.jsEntry)
         .pipe(webpack(webpackConfig))
-            .on('error', function () {
-              this.emit('end');
-            })
+        .on('error', function () {
+            this.emit('end');
+        })
         .pipe(gulp.dest(webpackConfig.output.path));
-});
+};
+
+gulp.task('js', js)
+exports.js = js;

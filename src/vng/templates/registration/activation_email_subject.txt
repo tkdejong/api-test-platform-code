@@ -1,4 +1,5 @@
-{% load i18n %}{% trans "Account aangemaakt op" %} {{ site.name }}
+{% load i18n %}
+{% trans "Account create successfully" %} {{ site.name }}
 
 
 {% comment %}

@@ -1,6 +1,9 @@
 'use strict';
-var gulp = require('gulp');
-var Server = require('karma').Server;
+const gulp = require('gulp');
+const Server = require('karma').Server;
+const {
+    lint
+} = require('./lint');
 
 
 /**
@@ -8,12 +11,12 @@ var Server = require('karma').Server;
  * Run using "gulp test"
  * Runs karma one
  */
-gulp.task('test', function (done) {
+function test(done) {
     new Server({
         configFile: __dirname + '/../../karma.conf.js',
         singleRun: true
     }, done).start();
-});
+}
 
 
 /**
@@ -21,8 +24,16 @@ gulp.task('test', function (done) {
  * Run using "gulp tdd"
  * Watch for file changes and re-run tests on each change
  */
-gulp.task('tdd', function (done) {
+function tdd(done) {
     new Server({
         configFile: __dirname + '/../../karma.conf.js',
     }, done).start();
-});
+}
+
+
+exports.test = tdd;
+gulp.task('test', gulp.parallel(lint, test));
+
+
+exports.tdd = tdd;
+gulp.task('tdd', gulp.parallel(lint, tdd));
