@@ -26,6 +26,7 @@ class TestScenario(models.Model):
     name = models.CharField(_('name'), max_length=200, unique=True)
     authorization = models.CharField(_('Authorization'), max_length=20, choices=choices.AuthenticationChoices.choices, default=choices.AuthenticationChoices.jwt)
     description = HTMLField()
+    active = models.BooleanField(blank=True, default=True)
 
     def __str__(self):
         return self.name

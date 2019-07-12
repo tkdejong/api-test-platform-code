@@ -34,7 +34,7 @@ class ServerRunSerializer(serializers.ModelSerializer):
     endpoints = EndpointSerializer(many=True)
 
     test_scenario = serializers.SlugRelatedField(
-        queryset=TestScenario.objects.all(),
+        queryset=TestScenario.objects.filter(active=True),
         slug_field='name',
     )
 

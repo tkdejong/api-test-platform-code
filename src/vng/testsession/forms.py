@@ -25,7 +25,7 @@ class SessionTypeFormAdmin(forms.ModelForm):
 
 class SessionForm(forms.ModelForm):
 
-    session_type = CustomModelChoiceField(SessionType.objects.all(), widget=forms.RadioSelect, empty_label=None)
+    session_type = CustomModelChoiceField(SessionType.objects.filter(active=True), widget=forms.RadioSelect, empty_label=None)
 
     class Meta:
         model = Session

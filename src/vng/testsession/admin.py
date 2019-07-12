@@ -50,7 +50,8 @@ class SessionTypeAdmin(admin.ModelAdmin):
         'application',
         'version',
         'header',
-        'db_data'
+        'db_data',
+        'active'
     ]
     list_filter = ['name']
     search_fields = ['name']
