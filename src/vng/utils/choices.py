@@ -19,11 +19,6 @@ class StatusWithScheduledChoices(StatusChoices):
     scheduled = ChoiceItem("Scheduled")
 
 
-class ResultChoices(DjangoChoices):
-    success = ChoiceItem("Success")
-    failed = ChoiceItem("Failed")
-
-
 class HTTPCallChoices(DjangoChoices):
     success = ChoiceItem("Succesvol")
     failed = ChoiceItem("Niet succesvol")
