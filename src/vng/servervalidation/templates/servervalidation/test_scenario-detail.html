@@ -65,15 +65,15 @@
                                 <table class="table">
                                     <thead class="thead-light">
                                         <th>{% trans "Name call" %}</th>
-                                        <th>{% trans "Method" %}</th>
                                         <th>{% trans "Url" %}</th>
+                                        <th>{% trans "Code snippet" %}</th>
                                     </thead>
                                     <tbody>
                                         {% for call in calls %}
                                             {% if 'event' in call %}
                                                 <tr>
                                                     <td>{{ call.name }}</td>
-                                                    <td>{{ call|build_method }}</td>
+                                                    <td>{{ call|build_url }}</td>
                                                     <td>
                                                         <pre class="prettyprint">{{call|build_script}}</pre>
                                                     </td>
