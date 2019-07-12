@@ -334,13 +334,13 @@ class TestUrlParam(WebTest):
         res = permissions.has_object_permission(
             type('req',(object,),{'user':self.session.user})(),
             type('view',(object,),{'user_path':['user']})(),
-            self.session 
+            self.session
         )
         self.assertEqual(res, True)
         res = permissions.has_object_permission(
             type('req',(object,),{'user':UserFactory()})(),
             type('view',(object,),{'user_path':['user']})(),
-            self.session 
+            self.session
         )
         self.assertEqual(res, False)
 
@@ -617,7 +617,7 @@ class TestAllProcedure(WebTest):
             'format':'.json'
         }))
         self.assertEqual(call.status, '200 OK')
-        
+
 
 class TestLogNewman(WebTest):
 
@@ -812,6 +812,21 @@ class TestPostmanRun(WebTest):
     def test_rewrite(self):
         run_tests(self.session.id)
         self.assertTrue(ExposedUrl.objects.get(id=self.eu.id).test_session.is_success_test())
+
+
+class TestActiveSessionType(WebTest):
+
+    def setUp(self):
+        self.stypes = [SessionTypeFactory(active = i%2==0) for i in range(10)]
+        self.user = UserFactory()
+
+    def test_active_stypes(self):
+        call = self.app.get(reverse('testsession:session_create'), user = self.user)
+        for st in self.stypes:
+            if st.active:
+                self.assertIn(st.name, call.text)
+            else:
+                self.assertNotIn(st.name, call.text)
 
 
 class TestMultipleParams(WebTest):
