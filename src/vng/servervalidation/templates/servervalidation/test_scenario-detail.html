@@ -38,6 +38,7 @@
                     </div>
                 {% endfor %}
             </div>
+            {% comment %}
             {% for pt in object.postmantest_set.all %}
                 {% with pt.validation_file|info_calls as calls %}
                     {% if calls %}
@@ -86,7 +87,8 @@
                         </div>
                     {% endif %}
                 {% endwith %}
-            {% endfor %}
+                        {% endfor %}
+                        {% endcomment %}
         </div>
     </div>
     {% endblock %}
