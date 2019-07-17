@@ -24,7 +24,22 @@ def info_name(value):
 def info_calls(value):
     with open(value.path) as infile:
         obj = json.load(infile)
-    return obj['item']
+    items = obj['item']
+
+    # unpacking all eventual subfolders
+    total_calls = []
+    while True:
+
+        calls = list(filter(lambda x: 'request' in x, items))
+        folders = list(filter(lambda x: 'request' not in x, items))
+        total_calls += calls
+        if not folders:
+            break
+        items = []
+        for f in folders:
+            items += f['item']
+
+    return total_calls
 
 
 @register.filter
