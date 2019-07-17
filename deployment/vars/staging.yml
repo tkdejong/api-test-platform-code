@@ -33,3 +33,7 @@ dbpassword: vng-staging
 uwsgi_port: 8105
 
 new_relic_license_key: df267b81c76433faafdbc414918535ea9b22b425
+
+gcloud_project_id: vng-test-platform
+gcloud_compute_zone: europe-west4-a
+gcloud_cluster_name: test-sessions
