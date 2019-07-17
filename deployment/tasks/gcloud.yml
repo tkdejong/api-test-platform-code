@@ -1,0 +1,15 @@
+
+  - name: Send google cloud api key
+    template: src=maykin-deployment/projects/vng-api-test/google_cloud_key.json dest=/home/maykin/vng_google_cloud_key.json
+
+  - name: Log in service accounts
+    shell: gcloud auth activate-service-account --key-file=/home/maykin/vng_google_cloud_key.json
+
+  - name: Set gcloud project
+    shell: "gcloud config set project {{ gcloud_project_id }}"
+
+  - name: Set gcloud compute/zone
+    shell: gcloud config set compute/zone {{ gcloud_compute_zone }}
+
+  - name: Get kubernetes cluster credentials
+    shell: gcloud container clusters get-credentials {{ gcloud_cluster_name }}
