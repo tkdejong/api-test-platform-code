@@ -1,6 +1,6 @@
 
   - name: Send google cloud api key
-    template: src=maykin-deployment/google_cloud_key.json dest=/home/maykin/vng_google_cloud_key.json
+    template: src=maykin-deployment/projects/vng-api-test/google_cloud_key.json dest=/home/maykin/vng_google_cloud_key.json
 
   - name: Log in service accounts
     shell: gcloud auth activate-service-account --key-file=/home/maykin/vng_google_cloud_key.json
