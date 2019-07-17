@@ -12,7 +12,7 @@
             {% elif server_run.status == choices.stopped %}
                 <span class="badge badge-pill badge-secondary">{% trans "Stopped" %}</span>
             {% elif server_run.status == choices.error_deploy %}
-                <span class="badge badge-pill badge-danger">{% trans "Error during deployment" %}</span>
+                <span class="badge badge-pill badge-danger">{% trans "Error during test" %}</span>
             {% else %}
                 <span class="badge badge-pill badge-dark">{{ server_run.status }}</span>
             {% endif %}
