@@ -52,7 +52,7 @@ class TestScenarioUrl(models.Model):
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
     url = models.BooleanField(default=True, help_text='''When enabled a single-line field is shown to the user
     when starting a session. When disabled a multi-line field is shown.''')
-    placeholder = models.CharField(max_length=100, blank=True, default='https://www.example.com')
+    placeholder = models.TextField(blank=True, default='https://www.example.com')
 
     def __str__(self):
         return '{} {}'.format(self.name, self.test_scenario)
