@@ -24,7 +24,7 @@ class NewmanManager:
                        '--reporter-htmlextra-title '
                        '--reporter-htmlextra-logs '
                        '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html {}')
-    RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export --timeout-request 10000 ' + REPORT_FOLDER + '/{}.json {}'
+    RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {} --timeout-request 10000 '
     GLOBAL_VAR_SYNTAX = ' --global-var {}={} '
     TOKEN = 'TOKEN'
 
