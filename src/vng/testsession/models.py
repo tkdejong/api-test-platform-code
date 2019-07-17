@@ -96,7 +96,7 @@ class TestSession(models.Model):
 
     def is_success_test(self):
         if self.json_result is not None:
-            return postman.get_outcome_json(self.json_result) == choices.ResultChoices.success
+            return postman.get_outcome_json(self.json_result) == ResultChoices.success
 
     def get_json_obj(self):
         return postman.get_json_obj(self.json_result)

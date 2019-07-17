@@ -18,13 +18,13 @@ class NewmanManager:
     REPORT_FOLDER = settings.MEDIA_ROOT + '/newman'
     newman_path = os.path.join(settings.BASE_DIR, 'node_modules', 'newman', 'bin', 'newman.js')
     RUN_HTML_REPORT = ('{} run --reporters html {} -r htmlextra '
-                       '--timeout-request 10 '
+                       '--timeout-request 10000 '
                        '--reporter-htmlextra-darkTheme '
                        '--reporter-htmlextra-testPaging '
                        '--reporter-htmlextra-title '
                        '--reporter-htmlextra-logs '
                        '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html {}')
-    RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {}'
+    RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export --timeout-request 10000 ' + REPORT_FOLDER + '/{}.json {}'
     GLOBAL_VAR_SYNTAX = ' --global-var {}={} '
     TOKEN = 'TOKEN'
 
