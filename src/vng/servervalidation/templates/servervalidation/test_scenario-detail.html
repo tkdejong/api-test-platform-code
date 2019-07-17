@@ -38,10 +38,10 @@
                     </div>
                 {% endfor %}
             </div>
-            {% comment %}
+
             {% for pt in object.postmantest_set.all %}
-                {% with pt.validation_file|info_calls as calls %}
-                    {% if calls %}
+                {% with pt.validation_file|info_calls as items %}
+                    {% if items  %}
                         <div class="card">
                             <div class="card-header">
                                 {% trans "Info" %}: {{ pt.validation_file|info_name }}
@@ -54,7 +54,7 @@
                                         <th>{% trans "Url" %}</th>
                                     </thead>
                                     <tbody>
-                                        {% for call in calls %}
+                                        {% for call in items %}
                                             <tr>
                                                 <td>{{ call.name }}</td>
                                                 <td>{{ call|build_method }}</td>
@@ -70,7 +70,7 @@
                                         <th>{% trans "Code snippet" %}</th>
                                     </thead>
                                     <tbody>
-                                        {% for call in calls %}
+                                        {% for call in items %}
                                             {% if 'event' in call %}
                                                 <tr>
                                                     <td>{{ call.name }}</td>
@@ -87,8 +87,8 @@
                         </div>
                     {% endif %}
                 {% endwith %}
-                        {% endfor %}
-                        {% endcomment %}
+            {% endfor %}
+
         </div>
     </div>
     {% endblock %}
