@@ -32,7 +32,7 @@ from .factories import (
 from ...utils import choices
 from ...utils.factories import UserFactory
 
-# settings.configure(SUBDOMAIN_SEPARATOR='-')
+settings.SUBDOMAIN_SEPARATOR = '-')
 
 def get_object(r):
     return json.loads(r.decode('utf-8'))
@@ -57,14 +57,14 @@ class RetrieveSessionType(WebTest):
         SessionTypeFactory()
 
     def test_retrieve_single_session_types(self):
-        call = self.app.get(reverse('apiv1session:session_types-list'), user='admin')
-        t = get_object(call.body)
+        call=self.app.get(reverse('apiv1session:session_types-list'), user = 'admin')
+        t=get_object(call.body)
         self.assertTrue(t[0]['id'] > 0)
 
     def test_retrieve_multiple_session_types(self):
-        SessionTypeFactory.create_batch(size=10)
-        call = self.app.get(reverse('apiv1session:session_types-list'), user='admin')
-        t = json.loads(call.text)
+        SessionTypeFactory.create_batch(size = 10)
+        call=self.app.get(reverse('apiv1session:session_types-list'), user = 'admin')
+        t=json.loads(call.text)
         self.assertTrue(t[9]['id'] > 0)
 
 
@@ -74,25 +74,25 @@ class AuthorizationTests(WebTest):
         UserFactory()
 
     def test_check_unauthenticated_testsessions(self):
-        self.app.get(reverse('apiv1session:session_types-list'), expect_errors=True)
+        self.app.get(reverse('apiv1session:session_types-list'), expect_errors = True)
 
     def test_right_login(self):
-        call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
+        call=self.app.post(reverse('apiv1_auth:rest_login'), params = collections.OrderedDict([
             ('username', get_username()),
             ('password', 'password')]))
         self.assertIsNotNone(call.json.get('key'))
 
     def test_wrong_login(self):
-        call = self.app.post(reverse('apiv1_auth:rest_login'), {
+        call=self.app.post(reverse('apiv1_auth:rest_login'), {
             'username': get_username(),
             'password': 'wrong'
-        }, status=400)
+        }, status = 400)
 
         self.assertEqual(call.json, {"non_field_errors": [gettext("Unable to log in with provided credentials.")]})
 
     def test_session_creation_authentication(self):
         Session.objects.all().delete()
-        session = {
+        session={
             'session_type': 1,
             'started': str(timezone.now()),
             'status': choices.StatusChoices.running,
