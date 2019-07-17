@@ -32,7 +32,7 @@ from .factories import (
 from ...utils import choices
 from ...utils.factories import UserFactory
 
-settings.SUBDOMAIN_SEPARATOR = '-')
+settings.SUBDOMAIN_SEPARATOR = '-'
 
 def get_object(r):
     return json.loads(r.decode('utf-8'))
