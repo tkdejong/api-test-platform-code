@@ -6,7 +6,9 @@ from django.urls import reverse
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User
 
-from .factories import TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory
+from .factories import (
+    TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory, PostmanTestSubFolderFactory
+)
 from ...utils import choices, forms
 
 
@@ -232,3 +234,15 @@ class IntegrationTest(WebTest):
             user='random',
             status=[403]
         )
+
+
+class TestScenarioDetail(WebTest):
+
+    def setUp(self):
+        self.pts = PostmanTestSubFolderFactory()
+
+    def test_scenario_detail(self):
+        call = self.app.get(reverse('server_run:testscenario-detail', kwargs={
+            'pk': self.pts.test_scenario.id
+        }))
+        self.assertIn('test subsub', call.text)
