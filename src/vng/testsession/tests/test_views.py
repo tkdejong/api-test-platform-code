@@ -876,7 +876,7 @@ class TestMultipleParams(WebTest):
                 'uuid': session.uuid
             }
         ))
-        self.assertEqual(call.json['message'], 'No errors, not completed')
+        self.assertEqual(call.json['message'], 'Not completed')
 
         reports[0].result = choices.HTTPCallChoices.failed
         reports[0].save()
