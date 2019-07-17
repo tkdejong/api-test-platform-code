@@ -29,4 +29,6 @@ dbuser: vngatv
 
 uwsgi_port: 8084
 
-
+gcloud_project_id: vng-test-platform
+gcloud_compute_zone: europe-west4-a
+gcloud_cluster_name: test-sessions
