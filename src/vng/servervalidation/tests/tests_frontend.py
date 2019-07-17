@@ -54,14 +54,14 @@ class TestCreation(WebTest):
 
     def test_creation_error_list(self):
         call = self.app.get(reverse('server_run:server-run_list'), user='test')
-        assert 'Started' not in str(call.body)
+        self.assertNotIn('Starting', call.text)
 
         call = self.app.get(reverse('server_run:server-run_create_item'), user='test')
         form = call.forms[1]
         form['test_scenario'].force_value('9')
         form.submit()
         call = self.app.get(reverse('server_run:server-run_list'), user='test')
-        assert 'Started' not in str(call.body)
+        self.assertNotIn('Starting', call.text)
 
     def test_scenarios(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
