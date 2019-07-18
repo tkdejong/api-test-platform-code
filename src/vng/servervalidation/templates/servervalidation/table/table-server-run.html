@@ -11,8 +11,8 @@
     <td>
         <div class='col-xs-1'>
             {% comment %} <div class='row'> {% endcomment %}
-
-                <a class="btn btn-info btn-margin" href="{% url 'server_run:testscenario-detail' server_run.test_scenario.pk  %}">{% trans "Description" %}</a>
+                <input type="button" class="btn btn-primary" value="{% trans "Description" %}"
+                    onclick="location.href = '{% url 'server_run:testscenario-detail' server_run.test_scenario.pk  %}';">
             {% comment %} </div> {% endcomment %}
                 {% for pc in server_run.test_scenario.postmantest_set.all %}
                 {% comment %} <div class='row'> {% endcomment %}
