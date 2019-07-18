@@ -58,14 +58,14 @@ class RetrieveSessionType(WebTest):
         SessionTypeFactory()
 
     def test_retrieve_single_session_types(self):
-        call=self.app.get(reverse('apiv1session:session_types-list'), user = 'admin')
-        t=get_object(call.body)
+        call = self.app.get(reverse('apiv1session:session_types-list'), user='admin')
+        t = get_object(call.body)
         self.assertTrue(t[0]['id'] > 0)
 
     def test_retrieve_multiple_session_types(self):
         SessionTypeFactory.create_batch(size = 10)
-        call=self.app.get(reverse('apiv1session:session_types-list'), user = 'admin')
-        t=json.loads(call.text)
+        call = self.app.get(reverse('apiv1session:session_types-list'), user='admin')
+        t = json.loads(call.text)
         self.assertTrue(t[9]['id'] > 0)
 
 
