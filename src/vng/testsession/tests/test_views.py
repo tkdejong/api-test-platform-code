@@ -7,6 +7,7 @@ import mock
 import factory
 
 from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
@@ -32,7 +33,6 @@ from .factories import (
 from ...utils import choices
 from ...utils.factories import UserFactory
 
-settings.SUBDOMAIN_SEPARATOR = '-'
 
 def get_object(r):
     return json.loads(r.decode('utf-8'))
@@ -51,6 +51,7 @@ def get_subdomain(url):
     return re.search('([0-9]+)\-', url).group(1)
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class RetrieveSessionType(WebTest):
 
     def setUp(self):
@@ -68,6 +69,7 @@ class RetrieveSessionType(WebTest):
         self.assertTrue(t[9]['id'] > 0)
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class AuthorizationTests(WebTest):
 
     def setUp(self):
@@ -101,6 +103,7 @@ class AuthorizationTests(WebTest):
         call = self.app.post(reverse('apiv1session:test_session-list'), session, status=[401, 302])
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class CreationAndDeletion(WebTest):
     csrf_checks = False
 
@@ -172,6 +175,7 @@ class CreationAndDeletion(WebTest):
         call = self.app.post(reverse('testsession:stop_session', kwargs={'session_id': session.id}), status=302)
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestLog(WebTest):
 
     def setUp(self):
@@ -309,6 +313,7 @@ class TestLog(WebTest):
         self.assertEqual(call.json['headers']['authorization'], headers['authorization'])
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestUrlParam(WebTest):
 
     def setUp(self):
@@ -391,6 +396,7 @@ class TestUrlParam(WebTest):
         self.assertEqual(report + 1, len(Report.objects.filter(scenario_case=self.scenario_case_p)))
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestUrlMatchingPatterns(WebTest):
 
     def setUp(self):
@@ -426,6 +432,7 @@ class TestUrlMatchingPatterns(WebTest):
         self.assertEqual(last_report.scenario_case, self.scenario_case)
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestSandboxMode(WebTest):
 
     def setUp(self):
@@ -524,6 +531,7 @@ class TestSandboxMode(WebTest):
         self.assertEqual(session.sandbox, True)
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestAllProcedure(WebTest):
     csrf_checks = False
 
@@ -620,6 +628,7 @@ class TestAllProcedure(WebTest):
         self.assertEqual(call.status, '200 OK')
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestLogNewman(WebTest):
 
     def setUp(self):
@@ -654,6 +663,7 @@ class TestLogNewman(WebTest):
         self.assertEqual(call['result'], 'Geen oproep uitgevoerd')
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestHeaderInjection(WebTest):
 
     def setUp(self):
@@ -680,6 +690,7 @@ class TestHeaderInjection(WebTest):
         self.assertIn('dummy', call.json['headers']['key'])
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestAuthProxy(WebTest):
 
     def setUp(self):
@@ -727,6 +738,7 @@ class TestAuthProxy(WebTest):
         self.assertEqual('test', resp.json['headers']['authorization'])
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestRewriteBody(WebTest):
 
     def setUp(self):
@@ -767,6 +779,7 @@ class TestRewriteBody(WebTest):
         self.assertEqual('dummy{}/dummy'.format(self.host), res)
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestRewriteUrl(WebTest):
 
     def setUp(self):
@@ -798,6 +811,7 @@ class TestRewriteUrl(WebTest):
         self.assertEqual(url, 'http://www.dummy.com/path/sub/a')
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestPostmanRun(WebTest):
 
     def setUp(self):
@@ -815,6 +829,7 @@ class TestPostmanRun(WebTest):
         self.assertTrue(ExposedUrl.objects.get(id=self.eu.id).test_session.is_success_test())
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestActiveSessionType(WebTest):
 
     def setUp(self):
@@ -830,6 +845,7 @@ class TestActiveSessionType(WebTest):
                 self.assertNotIn(st.name, call.text)
 
 
+@override_settings(SUBDOMAIN_SEPARATOR='-')
 class TestMultipleParams(WebTest):
     csrf_checks = False
 
