@@ -53,7 +53,7 @@ node {
     stage ("Install frontend requirements") {
         sh """
             npm install
-            gulp sass
+            ./node_modules/gulp/bin/gulp.js sass
            """
 
         sh """
@@ -126,7 +126,7 @@ node {
         finally {
             sh "./node_modules/gulp/bin/gulp.js lint"
             sh "./node_modules/gulp/bin/gulp.js build"
-            junit "reports/jstests/test-results.xml"
+            junit "reports/jstests/junit.xml"
 
             if (testsError) {
                 throw testsError

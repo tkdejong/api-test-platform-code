@@ -41,12 +41,13 @@
     </td>
     <td>
         {% if not server_run.is_stopped %}
-             <form id="myform" method="POST" action="{% url 'server_run:server-run_stop' server_run.pk %}">
+            <form id="myform" method="POST" action="{% url 'server_run:server-run_stop' server_run.pk %}">
                 {% csrf_token %}
                 <input type="submit" class="btn btn-danger"  value="Stop">
-             </form>
-
-             <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">{% trans "Fire now" %}</a>
+            </form>
+            {% if not server_run.is_running %}
+                <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">{% trans "Fire now" %}</a>
+            {% endif %}
         {% endif %}
     </td>
     <td>

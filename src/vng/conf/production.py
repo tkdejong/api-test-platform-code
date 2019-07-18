@@ -123,3 +123,5 @@ LOGGING['handlers'].update({
 })
 
 RUN_KUBERNETES_CMD = True
+
+SUBDOMAIN_SEPARATOR = '.'
