@@ -12,7 +12,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
     username = models.CharField(
         _('username'), max_length=150,
-        unique=True, help_text=_('Verplicht. Maximaal 150 tekens.'),
+        unique=True, help_text=_('Maximum 150 characters.'),
         error_messages={
             'unique': _("A user with that username already exists."),
         },
