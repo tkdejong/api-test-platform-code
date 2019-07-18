@@ -9,6 +9,7 @@ from celery.utils.log import get_task_logger
 
 from django.db.models import Q
 from django.utils.timezone import make_aware
+from django.utils.translation import ugettext_lazy as _
 
 from vng.k8s_manager.kubernetes import *
 from vng.k8s_manager.container_manager import K8S
