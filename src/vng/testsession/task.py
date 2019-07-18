@@ -179,7 +179,7 @@ def ZGW_deploy(session):
         '-U',
         'postgres'
     ])
-    update_session_status(session, _('Installatie succesvol uitgevoerd'), 100)
+    update_session_status(session, _('Installation succesful'), 100)
     session.status = choices.StatusChoices.running
     session.save()
 
