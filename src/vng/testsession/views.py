@@ -78,7 +78,10 @@ class Dashboard(TemplateView):
         )
         context['servers_scheduled'] = ServerRun.objects.filter(user=self.request.user) \
             .filter(scheduled=True) \
-            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting)) \
+            .filter(
+                Q(status=choices.StatusWithScheduledChoices.running)
+                | Q(status=choices.StatusWithScheduledChoices.starting)
+                | Q(status=choices.StatusWithScheduledChoices.scheduled)) \
             .order_by('-started') \
             .filter(user=self.request.user) \
             .count()
