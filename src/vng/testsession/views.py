@@ -76,12 +76,27 @@ class Dashboard(TemplateView):
             .filter(user=self.request.user)
             .count()
         )
+        context['sessions_active_hosted'] = (
+            Session.objects
+            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
+            .filter(session_type__vngendpoint__docker_image__isnull=True)
+            .filter(user=self.request.user)
+            .count()
+        )
         context['servers_scheduled'] = ServerRun.objects.filter(user=self.request.user) \
             .filter(scheduled=True) \
             .filter(
                 Q(status=choices.StatusWithScheduledChoices.running)
                 | Q(status=choices.StatusWithScheduledChoices.starting)
                 | Q(status=choices.StatusWithScheduledChoices.scheduled)) \
+            .order_by('-started') \
+            .filter(user=self.request.user) \
+            .count()
+        context['server_running'] = ServerRun.objects.filter(user=self.request.user) \
+            .filter(scheduled=False) \
+            .filter(
+                Q(status=choices.StatusWithScheduledChoices.running)
+                | Q(status=choices.StatusWithScheduledChoices.starting)) \
             .order_by('-started') \
             .filter(user=self.request.user) \
             .count()
