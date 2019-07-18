@@ -7,6 +7,8 @@ register = template.Library()
 
 
 def exception_as_string(func):
+    # return func
+
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -15,27 +17,20 @@ def exception_as_string(func):
     return wrapper
 
 
-@exception_as_string
 @register.filter
-def info(value):
-    with open(value.path) as infile:
-        obj = json.load(infile)
+@exception_as_string
+def info(obj):
     return obj['info']['schema']
 
 
-@exception_as_string
 @register.filter
-def info_name(value):
-    with open(value.path) as infile:
-        obj = json.load(infile)
+@exception_as_string
+def info_name(obj):
     return obj['info']['name']
 
 
 @exception_as_string
-@register.filter
-def info_calls(value):
-    with open(value.path) as infile:
-        obj = json.load(infile)
+def info_calls(obj):
     items = obj['item']
 
     # unpacking all eventual subfolders
@@ -52,6 +47,9 @@ def info_calls(value):
             items += f['item']
 
     return total_calls
+
+
+register.filter('info_calls', info_calls)
 
 
 @exception_as_string
