@@ -95,7 +95,7 @@ def deploy_db(session, data=[]):
 
 
 def ZGW_deploy(session):
-    update_session_status(session, _('Connectiong to Kubernetes'), 1)
+    update_session_status(session, _('Connecting to Kubernetes'), 1)
 
     k8s = K8S(app_name=session.name)
     k8s.initialize()
