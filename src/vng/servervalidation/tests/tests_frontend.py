@@ -6,7 +6,9 @@ from django.urls import reverse
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User
 
-from .factories import TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory
+from .factories import (
+    TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory, PostmanTestSubFolderFactory
+)
 from ...utils import choices, forms
 
 
@@ -54,14 +56,14 @@ class TestCreation(WebTest):
 
     def test_creation_error_list(self):
         call = self.app.get(reverse('server_run:server-run_list'), user='test')
-        assert 'Started' not in str(call.body)
+        self.assertNotIn('Starting', call.text)
 
         call = self.app.get(reverse('server_run:server-run_create_item'), user='test')
         form = call.forms[1]
         form['test_scenario'].force_value('9')
         form.submit()
         call = self.app.get(reverse('server_run:server-run_list'), user='test')
-        assert 'Started' not in str(call.body)
+        self.assertNotIn('Starting', call.text)
 
     def test_scenarios(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
@@ -232,3 +234,15 @@ class IntegrationTest(WebTest):
             user='random',
             status=[403]
         )
+
+
+class TestScenarioDetail(WebTest):
+
+    def setUp(self):
+        self.pts = PostmanTestSubFolderFactory()
+
+    def test_scenario_detail(self):
+        call = self.app.get(reverse('server_run:testscenario-detail', kwargs={
+            'pk': self.pts.test_scenario.id
+        }))
+        self.assertIn('test subsub', call.text)

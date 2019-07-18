@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from celery.utils.log import get_task_logger
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from vng.postman.choices import ResultChoices
@@ -131,7 +132,7 @@ def send_email_failure(sl):
     })
 
     send_mail(
-        'Failure of scheduled test',
+        _('Failure of scheduled test'),
         msg_html,
         settings.DEFAULT_FROM_EMAIL,
         [sl[0][0].user.email],

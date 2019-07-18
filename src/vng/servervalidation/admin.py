@@ -38,7 +38,7 @@ class PostmanTestResultAdmin(admin.ModelAdmin):
 class EndpointAdmin(admin.ModelAdmin):
     list_display = ['test_scenario_url', 'jwt', 'server_run', 'url']
     list_filter = ['test_scenario_url', 'server_run', 'url']
-    search_fields = ['test_scenario_url', 'server_run', 'url']
+    search_fields = ['test_scenario_url__name', 'server_run__id', 'url']
 
 
 @admin.register(model.ServerRun)
@@ -58,7 +58,7 @@ class ServerRunAdmin(admin.ModelAdmin):
         'scheduled'
     ]
     list_filter = ['user']
-    search_fields = ['user']
+    search_fields = ['user__username']
 
     inlines = [EndpointInline]
 
@@ -76,4 +76,4 @@ class TestScenarioAdmin(admin.ModelAdmin):
 class TestScenarioUrlAdmin(admin.ModelAdmin):
     list_display = ['name', 'test_scenario']
     list_filter = ['name', 'test_scenario']
-    search_fields = ['name', 'test_scenario']
+    search_fields = ['name', 'test_scenario__name']

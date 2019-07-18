@@ -36,6 +36,13 @@ class FilerFieldNoAssertion(Dmf):
     file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/Google_no_assertion.postman_collection.json')
 
 
+class FilerFieldSubFolder(Dmf):
+    class Meta:
+        model = File
+
+    file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/sub_sub_fold.postman_collection.json')
+
+
 class PostmanTestNoAssertionFactory(Dmf):
 
     class Meta:
@@ -50,6 +57,14 @@ class PostmanTestFactory(Dmf):
         model = PostmanTest
     test_scenario = factory.SubFactory(TestScenarioFactory)
     validation_file = factory.SubFactory(FilerField)
+
+
+class PostmanTestSubFolderFactory(Dmf):
+
+    class Meta:
+        model = PostmanTest
+    test_scenario = factory.SubFactory(TestScenarioFactory)
+    validation_file = factory.SubFactory(FilerFieldSubFolder)
 
 
 class TestScenarioUrlFactory(Dmf):

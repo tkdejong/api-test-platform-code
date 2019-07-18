@@ -105,17 +105,41 @@ class TestSession(models.Model):
 class VNGEndpoint(models.Model):
 
     port = models.PositiveIntegerField(default=8080, blank=True)
-    url = models.URLField(max_length=200, blank=True, null=True, default=None,
-                          help_text='Base url (host of the service). E.g. http://ref.tst.vng.cloud, without the ending slash.')
-    path = models.CharField(max_length=200, default='',
-                            help_text='Path url that is appended in the front end page. The path must contain the slash at \
-                            the beginning. E.g. /zrc/api/v1/', blank=True)
+    url = models.URLField(
+        max_length=200,
+        blank=True,
+        null=True,
+        default=None,
+        validators=[
+            RegexValidator(
+                regex='/$',
+                message=_('The url must not contain a final slash'),
+                code='Invalid_url',
+                inverse_match=True
+            )
+        ],
+        help_text=_('Base url (host of the service). E.g. http://ref.tst.vng.cloud, without the ending slash.')
+    )
+    path = models.CharField(
+        max_length=200,
+        default='',
+        validators=[
+            RegexValidator(
+                regex='^/',
+                message=_('The path must start with a slash'),
+                code='Invalid_path',
+            )
+        ],
+        help_text=_('Path url that is appended in the front end page. The path must contain the slash at \
+                            the beginning. E.g. /zrc/api/v1/'),
+        blank=True
+    )
     name = models.CharField(
         max_length=200,
         validators=[
             RegexValidator(
                 regex='^[^ ]*$',
-                message='The name cannot contain spaces',
+                message=_('The name cannot contain spaces'),
                 code='Invalid_name'
             )
         ]

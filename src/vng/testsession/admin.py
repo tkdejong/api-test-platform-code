@@ -37,7 +37,7 @@ class InjectHeaderAdmin(admin.ModelAdmin):
 @admin.register(model.ExposedUrl)
 class ExposedUrlAdmin(admin.ModelAdmin):
     list_display = ['session', 'vng_endpoint', 'subdomain', 'id', 'test_session', 'docker_url']
-    list_filter = ['session']
+    list_filter = ['session__name']
     search_fields = ['session__name']
 
 
@@ -82,7 +82,7 @@ class SessionAdmin(admin.ModelAdmin):
 @admin.register(model.SessionLog)
 class SessionLogAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
-    search_fields = ['session', 'date']
+    search_fields = ['session__name', 'date']
     list_display = ['date', 'session', 'response_status']
 
 
