@@ -165,11 +165,11 @@ class Container(AutoAssigner):
         return base
 
     def get_init_content(self):
-        if hasattr(self, 'migration') and self.migration:
+        if hasattr(self, 'initContainer'):
             return {
                 'name': '{}-init'.format(self.name),
                 'image': self.image,
-                'command': ['python', 'src/manage.py', 'migrate']
+                'command': self.initContainer
             }
         return None
 
