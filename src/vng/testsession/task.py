@@ -228,7 +228,7 @@ def bootstrap_session(session_pk, purged=False):
     if session.session_type.database:
         data = session.session_type.db_data or []
 
-        db_IP_address, _ = deploy_db(session, data)
+        db_IP_address, __ = deploy_db(session, data)
         if not db_IP_address:
             update_session_status(session, _('An error within the image prevented from a correct deployment'))
             return
