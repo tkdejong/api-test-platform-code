@@ -90,7 +90,8 @@ TINYMCE_DEFAULT_CONFIG = {
     'cleanup_on_startup': True,
     'custom_undo_redo_levels': 10,
     'width': '80%',
-    'height': 500
+    'height': 500,
+    'theme_advanced_resizing': True
 }
 
 REST_FRAMEWORK = {
