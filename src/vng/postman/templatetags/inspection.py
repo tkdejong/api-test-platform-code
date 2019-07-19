@@ -1,5 +1,7 @@
 import json
 
+from functools import wraps
+
 from django import template
 from django.utils.translation import ugettext_lazy as _
 
@@ -7,8 +9,8 @@ register = template.Library()
 
 
 def exception_as_string(func):
-    # return func
 
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -29,6 +31,7 @@ def info_name(obj):
     return obj['info']['name']
 
 
+@register.filter
 @exception_as_string
 def info_calls(obj):
     items = obj['item']
@@ -47,9 +50,6 @@ def info_calls(obj):
             items += f['item']
 
     return total_calls
-
-
-register.filter('info_calls', info_calls)
 
 
 @exception_as_string
