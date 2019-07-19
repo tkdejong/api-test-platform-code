@@ -67,6 +67,16 @@ class PostmanTest(OrderedModel):
     class Meta(OrderedModel.Meta):
         pass
 
+    @property
+    def valid_file(self):
+        if hasattr(self, 'valid_file_cache'):
+            return self.valid_file_cached
+        else:
+            with open(self.validation_file.path) as infile:
+                cache = json.load(infile)
+                self.valid_file_cached = cache
+            return cache
+
     def __str__(self):
         return '{} {}'.format(self.test_scenario, self.validation_file)
 

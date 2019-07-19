@@ -40,11 +40,11 @@
             </div>
 
             {% for pt in object.postmantest_set.all %}
-                {% with pt.validation_file|info_calls as items %}
+                {% with pt.valid_file|info_calls as items %}
                     {% if items  %}
                         <div class="card">
                             <div class="card-header">
-                                {% trans "Info" %}: {{ pt.validation_file|info_name }}
+                                {% trans "Info" %}: {{ pt.valid_file|info_name }}
                             </div>
                             <div class="card-body">
                                 <table class="table">
