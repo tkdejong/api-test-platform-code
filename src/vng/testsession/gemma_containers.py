@@ -38,7 +38,7 @@ NRC_CELERY = Container(
         'DB_NAME': 'nrc',
         'DB_USER': 'postgres',
         'DB_PASSWORD': 'postgres',
-        'DJANGO_SETTINGS_MODULE': 'notifications.conf.docker',
+        'DJANGO_SETTINGS_MODULE': 'nrc.conf.docker',
         'UWSGI_PORT': '8004',
         'IS_HTTPS': '0',
         'SECRET_KEY': '^6gn!(9zn%h(-u0t=iq3f(7izgi-#a2n6@fxlh5z7fxp=#evf#',
@@ -50,7 +50,7 @@ NRC_CELERY = Container(
         'celery',
         'worker',
         '-A',
-        'notifications',
+        'nrc',
         '--workdir=src'
     ]
 )
@@ -65,7 +65,7 @@ NRC = Container(
         'DB_NAME': 'nrc',
         'DB_USER': 'postgres',
         'DB_PASSWORD': 'postgres',
-        'DJANGO_SETTINGS_MODULE': 'notifications.conf.docker',
+        'DJANGO_SETTINGS_MODULE': 'nrc.conf.docker',
         'UWSGI_PORT': '8004',
         'IS_HTTPS': '0',
         'SECRET_KEY': 'x1#8uih#76j4z)+_3j-^iot)2=c#ht%&j1lcvyqxh&t+=5i@i=',
