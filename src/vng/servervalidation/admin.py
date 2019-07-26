@@ -67,6 +67,7 @@ class ServerRunAdmin(admin.ModelAdmin):
 class TestScenarioAdmin(admin.ModelAdmin):
     list_display = ['name', 'description', 'active']
     list_filter = ['name']
+    list_editable = ('active',)
     search_fields = ['name']
 
     inlines = [TestScenarioUrlInline, PostmanTestInline]
