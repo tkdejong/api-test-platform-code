@@ -54,6 +54,7 @@ class SessionTypeAdmin(admin.ModelAdmin):
         'active'
     ]
     list_filter = ['name']
+    list_editable = ('active',)
     search_fields = ['name']
 
     inlines = [VNGEndpointInline, InjectHeaderInline]
