@@ -12,7 +12,7 @@ django_settings_module: "{{ project_src_dir }}.conf.{{ target }}"
 pub_key_users:
   - alex
   - joeri
-  - alvise
+  - steven
 
 project_repo: git@github.com:VNG-Realisatie/api-test-platform-code.git
 branch: develop
