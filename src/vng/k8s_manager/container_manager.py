@@ -49,6 +49,7 @@ class K8S():
             'create',
             self.cluster,
             '--num-nodes=1',
+            '--enable-ip-alias', # Necessary for VPC-native routes from gcloud version 256.0.0 onward, https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips
         ]
         get_credentials = [
             'gcloud',
