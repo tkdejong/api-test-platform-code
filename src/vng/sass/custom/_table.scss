@@ -13,3 +13,19 @@
 .td-75 {
   width: 75%;
 }
+
+.table {
+  table-layout: fixed
+}
+
+.test-script {
+  width: 10%;
+}
+
+.scenario-detail tr td:nth-child(1), .scenario-detail tr th:nth-child(1) {
+  width: 30%;
+}
+
+.scenario-detail tr td:nth-child(3), .scenario-detail tr th:nth-child(3) {
+  width: 40%;
+}
