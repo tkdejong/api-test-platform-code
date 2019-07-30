@@ -1,0 +1,141 @@
+/* Colors */
+/* Overrides */
+a:link, a:visited {
+  color: #007bc7;
+}
+
+a:focus, a:hover {
+  color: #036;
+}
+
+#header {
+  color: #444;
+  background: white;
+  /* border-bottom: 8px solid $color_secondary; */
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 100000;
+}
+
+#header a:link, #header a:visited, #header a:hover {
+  color: black !important;
+}
+
+#user-tools a {
+  border-bottom: none;
+  text-decoration: underline;
+}
+
+#user-tools a:focus, #user-tools a:hover {
+  color: #b2d7ee;
+}
+
+.module h2, .module caption, .inline-group h2 {
+  background: #b2d7ee;
+  color: black;
+}
+
+#branding h1 {
+  color: black;
+}
+
+#branding h1 a:link, #branding h1 a:visited {
+  color: black;
+}
+
+div.breadcrumbs {
+  background: #b2d7ee;
+  color: #c4dce8;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 60px;
+  z-index: 100000;
+}
+
+div.breadcrumbs a {
+  color: black;
+}
+
+div.breadcrumbs {
+  color: black;
+}
+
+div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+  color: #fff;
+}
+
+/* Important is used because Django templates include their own style, after ours */
+#changelist-filter a:focus, #changelist-filter a:hover {
+  color: #b2d7ee !important;
+}
+
+#changelist-filter li.selected a {
+  color: #007bc7 !important;
+}
+
+#changelist-filter li.selected a:focus, #changelist-filter li.selected a:hover {
+  color: #b2d7ee !important;
+}
+
+.object-tools a:focus, .object-tools a:hover {
+  background-color: #333;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+  background: #b2d7ee;
+  color: black;
+  /* border: 2px solid $color_dark; */
+}
+
+.button:active, input[type=submit]:active, input[type=button]:active, .button:focus, input[type=submit]:focus, input[type=button]:focus, .button:hover, input[type=submit]:hover, input[type=button]:hover {
+  background: #b2d7ee;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+  background: #b2d7ee;
+}
+
+.button.default:active, input[type=submit].default:active, .button.default:focus, input[type=submit].default:focus, .button.default:hover, input[type=submit].default:hover {
+  background: #000;
+}
+
+.delete-confirmation form .cancel-link {
+  background: #b2d7ee;
+  color: #fff;
+}
+
+.delete-confirmation form .cancel-link:active, .delete-confirmation form .cancel-link:focus, .delete-confirmation form .cancel-link:hover {
+  background: #333;
+}
+
+/* Overriding admin-index.css */
+#container .dropdown-menu {
+    background-color: #007bc7;
+    top: 57px;
+}
+
+.dropdown-menu .dropdown-menu__item:hover, .dropdown-menu__item--active, .dropdown-menu .dropdown-menu__item:link.dropdown-menu__item--active, .dropdown-menu .dropdown-menu__item:visited.dropdown-menu__item--active {
+    background-color: #b2d7ee !important;
+    text-decoration: none !important;
+    color: black !important;
+    z-index: 999 !important;
+}
+
+.dropdown-menu .dropdown-menu__drop {
+    background-color: #b2d7ee !important;
+    text-decoration: none !important;
+    color: black !important;
+    z-index: 999 !important;
+}
+
+.dropdown-menu .dropdown-menu__link .dropdown-menu__link--active, .dropdown-menu .dropdown-menu__link:link.dropdown-menu__link--active, .dropdown-menu .dropdown-menu__link:visited.dropdown-menu__link--active, .dropdown-menu__link:hover {
+    background-color: #007bc7 !important;
+    text-decoration: none !important;
+    color: white !important;
+    z-index: 999 !important;
+}
+
+.dropdown-menu .dropdown-menu__link, .dropdown-menu .dropdown-menu__link:link, .dropdown-menu .dropdown-menu__link:visited {
+    color: black;
+}
