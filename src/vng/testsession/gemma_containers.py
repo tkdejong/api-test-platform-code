@@ -30,7 +30,7 @@ rabbitMQ = Container(
 
 NRC_CELERY = Container(
     name='celery',
-    image='vngr/gemma-notifications',
+    image='vngr/notificaties-api:develop',
     public_port=None,
     private_port=None,
     variables={
@@ -39,7 +39,6 @@ NRC_CELERY = Container(
         'DB_USER': 'postgres',
         'DB_PASSWORD': 'postgres',
         'DJANGO_SETTINGS_MODULE': 'nrc.conf.docker',
-        'UWSGI_PORT': '8004',
         'IS_HTTPS': '0',
         'SECRET_KEY': '^6gn!(9zn%h(-u0t=iq3f(7izgi-#a2n6@fxlh5z7fxp=#evf#',
         'PUBLISH_BROKER_URL': 'amqp://guest@localhost:5672//',
@@ -47,17 +46,13 @@ NRC_CELERY = Container(
         'CELERY_RESULT_BACKEND': 'amqp://guest@localhost:5672//',
     },
     command=[
-        'celery',
-        'worker',
-        '-A',
-        'nrc',
-        '--workdir=src'
+        '../celery_worker.sh'
     ]
 )
 
 NRC = Container(
     name='nrc',
-    image='vngr/gemma-notifications',
+    image='vngr/notificaties-api:develop',
     public_port=8004,
     private_port=8004,
     variables={

@@ -118,6 +118,7 @@ def ZGW_deploy(session):
     exposed_urls = []
     for c in containers:
         vng_endpoint = VNGEndpoint.objects.filter(session_type=session.session_type).filter(name__icontains=c.name)
+        c.variables['DB_HOST'] = db_IP_address
         if len(vng_endpoint) != 0:
             bind_url = ExposedUrl.objects.create(
                 session=session,
@@ -127,7 +128,6 @@ def ZGW_deploy(session):
             )
             exposed_urls.append(bind_url)
             c.name = '{}-{}'.format(session.name, c.name)
-            c.variables['DB_HOST'] = db_IP_address
 
     Deployment(
         name=session.name,
@@ -143,7 +143,7 @@ def ZGW_deploy(session):
         app=session.name,
         containers=containers
     ).execute()
-    ip = external_ip_pooling(k8s, session, n_trial=30, max_percentage=40)
+    ip = external_ip_pooling(k8s, session, n_trial=150, max_percentage=40)
     if ip is None:
         update_session_status(session, _('Impossible to deploy successfully, IP address not allocated'))
         session.status = choices.StatusChoices.error_deploy
@@ -154,12 +154,14 @@ def ZGW_deploy(session):
         ex.save()
 
     # check migrations status
-    while len(uwsgi_containers) != 0:
-        uwsgi_containers = [c for c in uwsgi_containers if 'spawned uWSGI' not in k8s.get_pod_log(c.name)]
+    while True:
+        spawned = [c for c in uwsgi_containers if 'spawned uWSGI' in k8s.get_pod_log(c.name)]
         update_session_status(session, _('Check migration status'), int(40 + (6 - len(uwsgi_containers)) * 45 / 6))
+        if len(spawned) == len(uwsgi_containers):
+            break
         time.sleep(5)
 
-    update_session_status(session, _('Loading preconfigured models', 85))
+    update_session_status(session, _('Loading preconfigured models'), 85)
     filename = str(uuid.uuid4())
     file_location = os.path.join(os.path.dirname(__file__), 'kubernetes/data/dump.sql')
     new_file = os.path.join(os.path.dirname(__file__), 'kubernetes/data/{}'.format(filename))
@@ -179,7 +181,7 @@ def ZGW_deploy(session):
         '-U',
         'postgres'
     ])
-    update_session_status(session, _('Installation succesful'), 100)
+    update_session_status(session, _('Installation successful'), 100)
     session.status = choices.StatusChoices.running
     session.save()
 
@@ -199,7 +201,7 @@ def external_ip_pooling(k8s, session, n_trial=15, purge=True, percentage=36, max
             return None
     for i in range(n_trial):
         time.sleep(10)
-        update_session_status(session, _('Installatione progress ') + '{}'.format(i + 1), min(percentage + i * 6, max_percentage))
+        update_session_status(session, _('Installation progress ') + '{}'.format(i + 1), min(percentage + i * 6, max_percentage))
         ip = k8s.service_status()
         if ip is not None:
             return ip
