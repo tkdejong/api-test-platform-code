@@ -85,7 +85,7 @@ INSTALLED_APPS += [
 ]
 PROJECT_APPS = [app for app in INSTALLED_APPS if app.startswith('vng.')]
 JENKINS_TASKS = (
-    'django_jenkins.tasks.run_pylint',
+    # 'django_jenkins.tasks.run_pylint',
     'django_jenkins.tasks.run_pep8',
 )
 

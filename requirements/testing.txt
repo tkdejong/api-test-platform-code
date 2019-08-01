@@ -1,4 +1,5 @@
 # Shared between dev and jenkins requirements to run our tests
+astroid==2.2.5
 coverage
 django-webtest
 factory_boy
@@ -9,4 +10,4 @@ pyquery
 tblib
 webtest
 pep8
-pylint<2
+pylint==2.3.1
