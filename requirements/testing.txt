@@ -10,4 +10,4 @@ pyquery
 tblib
 webtest
 pep8
-pylint==1.9.4
+pylint==2.3.1
