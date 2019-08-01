@@ -154,12 +154,18 @@ def ZGW_deploy(session):
         ex.save()
 
     # check migrations status
-    while True:
+    for i in range(60):
         spawned = [c for c in uwsgi_containers if 'spawned uWSGI' in k8s.get_pod_log(c.name)]
         update_session_status(session, _('Check migration status'), int(40 + (6 - len(uwsgi_containers)) * 45 / 6))
         if len(spawned) == len(uwsgi_containers):
             break
         time.sleep(5)
+
+    if len(spawned) != len(uwsgi_containers):
+        update_session_status(session, _('Not all uWSGI containers have spawned'))
+        session.status = choices.StatusChoices.error_deploy
+        session.save()
+        return
 
     update_session_status(session, _('Loading preconfigured models'), 85)
     filename = str(uuid.uuid4())
