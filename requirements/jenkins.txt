@@ -1,3 +1,3 @@
 -r base.txt
 -r testing.txt
-django-jenkins
+-e git+git://github.com/maykinmedia/django-jenkins.git@pylint-2.3.1#egg=django-jenkins
