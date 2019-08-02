@@ -123,7 +123,7 @@ def ZGW_deploy(session):
             bind_url = ExposedUrl.objects.create(
                 session=session,
                 vng_endpoint=vng_endpoint[0],
-                subdomain='{}'.format(int(time.time()) * 100 + random.randint(0, 99)),
+                subdomain=uuid.uuid4(),
                 port=c.public_port
             )
             exposed_urls.append(bind_url)
