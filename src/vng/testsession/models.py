@@ -102,6 +102,12 @@ class TestSession(models.Model):
         return postman.get_json_obj(self.json_result)
 
 
+class ScenarioCaseCollection(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 class VNGEndpoint(models.Model):
 
     port = models.PositiveIntegerField(default=8080, blank=True)
@@ -147,6 +153,7 @@ class VNGEndpoint(models.Model):
     docker_image = models.CharField(max_length=200, blank=True, null=True, default=None)
     session_type = models.ForeignKey(SessionType, on_delete=models.PROTECT)
     test_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    scenario_collection = models.ForeignKey(ScenarioCaseCollection, on_delete=models.SET_NULL, default=None, null=True, blank=True)
 
     def __str__(self):
         # To show the session type when adding a scenario case
@@ -161,7 +168,7 @@ class EnvironmentalVariables(models.Model):
 
 
 class ScenarioCase(OrderedModel):
-
+    collection = models.ForeignKey(ScenarioCaseCollection, on_delete=models.CASCADE)
     url = models.CharField(max_length=200, help_text='''
     URL pattern that will be compared
     with the request and eventually matched.
@@ -169,8 +176,7 @@ class ScenarioCase(OrderedModel):
     will match the URL '/test/c5429dcc-6955-4e22-9832-08d52205f633/stop'.
     ''')
     http_method = models.CharField(max_length=20, choices=choices.HTTPMethodChoices.choices, default=choices.HTTPMethodChoices.GET)
-    vng_endpoint = models.ForeignKey(VNGEndpoint, on_delete=models.PROTECT)
-    order_with_respect_to = 'vng_endpoint__session_type'
+    # order_with_respect_to = 'vng_endpoint__session_type'
 
     class Meta(OrderedModel.Meta):
         pass
