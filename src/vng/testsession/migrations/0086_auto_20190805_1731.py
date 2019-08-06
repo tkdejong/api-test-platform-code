@@ -20,7 +20,11 @@ def create_scenario_case_collections(apps, schema_editor):
 def remove_scenario_case_collections(apps, schema_editor):
     VNGEndpoint = apps.get_model('testsession', 'VNGEndpoint')
     for endpoint in VNGEndpoint.objects.all():
-        for case in endpoint.scenario_collection.scenariocase_set.all():
+        try:
+            collection = endpoint.scenario_collection
+        except:
+            continue
+        for case in collection.scenariocase_set.all():
             case.vng_endpoint = endpoint
             case.collection = None
             case.save()
