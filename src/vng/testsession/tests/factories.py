@@ -7,7 +7,7 @@ from filer.models import File
 from vng.accounts.models import User
 
 from ..models import (
-    SessionType, Session, ScenarioCase, VNGEndpoint, ExposedUrl,
+    SessionType, Session, ScenarioCaseCollection, ScenarioCase, VNGEndpoint, ExposedUrl,
     SessionLog, TestSession, QueryParamsScenario, InjectHeader
 )
 from ...utils import choices
@@ -42,6 +42,14 @@ class FilerField(Dmf):
     file = factory.django.FileField(from_path=settings.POSTMAN_ROOT + '/google-variable.postman_collection.json')
 
 
+class ScenarioCaseCollectionFactory(Dmf):
+
+    class Meta:
+        model = ScenarioCaseCollection
+
+    name = 'test collection'
+
+
 class VNGEndpointFactory(Dmf):
 
     class Meta:
@@ -51,6 +59,7 @@ class VNGEndpointFactory(Dmf):
     url = 'https://ref.tst.vng.cloud/drc/api/v1'
     session_type = factory.SubFactory(SessionTypeFactory)
     test_file = factory.SubFactory(FilerField)
+    scenario_collection = factory.SubFactory(ScenarioCaseCollectionFactory)
 
 
 class VNGEndpointEchoFactory(Dmf):
@@ -92,7 +101,7 @@ class ScenarioCaseFactory(Dmf):
 
     url = 'unknown/23'
     http_method = choices.HTTPMethodChoices.GET
-    vng_endpoint = factory.SubFactory(VNGEndpointFactory)
+    collection = factory.SubFactory(ScenarioCaseCollectionFactory)
 
 
 class QueryParamsScenarioFactory(Dmf):

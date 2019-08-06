@@ -20,7 +20,7 @@ from vng.servervalidation.models import ServerRun, TestScenario
 
 from .models import (
     ScenarioCase, Session, SessionLog, ExposedUrl,
-    TestSession, Report, SessionType
+    TestSession, Report, SessionType, VNGEndpoint
 )
 
 from .task import bootstrap_session, stop_session
@@ -230,10 +230,9 @@ class SessionReport(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        scenario_case = self.model.objects.filter(vng_endpoint__session_type=self.session.session_type)
         report = list(Report.objects.filter(session_log__session=self.session))
         report_ordered = []
-        for case in scenario_case:
+        for case in context['session'].session_type.scenario_cases:
             is_in = False
             for rp in report:
                 if rp.scenario_case == case:
@@ -324,5 +323,5 @@ class SessionTypeDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['scenario_cases'] = ScenarioCase.objects.filter(vng_endpoint__session_type=context['sessiontype'])
+        context['scenario_cases'] = context['sessiontype'].scenario_cases
         return context

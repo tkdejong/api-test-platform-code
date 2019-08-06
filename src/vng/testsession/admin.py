@@ -15,6 +15,10 @@ class ScenarioCaseInline(admin.TabularInline):
     model = model.ScenarioCase
 
 
+class ScenarioCaseCollectionInline(admin.TabularInline):
+    model = model.ScenarioCaseCollection
+
+
 class ExposedUrlInline(admin.TabularInline):
     model = model.ExposedUrl
 
@@ -87,17 +91,23 @@ class SessionLogAdmin(admin.ModelAdmin):
     list_display = ['date', 'session', 'response_status']
 
 
+@admin.register(model.ScenarioCaseCollection)
+class ScenarioCaseCollectionAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+    ]
+
+    inlines = [ScenarioCaseInline]
+
+
 @admin.register(model.ScenarioCase)
 class ScenarioCaseAdmin(OrderedModelAdmin):
     list_display = [
         'url',
         'move_up_down_links',
         'http_method',
-        'vng_endpoint',
         'query_params'
     ]
-    list_filter = ['vng_endpoint__session_type']
-    search_fields = ['vng_endpoint__id']
     inlines = [QueryParamsScenarioInline]
 
 
@@ -126,7 +136,6 @@ class VNGEndpointAdmin(admin.ModelAdmin):
         'port',
         'test_file',
     ]
-    inlines = [ScenarioCaseInline]
 
 
 @admin.register(model.Report)
