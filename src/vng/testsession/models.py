@@ -50,6 +50,14 @@ class SessionType(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def scenario_cases(self):
+        if not hasattr(self, '_scenario_cases'):
+            endpoints = self.vngendpoint_set.all()
+            collection_ids = endpoints.values_list('scenario_collection')
+            self._scenario_cases = ScenarioCase.objects.filter(collection__in=collection_ids)
+        return self._scenario_cases
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.ZGW_images:
@@ -260,8 +268,7 @@ class Session(models.Model):
                 failed += 1
             elif report.is_not_called():
                 not_called += 1
-        return success, failed, not_called + (ScenarioCase.objects.filter(vng_endpoint__session_type=self.session_type).count() - reports.count())
-
+        return success, failed, not_called + (self.session_type.scenario_cases.count() - reports.count())
 
 class ExposedUrl(models.Model):
 

@@ -123,8 +123,8 @@ class StopSessionView(generics.ListAPIView):
         run_tests.delay(session.pk)
 
     def get_queryset(self):
-        scenarios = ScenarioCase.objects.filter(vng_endpoint__session_type__session=self.kwargs['pk'])
         session = get_object_or_404(Session, id=self.kwargs['pk'])
+        scenarios = session.session_type.scenario_cases
         if session.user != self.request.user:
             return HttpResponseForbidden()
         self.perform_operations(session)
@@ -145,7 +145,7 @@ class ResultSessionView(views.APIView):
         session = self.get_object()
         if session.user != request.user:
             raise PermissionDenied
-        scenario_cases = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
+        scenario_cases = session.session_type.scenario_cases
         report = list(Report.objects.filter(session_log__session=session))
 
         def check(scenario_cases, report):
@@ -291,10 +291,14 @@ class RunTest(CSRFExemptMixin, View):
         logger.info(request_method_name)
         logger.info(url)
         logger.info(relative_url)
-        scenario_cases = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type).annotate(count=Count('queryparamsscenario')).order_by('-count')
-        for case in scenario_cases:
-            logger.info(case)
-            if case.http_method.lower() == request_method_name.lower():
+
+        exposed = ExposedUrl.objects.get(subdomain=url, session=session)
+        endpoint = exposed.vng_endpoint
+        if endpoint.scenario_collection:
+            scenario_cases = endpoint.scenario_collection.scenariocase_set.filter(http_method__iexact=request_method_name)
+            ordered_scenario_cases = scenario_cases.annotate(count=Count('queryparamsscenario')).order_by('-count')
+            for case in ordered_scenario_cases:
+                logger.info(case)
                 if self.match_url(request.build_absolute_uri(), case.url, QueryParamsScenario.objects.filter(scenario_case=case)):
                     pre_exist = Report.objects.filter(scenario_case=case).filter(session_log__session=session)
                     if len(pre_exist) == 0:
@@ -530,13 +534,14 @@ class ResultTestsessionViewShield(views.APIView):
 
     def get(self, request, uuid=None):
         session = get_object_or_404(Session, uuid=uuid)
-        scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
         report = list(Report.objects.filter(session_log__session=session))
         report_ordered = []
         is_error = False
         not_full = False
 
-        for case in scenario_case:
+        scenario_cases = session.session_type.scenario_cases
+
+        for case in scenario_cases:
             missing = False
             for rp in report:
                 if rp.result == choices.HTTPCallChoices.failed:
@@ -548,7 +553,7 @@ class ResultTestsessionViewShield(views.APIView):
             if not missing:
                 not_full = True
 
-        if not scenario_case:
+        if not scenario_cases:
             message = 'No results'
             color = 'inactive'
         elif is_error:
