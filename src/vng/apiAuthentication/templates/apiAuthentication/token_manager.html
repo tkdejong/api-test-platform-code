@@ -1,0 +1,54 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load subdomainurls %}
+{% load i18n %}
+
+
+{% block title %}{% trans "API Token Manager" %}{% endblock %}
+
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "My API Token" %}
+                </div>
+                <div class="card-body">
+                    {% if token %}
+                        <table class="table">
+                            <tr>
+                                <th>{% trans "Date created" %}</th>
+                                <th>{% trans "Key" %}</th>
+                            </tr>
+                            <tr>
+                                <td>{{ token.created }}</td>
+                                <td>{{ token.key }}</td>
+                            </tr>
+                        </table>
+                    {% else %}
+                        {% trans "This account does not have an API token" %}
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <form class="" method="post">{% csrf_token %}
+                        <input type="hidden" name="user" value="{{ request.user.id }}"></input>
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" type="submit" name="generate_new">
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Generate new API token" %}</button>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-sm btn-danger" type="submit" name="delete">
+                                    <i class="fa fa-ban"></i>{% trans "Delete API token" %}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
