@@ -1,13 +1,12 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import Form
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
-
 from rest_framework.authtoken.models import Token
 
-# Create your views here.
 
-class TokenManager(FormView):
+class TokenManager(LoginRequiredMixin, FormView):
 
     template_name = 'apiAuthentication/token_manager.html'
     form_class = Form
