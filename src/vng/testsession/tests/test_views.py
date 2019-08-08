@@ -7,7 +7,7 @@ import mock
 import factory
 
 from django.conf import settings
-from django.test import override_settings
+from django.test import override_settings, tag
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
@@ -28,7 +28,7 @@ from ..permission import IsOwner
 from .factories import (
     SessionFactory, SessionTypeFactory, VNGEndpointDockerFactory, ExposedUrlEchoFactory, VNGEndpointEchoFactory,
     ScenarioCaseFactory, ExposedUrlFactory, SessionLogFactory, VNGEndpointFactory, QueryParamsScenarioFactory,
-    HeaderInjectionFactory, FilerField
+    HeaderInjectionFactory, FilerField, ScenarioCaseCollectionFactory
 )
 from ...utils import choices
 from ...utils.factories import UserFactory
@@ -102,7 +102,7 @@ class AuthorizationTests(WebTest):
         }
         call = self.app.post(reverse('apiv1session:test_session-list'), session, status=[401, 302])
 
-
+@tag('kubernetes')
 @override_settings(SUBDOMAIN_SEPARATOR='-')
 class CreationAndDeletion(WebTest):
     csrf_checks = False
@@ -184,8 +184,8 @@ class TestLog(WebTest):
         self.session = self.exp_url.session
         self.exp_url.vng_endpoint.session_type = self.session.session_type
         self.exp_url.vng_endpoint.url = 'https://postman-echo.com/'
+        self.exp_url.vng_endpoint.scenario_collection = self.scenarioCase.collection
         self.exp_url.vng_endpoint.save()
-        self.scenarioCase.vng_endpoint = self.exp_url.vng_endpoint
         self.scenarioCase_hard = copy.copy(self.scenarioCase)
         self.scenarioCase_hard.url = 'test/{uuid}/t'
         self.scenarioCase_hard.pk += 1
@@ -198,11 +198,14 @@ class TestLog(WebTest):
         self.endpoint_echo_e = ExposedUrlEchoFactory()
         self.endpoint_echo_e.session.session_type = self.endpoint_echo_e.vng_endpoint.session_type
         self.endpoint_echo_e.session.save()
+        self.endpoint_echo_e.vng_endpoint.scenario_collection = ScenarioCaseCollectionFactory()
+        self.endpoint_echo_e.vng_endpoint.save()
         self.endpoint_echo_e.save()
 
         self.endpoint_echo_h = ExposedUrlEchoFactory()
         self.endpoint_echo_h.session.session_type = self.endpoint_echo_h.vng_endpoint.session_type
         self.endpoint_echo_h.vng_endpoint.url = 'https://postman-echo.com/headers'
+        self.endpoint_echo_h.vng_endpoint.scenario_collection = ScenarioCaseCollectionFactory()
         self.endpoint_echo_h.vng_endpoint.save()
         self.endpoint_echo_h.session.session_type.authentication = choices.AuthenticationChoices.jwt
         self.endpoint_echo_h.session.session_type.save()
@@ -288,7 +291,7 @@ class TestLog(WebTest):
         url = reverse('testsession:session_report', kwargs={
             'uuid': self.session.uuid
         })
-        sc = ScenarioCase.objects.filter(vng_endpoint__session_type=self.session.session_type).order_by('order')
+        sc = ScenarioCase.objects.all().order_by('order')
         call = self.app.get(url, user=self.session.user)
         index = 0
         for s in sc:
@@ -319,14 +322,17 @@ class TestUrlParam(WebTest):
     def setUp(self):
         self.qp = QueryParamsScenarioFactory()
         self.scenario_case = self.qp.scenario_case
-        self.vng_endpoint = self.scenario_case.vng_endpoint
+        self.collection = self.scenario_case.collection
+        self.vng_endpoint = VNGEndpointFactory(scenario_collection=self.collection)
         self.session = SessionFactory(session_type=self.vng_endpoint.session_type)
         self.exposed_url = ExposedUrlFactory(session=self.session, vng_endpoint=self.vng_endpoint)
+
         self.qp_p = QueryParamsScenarioFactory()
         self.scenario_case_p = self.qp_p.scenario_case
         self.scenario_case_p.http_method = choices.HTTPMethodChoices.PUT
         self.scenario_case_p.save()
-        self.vng_endpoint_p = self.scenario_case_p.vng_endpoint
+        self.collection_p = self.scenario_case_p.collection
+        self.vng_endpoint_p = VNGEndpointFactory(scenario_collection=self.collection_p)
         self.session_p = SessionFactory(session_type=self.vng_endpoint_p.session_type)
         self.exposed_url_p = ExposedUrlFactory(session=self.session_p, vng_endpoint=self.vng_endpoint_p)
 
@@ -401,6 +407,9 @@ class TestUrlMatchingPatterns(WebTest):
 
     def setUp(self):
         self.scenario_case = ScenarioCaseFactory(url='test')
+        self.vng_endpoint = VNGEndpointFactory(
+            scenario_collection=self.scenario_case.collection
+        )
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
             ('username', get_username()),
@@ -412,7 +421,7 @@ class TestUrlMatchingPatterns(WebTest):
         # Save the report list
         report_list = Report.objects.all()
         resp = self.app.post_json(reverse('apiv1session:test_session-list'), {
-            'session_type': self.scenario_case.vng_endpoint.session_type.name
+            'session_type': self.vng_endpoint.session_type.name
         }, headers=self.head)
 
         # Call the url with additional padding
@@ -438,9 +447,11 @@ class TestSandboxMode(WebTest):
     def setUp(self):
         self.user = UserFactory()
         self.sc = ScenarioCaseFactory(url='status/{code}')
-        self.sc.vng_endpoint.url = 'https://postman-echo.com/'
-        self.sc.vng_endpoint.save()
-        self.session_type = self.sc.vng_endpoint.session_type
+        self.endpoint = VNGEndpointFactory(
+            scenario_collection=self.sc.collection,
+            url='https://postman-echo.com/'
+        )
+        self.session_type = self.endpoint.session_type
 
     def test_sandbox(self):
         call = self.app.get(reverse('testsession:session_create'), user=self.user)
@@ -633,9 +644,8 @@ class TestLogNewman(WebTest):
 
     def setUp(self):
         self.scenario_case = ScenarioCaseFactory()
-        self.scenario_case1 = ScenarioCaseFactory()
-        self.scenario_case1.vng_endpoint = self.scenario_case.vng_endpoint
-        self.scenario_case1.save()
+        self.scenario_case1 = ScenarioCaseFactory(collection=self.scenario_case.collection)
+        self.vng_endpoint = VNGEndpointFactory(scenario_collection=self.scenario_case.collection)
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
             ('username', get_username()),
@@ -645,7 +655,7 @@ class TestLogNewman(WebTest):
 
     def test_run(self):
         call = self.app.post(reverse("apiv1session:test_session-list"), params=collections.OrderedDict([
-            ('session_type', self.scenario_case.vng_endpoint.session_type.name),
+            ('session_type', self.vng_endpoint.session_type.name),
         ]), headers=self.head)
         call = get_object(call.body)
         session_id = call['id']
@@ -667,7 +677,8 @@ class TestLogNewman(WebTest):
 class TestHeaderInjection(WebTest):
 
     def setUp(self):
-        self.endpoint = VNGEndpointEchoFactory()
+        self.collection = ScenarioCaseCollectionFactory()
+        self.endpoint = VNGEndpointEchoFactory(scenario_collection=self.collection)
         self.hi = HeaderInjectionFactory(session_type=self.endpoint.session_type)
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
@@ -851,9 +862,10 @@ class TestMultipleParams(WebTest):
 
     def setUp(self):
         self.user = UserFactory()
-        self.ep = VNGEndpointFactory()
-        self.sc1 = ScenarioCaseFactory(vng_endpoint=self.ep)
-        self.sc2 = ScenarioCaseFactory(vng_endpoint=self.ep)
+        self.collection = ScenarioCaseCollectionFactory()
+        self.ep = VNGEndpointFactory(scenario_collection=self.collection)
+        self.sc1 = ScenarioCaseFactory(collection=self.collection)
+        self.sc2 = ScenarioCaseFactory(collection=self.collection)
         QueryParamsScenarioFactory(scenario_case=self.sc1, name='tparam1')
         QueryParamsScenarioFactory(scenario_case=self.sc2, name='tparam1')
         QueryParamsScenarioFactory(scenario_case=self.sc2, name='tparam2')
@@ -882,7 +894,9 @@ class TestMultipleParams(WebTest):
         self.test()
         session = Session.objects.all()[0]
         reports = Report.objects.filter(session_log__session=session)
-        scenario_case = ScenarioCase.objects.filter(vng_endpoint__session_type=session.session_type)
+        collection = ScenarioCaseCollectionFactory()
+        endpoint = VNGEndpointFactory(scenario_collection=collection)
+        scenario_case = ScenarioCase.objects.filter(collection=collection)
         for r in reports:
             r.result = choices.HTTPCallChoices.not_called
             r.save()

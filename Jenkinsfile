@@ -82,6 +82,7 @@ node {
                     --verbosity 2 \
                     --noinput \
                     --pep8-rcfile=.pep8 \
+                    --pylint-rcfile=.pylintrc \
                     --coverage-rcfile=.coveragerc \
                     ${keepDbOption} \
                     --enable-coverage \
