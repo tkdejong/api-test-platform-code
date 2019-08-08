@@ -50,7 +50,8 @@ class ServerRunSerializer(serializers.ModelSerializer):
             'endpoints',
             'status',
             'percentage_exec',
-            'status_exec'
+            'status_exec',
+            'uuid'
         ]
         read_only_fields = ['id', 'started', 'stopped', 'status']
 
