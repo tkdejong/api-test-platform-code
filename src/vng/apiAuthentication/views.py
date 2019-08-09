@@ -1,9 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms import Form
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
-from rest_framework.authtoken.models import Token
 from .models import CustomToken
 from .serializers import CustomTokenSerializer
 
