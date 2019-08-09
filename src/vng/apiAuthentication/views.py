@@ -9,6 +9,7 @@ from .serializers import CustomTokenSerializer
 
 from rest_auth.views import LoginView, LogoutView
 
+from .forms import TokenForm
 
 class CustomLoginView(LoginView):
     token_model = CustomToken
@@ -27,21 +28,30 @@ class CustomLogoutView(LogoutView):
 class TokenManager(LoginRequiredMixin, FormView):
 
     template_name = 'apiAuthentication/token_manager.html'
-    form_class = Form
+    form_class = TokenForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['token'] = Token.objects.filter(user=self.request.user).first()
+        context['tokens'] = CustomToken.objects.filter(user=self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):
         user = request.user
 
-        token = Token.objects.filter(user=user).first()
-        if token:
+        if 'delete_items' in request.POST:
+            pk = int(request.POST['delete_items'])
+            token = CustomToken.objects.get(pk=pk)
             token.delete()
 
         if 'generate_new' in request.POST:
-            Token.objects.create(user=user)
+            form = self.form_class(request.POST, user=user)
+            if form.is_valid():
+                token = form.save(commit=False)
+                token.user = user
+                token.save()
+            else:
+                context = self.get_context_data()
+                context['form'] = form
+                return render(request, 'apiAuthentication/token_manager.html', context=context)
 
         return redirect(reverse('apiv1_auth:token-manager'))

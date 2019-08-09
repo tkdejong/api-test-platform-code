@@ -14,27 +14,55 @@
         <div class="col-sm-8 offset-sm-2">
             <div class="card">
                 <div class="card-header">
-                    {% trans "My API Token" %}
+                    {% trans "My API Tokens" %}
                 </div>
                 <div class="card-body">
-                    {% if token %}
+                    {% if tokens %}
                         <table class="table">
                             <tr>
                                 <th>{% trans "Date created" %}</th>
+                                <th>{% trans "Token name" %}</th>
                                 <th>{% trans "Key" %}</th>
+                                <th></th>
                             </tr>
-                            <tr>
-                                <td>{{ token.created }}</td>
-                                <td>{{ token.key }}</td>
-                            </tr>
+                            {% for token in tokens %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <tr>
+                                        <td>{{ token.created }}</td>
+                                        <td>{{ token.name }}</td>
+                                        <td>{{ token.key }}</td>
+                                        <td><button class="btn btn-sm btn-danger" type="submit" name="delete_items" value="{{ token.pk }}" onclick="return confirm('Are you sure?');">Delete</button</td>
+                                    </tr>
+                                </form>
+                            {% endfor %}
                         </table>
                     {% else %}
-                        {% trans "This account does not have an API token" %}
+                        {% trans "This account does not have any API tokens" %}
                     {% endif %}
+
+                    <p>Generate a new token</p>
+                    <form class="" method="post">{% csrf_token %}
+                        {% comment %} <input type="hidden" name="user" value="{{ request.user.id }}"></input>
+                         {% endcomment %}
+                        {{ form }}
+
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" type="submit" name="generate_new">
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Generate new API token" %}</button>
+                            </div>
+                            {% comment %} <div class="col-auto">
+                                <button class="btn btn-sm btn-danger" type="submit" name="delete">
+                                    <i class="fa fa-ban"></i>{% trans "Delete API token" %}</button>
+                            </div> {% endcomment %}
+                        </div>
+                    </form>
                 </div>
                 <div class="card-footer">
-                    <form class="" method="post">{% csrf_token %}
+                    {% comment %} <form class="" method="post">{% csrf_token %}
                         <input type="hidden" name="user" value="{{ request.user.id }}"></input>
+                        {{form}}
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit" name="generate_new">
@@ -45,7 +73,7 @@
                                     <i class="fa fa-ban"></i>{% trans "Delete API token" %}</button>
                             </div>
                         </div>
-                    </form>
+                    </form> {% endcomment %}
                 </div>
             </div>
         </div>
