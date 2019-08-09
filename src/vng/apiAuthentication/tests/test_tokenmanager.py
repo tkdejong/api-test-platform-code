@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
 
 from vng.servervalidation.models import User
-from vng.testsession.tests.factories import UserFactory
+
+from ..models import CustomToken
 
 
 class TestMultipleEndpoint(TestCase):
@@ -18,52 +18,58 @@ class TestMultipleEndpoint(TestCase):
     def test_get_without_existing_token(self):
         response = self.client.get(reverse('apiv1_auth:token-manager'), user=self.user)
 
-        self.assertIsNone(response.context_data['token'])
+        self.assertFalse(response.context_data['tokens'].exists())
 
     def test_create_token(self):
         response = self.client.post(
             self.token_manager_url,
-            {'generate_new': ''},
+            {'generate_new': '', 'name': 'newtoken'},
             user=self.user,
             follow=True
         )
 
-        token = response.context_data['token']
-        self.assertIsInstance(token, Token)
+        tokens = response.context_data['tokens']
+        self.assertEqual(tokens.count(), 1)
+
+        token = tokens.first()
+        self.assertIsInstance(token, CustomToken)
+        self.assertEqual(token.name, 'newtoken')
         self.assertEqual(token.user, self.user)
 
-    def test_generate_new_token(self):
-        response = self.client.post(
+    def test_add_second_token(self):
+        self.client.post(
             self.token_manager_url,
-            {'generate_new': ''},
+            {'generate_new': '', 'name': 'token1'},
             user=self.user,
             follow=True
         )
-        old_token = response.context_data['token']
 
         response = self.client.post(
             self.token_manager_url,
-            {'generate_new': ''},
+            {'generate_new': '', 'name': 'token2'},
             user=self.user,
             follow=True
         )
-        new_token = response.context_data['token']
-        self.assertIsInstance(new_token, Token)
-        self.assertEqual(new_token.user, self.user)
 
-        self.assertNotEqual(old_token, new_token)
+        tokens = response.context_data['tokens']
+        self.assertEqual(tokens.count(), 2)
+
+        token1 = tokens.first()
+        token2 = tokens.last()
+        self.assertEqual(token1.name, 'token1')
+        self.assertEqual(token2.name, 'token2')
 
     def test_delete_token(self):
         self.client.post(
             self.token_manager_url,
-            {'generate_new': ''},
+            {'generate_new': '', 'name': 'token'},
             user=self.user
         )
         response = self.client.post(
             self.token_manager_url,
-            {'delete': ''},
+            {'delete_items': '1'},
             user=self.user,
             follow=True
         )
 
-        self.assertIsNone(response.context_data['token'])
+        self.assertFalse(response.context_data['tokens'].exists())
