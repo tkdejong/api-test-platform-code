@@ -81,7 +81,7 @@ INSTALLED_APPS = [
     # Rest Framework
     'rest_framework',
     'rest_auth',
-    'rest_framework.authtoken',
+    # 'rest_framework.authtoken',
 ]
 
 TINYMCE_DEFAULT_CONFIG = {
@@ -96,7 +96,8 @@ TINYMCE_DEFAULT_CONFIG = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        'vng.apiAuthentication.authentication.CustomTokenAuthentication',
     ]
 }
 

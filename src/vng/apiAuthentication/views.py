@@ -4,6 +4,24 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
 from rest_framework.authtoken.models import Token
+from .models import CustomToken
+from .serializers import CustomTokenSerializer
+
+from rest_auth.views import LoginView, LogoutView
+
+
+class CustomLoginView(LoginView):
+    token_model = CustomToken
+
+    def get_response_serializer(self):
+        return CustomTokenSerializer
+
+
+class CustomLogoutView(LogoutView):
+    token_model = CustomToken
+
+    def get_response_serializer(self):
+        return CustomTokenSerializer
 
 
 class TokenManager(LoginRequiredMixin, FormView):
