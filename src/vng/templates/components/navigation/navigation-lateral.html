@@ -35,6 +35,11 @@
 	    <i class="nav-icon icon-note"></i>
 	    Start testrun</a>
 	</li>
+    <li class="nav-title">{% trans "API Token manager" %}</li>
+        <li class="nav-item ">
+            <a class="nav-link" href="{% url 'apiv1_auth:token-manager' %}">
+                <i class="nav-icon icon-list"></i>{% trans "My API Tokens" %}</a>
+        </li>
         {% endif %}
     {% comment %} Disable since not mature enough {% endcomment %}
 	{% comment %} <li class="nav-title">OpenAPI</li>

@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'django_bootstrap_breadcrumbs',
     'mobetta',
+    'crispy_forms',
 
     # Project applications.
     'vng.accounts',
@@ -81,7 +82,7 @@ INSTALLED_APPS = [
     # Rest Framework
     'rest_framework',
     'rest_auth',
-    'rest_framework.authtoken',
+    # 'rest_framework.authtoken',
 ]
 
 TINYMCE_DEFAULT_CONFIG = {
@@ -96,7 +97,8 @@ TINYMCE_DEFAULT_CONFIG = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        'vng.apiAuthentication.authentication.CustomTokenAuthentication',
     ]
 }
 
@@ -415,3 +417,5 @@ ELASTIC_APM = {
     'SECRET_TOKEN': os.getenv('ELASTIC_APM_SECRET_TOKEN', 'default'),
     'SERVER_URL': os.getenv('ELASTIC_APM_SERVER_URL', 'http://example.com'),
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

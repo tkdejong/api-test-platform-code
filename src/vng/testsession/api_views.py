@@ -35,6 +35,8 @@ from .serializers import (
 from .views import bootstrap_session
 from .task import run_tests, stop_session
 
+from vng.apiAuthentication.authentication import CustomTokenAuthentication
+
 logger = logging.getLogger(__name__)
 
 
@@ -56,7 +58,7 @@ class SessionViewStatusSet(
         mixins.RetrieveModelMixin,
         viewsets.GenericViewSet):
     serializer_class = SessionStatusSerializer
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     queryset = Session.objects.all()
 
@@ -83,7 +85,7 @@ class SessionViewSet(
     Create a new session instance.
     """
     serializer_class = SessionSerializer
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
 
     def get_queryset(self):
@@ -110,7 +112,7 @@ class StopSessionView(generics.ListAPIView):
 
     Stop the session and retrieve all the scenario cases related to it.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     serializer_class = ScenarioCaseSerializer
 
@@ -137,7 +139,7 @@ class ResultSessionView(views.APIView):
 
     Return for each scenario case related to the session, if that call has been performed and the global outcome.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, pk, *args, **kwargs):
@@ -197,7 +199,7 @@ class SessionTypesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     Return all the session types
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
     serializer_class = SessionTypesSerializer
 
@@ -211,7 +213,7 @@ class ExposedUrlView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     Return a list of all the exposed url of a certain session.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     serializer_class = ExposedUrlSerializer
     user_path = ['session']
