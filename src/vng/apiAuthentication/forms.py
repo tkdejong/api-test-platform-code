@@ -11,11 +11,12 @@ class TokenForm(forms.ModelForm):
         fields = ('name',)
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user',None)
+        self.user = kwargs.pop('user', None)
         super(TokenForm, self).__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update(style='max-width: 20em')
 
     def clean_name(self):
         name = self.cleaned_data['name']
         if CustomToken.objects.filter(name=self.data['name'], user=self.user).exists():
-            raise ValidationError(_("A token with this name already exists for this user"))
+            raise ValidationError(_("Please choose a unique name for each token"))
         return name

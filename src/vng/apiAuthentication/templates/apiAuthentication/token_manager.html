@@ -1,6 +1,7 @@
 {% extends 'master.html' %}
 {% load sniplates %}
 {% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
 {% load subdomainurls %}
 {% load i18n %}
 
@@ -38,15 +39,15 @@
                             {% endfor %}
                         </table>
                     {% else %}
-                        {% trans "This account does not have any API tokens" %}
+                        <p>{% trans "This account does not have any API tokens" %}</p>
                     {% endif %}
 
                     <p>Generate a new token</p>
                     <form class="" method="post">{% csrf_token %}
                         {% comment %} <input type="hidden" name="user" value="{{ request.user.id }}"></input>
                          {% endcomment %}
-                        {{ form }}
-
+                        {% comment %} {{ form }} {% endcomment %}
+                        {{ form|crispy }}
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit" name="generate_new">

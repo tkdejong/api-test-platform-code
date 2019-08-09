@@ -29,6 +29,7 @@ django-bootstrap-breadcrumbs==0.9.1
 django-choices==1.6.1
 django-compat==1.0.15     # via django-background-tasks, django-hijack, django-hijack-admin
 django-countries==5.3.2
+django-crispy-forms==1.7.2
 django-dynamic-raw-id==2.4
 django-filter==1.1.0      # via djangorestframework-filters
 django-hijack-admin==2.1.10

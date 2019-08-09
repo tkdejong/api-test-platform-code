@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'django_bootstrap_breadcrumbs',
     'mobetta',
+    'crispy_forms',
 
     # Project applications.
     'vng.accounts',
@@ -416,3 +417,5 @@ ELASTIC_APM = {
     'SECRET_TOKEN': os.getenv('ELASTIC_APM_SECRET_TOKEN', 'default'),
     'SERVER_URL': os.getenv('ELASTIC_APM_SERVER_URL', 'http://example.com'),
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
