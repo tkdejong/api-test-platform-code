@@ -44,37 +44,16 @@
 
                     <p>Generate a new token</p>
                     <form class="" method="post">{% csrf_token %}
-                        {% comment %} <input type="hidden" name="user" value="{{ request.user.id }}"></input>
-                         {% endcomment %}
-                        {% comment %} {{ form }} {% endcomment %}
                         {{ form|crispy }}
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit" name="generate_new">
                                     <i class="fa fa-dot-circle-o"></i>{% trans "Generate new API token" %}</button>
                             </div>
-                            {% comment %} <div class="col-auto">
-                                <button class="btn btn-sm btn-danger" type="submit" name="delete">
-                                    <i class="fa fa-ban"></i>{% trans "Delete API token" %}</button>
-                            </div> {% endcomment %}
                         </div>
                     </form>
                 </div>
                 <div class="card-footer">
-                    {% comment %} <form class="" method="post">{% csrf_token %}
-                        <input type="hidden" name="user" value="{{ request.user.id }}"></input>
-                        {{form}}
-                        <div class="row">
-                            <div class="col-auto mr-auto">
-                                <button class="btn btn-sm btn-primary" type="submit" name="generate_new">
-                                    <i class="fa fa-dot-circle-o"></i>{% trans "Generate new API token" %}</button>
-                            </div>
-                            <div class="col-auto">
-                                <button class="btn btn-sm btn-danger" type="submit" name="delete">
-                                    <i class="fa fa-ban"></i>{% trans "Delete API token" %}</button>
-                            </div>
-                        </div>
-                    </form> {% endcomment %}
                 </div>
             </div>
         </div>
