@@ -25,7 +25,7 @@ class NewmanManager:
                        '--reporter-htmlextra-logs '
                        '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html {}')
     RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {} --timeout-request 10000 '
-    GLOBAL_VAR_SYNTAX = ' --global-var {}={} '
+    ENV_VAR_SYNTAX = ' --env-var {}={} '
     TOKEN = 'TOKEN'
 
     def __init__(self, file, api_endpoint=None):
@@ -48,7 +48,7 @@ class NewmanManager:
 
     def replace_parameters(self, _dict):
         for k, v in _dict.items():
-            self.global_vars += self.GLOBAL_VAR_SYNTAX.format(k, v)
+            self.global_vars += self.ENV_VAR_SYNTAX.format(k, v)
 
     def execute_test(self):
         self.file_path = self.file.path
