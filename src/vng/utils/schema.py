@@ -3,16 +3,20 @@ from drf_yasg.views import get_schema_view
 from drf_yasg.inspectors import SwaggerAutoSchema
 from rest_framework import permissions
 
+description = """This API can be used to automate provider tests and consumer sessions.
+
+The tutorial for this API can be found [here](https://github.com/VNG-Realisatie/api-test-platform/blob/master/tutorials/API.md)
+"""
+
 schema_view = get_schema_view(
     openapi.Info(
-        title="API Testvoorziening",
+        title="API Test platform",
         default_version='v1',
-        description="API test platform",
+        description=description,
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
-
 
 class CompoundTagsSchema(SwaggerAutoSchema):
 
