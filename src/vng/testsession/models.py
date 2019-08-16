@@ -184,7 +184,7 @@ class ScenarioCase(OrderedModel):
     will match the URL '/test/c5429dcc-6955-4e22-9832-08d52205f633/stop'.
     ''')
     http_method = models.CharField(max_length=20, choices=choices.HTTPMethodChoices.choices, default=choices.HTTPMethodChoices.GET)
-    # order_with_respect_to = 'vng_endpoint__session_type'
+    order_with_respect_to = 'collection'
 
     class Meta(OrderedModel.Meta):
         pass
