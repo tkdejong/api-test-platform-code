@@ -87,19 +87,22 @@ class TestCreation(WebTest):
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_log', kwargs={
-            'uuid': ptr.server_run.uuid
+            'uuid': ptr.server_run.uuid,
+            'test_result_pk': ptr.pk
         })
         call = self.app.get(url, user=self.user)
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_log_json', kwargs={
-            'uuid': ptr.server_run.uuid
+            'uuid': ptr.server_run.uuid,
+            'test_result_pk': ptr.pk
         })
         call = self.app.get(url, user=self.user)
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_pdf', kwargs={
-            'uuid': server.uuid
+            'uuid': server.uuid,
+            'test_result_pk': ptr.pk
         })
         call = self.app.get(url, user=self.user)
 
