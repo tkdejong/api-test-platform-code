@@ -77,10 +77,11 @@
     <td>{% trans "Log" %}</td>
         <td>
             {% for pr in postman_result %}
+                {{ pr.postman_test }}
                 <ul>
-                    <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid %}">{% trans "Visualize HTML log" %}</a></li>
-                    <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid %}">{% trans "Visualize JSON log" %}</a></li>
-                    <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid  %}">{% trans "Visualize PDF report" %}</a></li>
+                    <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid pr.id %}">{% trans "Visualize HTML log" %}</a></li>
+                    <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid pr.id %}">{% trans "Visualize JSON log" %}</a></li>
+                    <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid pr.id  %}">{% trans "Visualize PDF report" %}</a></li>
                 </ul>
             {% endfor %}
         </td>
