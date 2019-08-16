@@ -23,7 +23,7 @@ from vng.accounts.models import User
 from vng.postman.choices import ResultChoices
 
 from ..utils import choices
-
+from ..utils.auth import get_jwt
 
 class SessionType(models.Model):
 
@@ -58,6 +58,19 @@ class SessionType(models.Model):
             self._scenario_cases = ScenarioCase.objects.filter(collection__in=collection_ids)
         return self._scenario_cases
 
+    def add_auth_header(self):
+        auth_header = self.injectheader_set.filter(key='Authorization').first()
+        jwt_auth = get_jwt(self).credentials()['Authorization']
+        if auth_header:
+            auth_header.value = jwt_auth
+            auth_header.save()
+        else:
+            InjectHeader.objects.create(
+                session_type=self,
+                key='Authorization',
+                value=jwt_auth
+            )
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.ZGW_images:
@@ -67,6 +80,9 @@ class SessionType(models.Model):
             VNGEndpoint(name='BRC', session_type=self).save()
             VNGEndpoint(name='DRC', session_type=self).save()
             VNGEndpoint(name='AC', session_type=self).save()
+        if self.authentication == choices.AuthenticationChoices.jwt:
+            if hasattr(self, 'client_id') and hasattr(self, 'secret'):
+                self.add_auth_header()
 
 
 class InjectHeader(models.Model):
