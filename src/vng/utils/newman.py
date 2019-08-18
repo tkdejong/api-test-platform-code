@@ -17,14 +17,15 @@ class DidNotRunException(Exception):
 class NewmanManager:
     REPORT_FOLDER = settings.MEDIA_ROOT + '/newman'
     newman_path = os.path.join(settings.BASE_DIR, 'node_modules', 'newman', 'bin', 'newman.js')
-    RUN_HTML_REPORT = ('{} run --reporters html {} -r htmlextra '
-                       '--timeout-request 10000 '
+    RUN_HTML_REPORT = ('NODE_OPTIONS="--max-old-space-size=2048" '
+                       '{} run --reporters html {} -r htmlextra '
+                       '--timeout-request 5000 '
                        '--reporter-htmlextra-darkTheme '
                        '--reporter-htmlextra-testPaging '
                        '--reporter-htmlextra-title '
                        '--reporter-htmlextra-logs '
                        '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html {}')
-    RUN_JSON_REPORT = '{} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {} --timeout-request 10000 '
+    RUN_JSON_REPORT = 'NODE_OPTIONS="--max-old-space-size=2048" {} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {} --timeout-request 5000 '
     ENV_VAR_SYNTAX = ' --env-var {}={} '
     TOKEN = 'TOKEN'
 

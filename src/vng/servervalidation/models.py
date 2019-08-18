@@ -124,6 +124,15 @@ class ServerRun(models.Model):
                     success = False
         return success
 
+    def get_all_call_results(self):
+        success = 0
+        failure = 0
+        for test_result in self.postmantestresult_set.all():
+            positive, negative = test_result.get_call_results()
+            success += positive
+            failure += negative
+        return success, failure
+
 
 class ServerHeader(models.Model):
 

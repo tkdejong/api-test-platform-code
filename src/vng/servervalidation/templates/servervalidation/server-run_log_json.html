@@ -22,7 +22,7 @@
                 <input type="button" class="btn btn-primary" value="Back to the details" onclick="location.href = '{% url 'server_run:server-run_detail_uuid' object.uuid %}';">
                     <p id="translate"></p>
                     <p id="json-content" hidden=>
-                    {{ object.postmantestresult_set.first.display_log_json|safe }}
+                        {{postman_test_result.display_log_json}}
                     </p>
                 </div>
             </div>

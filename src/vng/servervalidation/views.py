@@ -1,5 +1,7 @@
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -271,7 +273,7 @@ class ServerRunLogView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return HttpResponse(content=self.object.postmantestresult_set.first().log)
+        return HttpResponse(content=self.object.postmantestresult_set.get(pk=kwargs['test_result_pk']).log)
 
 
 class ServerRunLogJsonView(DetailView):
@@ -281,6 +283,13 @@ class ServerRunLogJsonView(DetailView):
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        test_result_pk = self.kwargs.get('test_result_pk')
+        test_result = self.object.postmantestresult_set.get(pk=test_result_pk)
+        context['postman_test_result'] = test_result
+        return context
+
 
 class ServerRunPdfView(PDFGenerator, ServerRunOutputUuid):
 
@@ -289,13 +298,14 @@ class ServerRunPdfView(PDFGenerator, ServerRunOutputUuid):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
-        for ptm in context['postman_result']:
-            ptm.json = ptm.get_json_obj()
-            for calls in ptm.json:
-                if 'response' in calls:
-                    calls['response']['code'] = str(calls['response']['code'])
-                else:
-                    calls['response'] = 'Error occurred call the resource'
+
+        ptm = context['postman_result'].get(pk=self.kwargs['test_result_pk'])
+        ptm.json = ptm.get_json_obj()
+        for calls in ptm.json:
+            if 'response' in calls:
+                calls['response']['code'] = str(calls['response']['code'])
+            else:
+                calls['response'] = 'Error occurred call the resource'
 
         self.filename = 'Server run {} report.pdf'.format(server_run.pk)
         context['error_codes'] = postman.get_error_codes()
