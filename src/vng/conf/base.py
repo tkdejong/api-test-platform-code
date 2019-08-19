@@ -419,3 +419,6 @@ ELASTIC_APM = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Custom token creation to support multiple API tokens
+REST_AUTH_TOKEN_CREATOR = 'vng.apiAuthentication.utils.create_token'
