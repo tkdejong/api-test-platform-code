@@ -65,14 +65,17 @@ class TestMultipleEndpoint(TestCase):
         self.assertEqual(token2.name, 'token2')
 
     def test_delete_token(self):
-        self.client.post(
-            self.token_manager_url,
-            {'generate_new': '', 'name': 'token'},
-            user=self.user
-        )
         response = self.client.post(
             self.token_manager_url,
-            {'delete_items': '1'},
+            {'generate_new': '', 'name': 'token'},
+            user=self.user,
+            follow=True
+        )
+        token = response.context['tokens'].first()
+
+        response = self.client.post(
+            self.token_manager_url,
+            {'delete_items': str(token.pk)},
             user=self.user,
             follow=True
         )
