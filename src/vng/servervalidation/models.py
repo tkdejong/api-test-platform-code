@@ -63,6 +63,7 @@ class PostmanTest(OrderedModel):
     order_with_respect_to = 'test_scenario'
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
     validation_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    published_url = models.URLField(null=True, blank=True)
 
     class Meta(OrderedModel.Meta):
         pass
