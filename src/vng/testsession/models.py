@@ -81,7 +81,7 @@ class SessionType(models.Model):
             VNGEndpoint(name='DRC', session_type=self).save()
             VNGEndpoint(name='AC', session_type=self).save()
         if self.authentication == choices.AuthenticationChoices.jwt:
-            if hasattr(self, 'client_id') and hasattr(self, 'secret'):
+            if self.client_id and self.secret:
                 self.add_auth_header()
 
 
