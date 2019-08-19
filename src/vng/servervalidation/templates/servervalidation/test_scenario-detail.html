@@ -44,7 +44,12 @@
                     {% if items  %}
                         <div class="card">
                             <div class="card-header">
-                                {% trans "Info" %}: {{ pt.valid_file|info_name }}
+                                {% trans "Info" %}:
+                                {% if pt.published_url %}
+                                    <a href="{{ pt.published_url }}">{{ pt.valid_file|info_name }}</a>
+                                {% else %}
+                                    {{ pt.valid_file|info_name }}
+                                {% endif %}
                             </div>
                             <div class="card-body">
                                 <table class="table">

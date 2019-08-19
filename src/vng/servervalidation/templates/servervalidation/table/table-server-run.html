@@ -1,5 +1,5 @@
 {% load i18n %}
-
+{% load inspection %}
 {% spaceless %}
 <tr>
     <td>{% trans "Session" %}</td>
@@ -10,14 +10,10 @@
     <td>{% trans "Test Scenario" %}</td>
     <td>
         <div class='col-xs-1'>
-            {% comment %} <div class='row'> {% endcomment %}
                 <input type="button" class="btn btn-primary" value="{% trans "Description" %}"
-                    onclick="location.href = '{% url 'server_run:testscenario-detail' server_run.test_scenario.pk  %}';">
-            {% comment %} </div> {% endcomment %}
+                    onclick="location.href = '{% url 'server_run:testscenario-detail' server_run.test_scenario.pk  %}';"></br>
                 {% for pc in server_run.test_scenario.postmantest_set.all %}
-                {% comment %} <div class='row'> {% endcomment %}
-                    <a class="btn btn-light btn-margin" href="{% url 'server_run:postman_download' pc.pk %}">Download {{ server_run.test_scenario }}</a>
-                {% comment %} </div> {% endcomment %}
+                    <a class="btn btn-light btn-margin" href="{% url 'server_run:postman_download' pc.pk %}">Download {{ pc.validation_file.original_filename }}</a>
                 {% endfor %}
 
         </div>
@@ -73,6 +69,17 @@
     <td>{{ server_run.status }}</td>
 </tr>
 {% endif %}
+<tr>
+    <td>{% trans "Postman collection URLs" %}</td>
+        <td>
+            {% for postman_collection in server_run.test_scenario.postmantest_set.all %}
+                {% if postman_collection.published_url %}
+                    <a href="{{ postman_collection.published_url }}">{{ postman_collection.valid_file|info_name }}</a></br>
+                {% endif %}
+            {% endfor %}
+        </td>
+    </td>
+</tr>
 <tr>
     <td>{% trans "Log" %}</td>
         <td>
