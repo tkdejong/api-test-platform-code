@@ -1,5 +1,5 @@
 {% load i18n %}
-
+{% load inspection %}
 {% spaceless %}
 <tr>
     <td>{% trans "Session" %}</td>
@@ -73,6 +73,17 @@
     <td>{{ server_run.status }}</td>
 </tr>
 {% endif %}
+<tr>
+    <td>{% trans "Postman collection URLs" %}</td>
+        <td>
+            {% for postman_collection in server_run.test_scenario.postmantest_set.all %}
+                {% if postman_collection.published_url %}
+                    <a href="{{ postman_collection.published_url }}">{{ postman_collection.valid_file|info_name }}</a></br>
+                {% endif %}
+            {% endfor %}
+        </td>
+    </td>
+</tr>
 <tr>
     <td>{% trans "Log" %}</td>
         <td>
