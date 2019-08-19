@@ -34,24 +34,11 @@ from .serializers import (
 )
 from .views import bootstrap_session
 from .task import run_tests, stop_session
+from ..utils.auth import get_jwt
 
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
 logger = logging.getLogger(__name__)
-
-
-def get_jwt(session):
-
-    return ClientAuth(
-        client_id=session.client_id,
-        secret=session.secret,
-        scopes=['zds.scopes.zaken.lezen',
-                'zds.scopes.zaaktypes.lezen',
-                'zds.scopes.zaken.aanmaken',
-                'zds.scopes.statussen.toevoegen',
-                'zds.scopes.zaken.bijwerken'],
-        zaaktypes=['*']
-    )
 
 
 class SessionViewStatusSet(

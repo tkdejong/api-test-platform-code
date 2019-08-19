@@ -16,23 +16,10 @@ from ..celery.celery import app
 from .models import PostmanTest, PostmanTestResult, Endpoint, ServerRun, ServerHeader
 from ..utils import choices
 from ..utils.newman import NewmanManager
+from ..utils.auth import get_jwt
 
 
 logger = get_task_logger(__name__)
-
-
-def get_jwt(server_run):
-
-    return ClientAuth(
-        client_id=server_run.client_id,
-        secret=server_run.secret,
-        scopes=['zds.scopes.zaken.lezen',
-                'zds.scopes.zaaktypes.lezen',
-                'zds.scopes.zaken.aanmaken',
-                'zds.scopes.statussen.toevoegen',
-                'zds.scopes.zaken.bijwerken'],
-        zaaktypes=['*']
-    )
 
 
 @app.task
