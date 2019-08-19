@@ -112,7 +112,11 @@ class StopSessionView(generics.ListAPIView):
         run_tests.delay(session.pk)
 
     def get_queryset(self):
-        session = get_object_or_404(Session, id=self.kwargs['pk'])
+        pk = self.kwargs.get('pk')
+        if not pk:
+            return ScenarioCase.objects.none()
+
+        session = get_object_or_404(Session, id=pk)
         scenarios = session.session_type.scenario_cases
         if session.user != self.request.user:
             return HttpResponseForbidden()
