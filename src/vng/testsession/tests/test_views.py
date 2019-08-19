@@ -1,6 +1,7 @@
 import collections
 import re
 import json
+import jwt
 import copy
 
 import mock
@@ -21,7 +22,7 @@ from ..task import run_tests, align_sessions_data, purge_sessions
 from ..api_views import RunTest
 from ..models import (
     Session, SessionType, SessionLog, Report,
-    ScenarioCase, VNGEndpoint, ExposedUrl, TestSession
+    ScenarioCase, VNGEndpoint, ExposedUrl, TestSession, InjectHeader
 )
 from ..permission import IsOwner
 
@@ -699,6 +700,23 @@ class TestHeaderInjection(WebTest):
         call = self.app.get(url + 'headers', extra_environ={'HTTP_HOST': '{}-example.com'.format(http_host)})
         self.assertIn('key', call.json['headers'])
         self.assertIn('dummy', call.json['headers']['key'])
+
+    def test_create_jwt_auth_inject_header_from_client_credentials(self):
+        sessiontype = SessionTypeFactory(
+            client_id='username',
+            secret='bla',
+            authentication=choices.AuthenticationChoices.jwt
+        )
+
+        auth_headers = InjectHeader.objects.filter(session_type=sessiontype)
+        self.assertEqual(auth_headers.count(), 1)
+
+        auth_header = auth_headers.first()
+        self.assertEqual(auth_header.key, 'Authorization')
+
+        token = auth_header.value
+        decoded = jwt.decode(token.split()[-1], 'bla', algorithms=['HS256'])
+        self.assertEqual(decoded['client_id'], 'username')
 
 
 @override_settings(SUBDOMAIN_SEPARATOR='-')
