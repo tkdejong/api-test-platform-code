@@ -100,7 +100,7 @@ class ResultServerViewShield(views.APIView):
             color = 'red'
         result = {
             'schemaVersion': 1,
-            'label': 'API Test Platform',
+            'label': 'API Test Platform (beta)',
             'message': message,
             'color': color,
             'isError': is_error,
