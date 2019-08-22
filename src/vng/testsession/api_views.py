@@ -8,7 +8,6 @@ from zds_client import ClientAuth
 from subdomains.utils import reverse as reverse_sub
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.db import transaction
 from django.utils import timezone
 from django.db.models import Count
 from django.core.exceptions import PermissionDenied
@@ -109,8 +108,7 @@ class StopSessionView(generics.ListAPIView):
             return
         stop_session.delay(session.pk)
         session.status = choices.StatusChoices.shutting_down
-        with transaction.atomic():
-            session.save()
+        session.save()
         run_tests.delay(session.pk)
 
     def get_queryset(self):
