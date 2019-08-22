@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.urls import reverse_lazy
+from django.db import transaction
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.views import View
@@ -149,7 +150,8 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             self.server.status = choices.StatusWithScheduledChoices.scheduled
         else:
             self.server.status = choices.StatusWithScheduledChoices.running
-        self.server.save()
+        with transaction.atomic():
+            self.server.save()
         try:
             ep = form.instance
             ep.server_run = self.server

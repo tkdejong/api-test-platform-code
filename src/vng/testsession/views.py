@@ -1,7 +1,7 @@
 import json
 import logging
 
-
+from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
@@ -120,7 +120,8 @@ class SessionFormView(FormView):
         form.instance.status = choices.StatusChoices.starting
         form.instance.assign_name(self.request.user.id)
         form.instance.name = Session.assign_name(self.request.user.id)
-        session = form.save()
+        with transaction.atomic():
+            session = form.save()
         bootstrap_session.delay(session.pk)
         return HttpResponseRedirect(self.get_success_url())
 
@@ -214,7 +215,8 @@ class StopSession(OwnerSingleObject, View):
             return HttpResponseRedirect(reverse('testsession:sessions'))
 
         session.status = choices.StatusChoices.shutting_down
-        session.save()
+        with transaction.atomic():
+            session.save()
         stop_session.delay(session.pk)
         return HttpResponseRedirect(reverse('testsession:sessions'))
 
