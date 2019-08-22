@@ -75,10 +75,7 @@ class ServerRunSerializer(serializers.ModelSerializer):
             instance = ServerRun.objects.create(**validated_data)
         instance.endpoints = endpoint_created
 
-        with transaction.atomic():
-            instance.save()
-
-        execute_test.delay(instance.pk)
+        transaction.on_commit(lambda: execute_test.delay(instance.pk))
         return instance
 
 
