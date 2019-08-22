@@ -3,7 +3,7 @@ import json
 
 from django.utils import timezone
 from django.test import TestCase
-from django_webtest import WebTest
+from django_webtest import TransactionWebTest, WebTest
 from django.urls import reverse
 
 from vng.accounts.models import User
@@ -41,7 +41,7 @@ def create_server_run(name, tsu):
     }
 
 
-class RetrieveCreationTest(WebTest):
+class RetrieveCreationTest(TransactionWebTest):
 
     def setUp(self):
         self.test_scenario = PostmanTestFactory().test_scenario
@@ -100,7 +100,7 @@ class RetrieveCreationTest(WebTest):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, expect_errors=True)
 
 
-class TestNoAssertion(WebTest):
+class TestNoAssertion(TransactionWebTest):
 
     def setUp(self):
         self.postman_test = PostmanTestNoAssertionFactory()

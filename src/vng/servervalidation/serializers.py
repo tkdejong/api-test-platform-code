@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import TestScenarioUrl, Endpoint, ServerRun, TestScenario
 from .task import execute_test
 
+from django.db import transaction
 
 class TestScenarioUrlSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,7 +74,8 @@ class ServerRunSerializer(serializers.ModelSerializer):
         else:
             instance = ServerRun.objects.create(**validated_data)
         instance.endpoints = endpoint_created
-        execute_test.delay(instance.pk)
+
+        transaction.on_commit(lambda: execute_test.delay(instance.pk))
         return instance
 
 
