@@ -63,6 +63,7 @@ class PostmanTest(OrderedModel):
     order_with_respect_to = 'test_scenario'
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
     validation_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    published_url = models.URLField(null=True, blank=True)
 
     class Meta(OrderedModel.Meta):
         pass
@@ -123,6 +124,15 @@ class ServerRun(models.Model):
                 elif ptr.is_success() == -1 and success is not None:
                     success = False
         return success
+
+    def get_all_call_results(self):
+        success = 0
+        failure = 0
+        for test_result in self.postmantestresult_set.all():
+            positive, negative = test_result.get_call_results()
+            success += positive
+            failure += negative
+        return success, failure
 
 
 class ServerHeader(models.Model):
@@ -207,10 +217,13 @@ class PostmanTestResult(models.Model):
     def get_call_results(self):
         positive, negative = 0, 0
         for call in self.get_json_obj():
-            if postman.get_call_result(call):
-                positive += 1
-            else:
-                negative += 1
+            # Count the failed and successful assertions
+            if 'assertions' in call:
+                for assertion in call['assertions']:
+                    if 'error' in assertion:
+                        negative += 1
+                    else:
+                        positive += 1
         return positive, negative
 
     def get_aggregate_results(self):

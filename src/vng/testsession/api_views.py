@@ -34,29 +34,18 @@ from .serializers import (
 )
 from .views import bootstrap_session
 from .task import run_tests, stop_session
+from ..utils.auth import get_jwt
+
+from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
 logger = logging.getLogger(__name__)
-
-
-def get_jwt(session):
-
-    return ClientAuth(
-        client_id=session.client_id,
-        secret=session.secret,
-        scopes=['zds.scopes.zaken.lezen',
-                'zds.scopes.zaaktypes.lezen',
-                'zds.scopes.zaken.aanmaken',
-                'zds.scopes.statussen.toevoegen',
-                'zds.scopes.zaken.bijwerken'],
-        zaaktypes=['*']
-    )
 
 
 class SessionViewStatusSet(
         mixins.RetrieveModelMixin,
         viewsets.GenericViewSet):
     serializer_class = SessionStatusSerializer
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     queryset = Session.objects.all()
 
@@ -83,7 +72,7 @@ class SessionViewSet(
     Create a new session instance.
     """
     serializer_class = SessionSerializer
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
 
     def get_queryset(self):
@@ -110,7 +99,7 @@ class StopSessionView(generics.ListAPIView):
 
     Stop the session and retrieve all the scenario cases related to it.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     serializer_class = ScenarioCaseSerializer
 
@@ -123,7 +112,11 @@ class StopSessionView(generics.ListAPIView):
         run_tests.delay(session.pk)
 
     def get_queryset(self):
-        session = get_object_or_404(Session, id=self.kwargs['pk'])
+        pk = self.kwargs.get('pk')
+        if not pk:
+            return ScenarioCase.objects.none()
+
+        session = get_object_or_404(Session, id=pk)
         scenarios = session.session_type.scenario_cases
         if session.user != self.request.user:
             return HttpResponseForbidden()
@@ -137,7 +130,7 @@ class ResultSessionView(views.APIView):
 
     Return for each scenario case related to the session, if that call has been performed and the global outcome.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, pk, *args, **kwargs):
@@ -197,7 +190,7 @@ class SessionTypesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     Return all the session types
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
     serializer_class = SessionTypesSerializer
 
@@ -211,7 +204,7 @@ class ExposedUrlView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     Return a list of all the exposed url of a certain session.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     serializer_class = ExposedUrlSerializer
     user_path = ['session']

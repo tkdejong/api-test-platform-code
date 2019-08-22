@@ -1,0 +1,63 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
+{% load subdomainurls %}
+{% load i18n %}
+
+
+{% block title %}{% trans "API Token Manager" %}{% endblock %}
+
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "My API Tokens" %}
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "These tokens can be used to access the" %} <a href="/api/v1/schema">{% trans "API of the Test Platform" %}</a>.</h5></br>
+                    {% if tokens %}
+                        <table class="table">
+                            <tr>
+                                <th>{% trans "Date created" %}</th>
+                                <th>{% trans "Token name" %}</th>
+                                <th>{% trans "Key" %}</th>
+                                <th></th>
+                            </tr>
+                            {% for token in tokens %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <tr>
+                                        <td>{{ token.created }}</td>
+                                        <td>{{ token.name }}</td>
+                                        <td>{{ token.key }}</td>
+                                        <td><button class="btn btn-sm btn-danger" type="submit" name="delete_items" value="{{ token.pk }}" onclick="return confirm('Are you sure?');">Delete</button</td>
+                                    </tr>
+                                </form>
+                            {% endfor %}
+                        </table>
+                    {% else %}
+                        <p>{% trans "This account does not have any API tokens" %}</p>
+                    {% endif %}
+
+                    <p>Generate a new token</p>
+                    <form class="" method="post">{% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" type="submit" name="generate_new">
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Generate new API token" %}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

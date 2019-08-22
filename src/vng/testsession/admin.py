@@ -96,7 +96,6 @@ class ScenarioCaseCollectionAdmin(admin.ModelAdmin):
     list_display = [
         'name',
     ]
-
     inlines = [ScenarioCaseInline]
 
 
@@ -106,9 +105,11 @@ class ScenarioCaseAdmin(OrderedModelAdmin):
         'url',
         'move_up_down_links',
         'http_method',
-        'query_params'
+        'query_params',
+        'collection'
     ]
     inlines = [QueryParamsScenarioInline]
+    ordering = ('collection', 'order',)
 
 
 @admin.register(model.QueryParamsScenario)

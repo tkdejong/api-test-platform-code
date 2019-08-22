@@ -18,6 +18,8 @@ from drf_yasg.utils import swagger_auto_schema
 
 import vng.postman.utils as ptm
 
+from vng.apiAuthentication.authentication import CustomTokenAuthentication
+
 from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield
 from .models import ServerRun, PostmanTestResult
 from .task import execute_test
@@ -46,7 +48,7 @@ class ServerRunViewSet(
 
     Return a list of all the existing provider-run.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ServerRunSerializer
 
@@ -68,7 +70,7 @@ class ServerRunViewSet(
 
 
 class TriggerServerRunView(viewsets.ViewSet):
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
 
     def update(self, request, pk):
@@ -113,7 +115,7 @@ class ResultServerView(views.APIView):
 
     Return for each scenario case related to the session, if that call has been performed and the global outcome.
     """
-    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self):
