@@ -1,6 +1,7 @@
 {% extends 'master.html' %}
 {% load sniplates %}
 {% load i18n %}
+{% load static %}
 {% load inspection %}
 
 {% block title %}{% trans "Test Scenario" %}{% endblock %}
@@ -45,10 +46,11 @@
                         <div class="card">
                             <div class="card-header">
                                 {% trans "Info" %}:
+                                {{ pt.valid_file|info_name }}</br>
+                                </br>
                                 {% if pt.published_url %}
-                                    <a href="{{ pt.published_url }}">{{ pt.valid_file|info_name }}</a>
-                                {% else %}
-                                    {{ pt.valid_file|info_name }}
+                                    <img src="{% static 'img/postman.png' %}" class="postman-logo">
+                                    <a href="{{ pt.published_url }}">Link to collection in Postman documentation</a>
                                 {% endif %}
                             </div>
                             <div class="card-body">
