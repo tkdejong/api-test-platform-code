@@ -7,7 +7,7 @@ from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User
 
 from .factories import (
-    TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory, PostmanTestSubFolderFactory
+    TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory, PostmanTestSubFolderFactory, EndpointFactory
 )
 from ...utils import choices, forms
 
@@ -249,3 +249,23 @@ class TestScenarioDetail(WebTest):
             'pk': self.pts.test_scenario.id
         }))
         self.assertIn('test subsub', call.text)
+
+
+class ServerRunHiddenVarsTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.test_scenario = PostmanTestFactory().test_scenario
+
+    def test_detail_page_replace_hidden_vars_with_placeholders(self):
+        tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
+        tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
+        server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=server_run, url='https://url1.com/')
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=server_run, url='https://url2.com/')
+
+        detail_url = reverse('server_run:server-run_detail', kwargs={'pk': server_run.pk})
+        response = self.app.get(detail_url, user=self.user)
+
+        self.assertNotContains(response, 'https://url1.com/')
+        self.assertContains(response, 'https://url2.com/')

@@ -1,6 +1,7 @@
 import collections
 import json
 
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.test import TestCase
 from django_webtest import TransactionWebTest, WebTest
@@ -9,7 +10,7 @@ from django.urls import reverse
 from vng.accounts.models import User
 
 from ..models import PostmanTestResult
-from .factories import ServerRunFactory, TestScenarioFactory, TestScenarioUrlFactory, PostmanTestFactory, PostmanTestNoAssertionFactory
+from .factories import ServerRunFactory, TestScenarioFactory, TestScenarioUrlFactory, PostmanTestFactory, PostmanTestNoAssertionFactory, EndpointFactory
 from ...utils.factories import UserFactory
 
 
@@ -127,3 +128,31 @@ class TestNoAssertion(TransactionWebTest):
         }), headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['status'], 'stopped')
+
+
+class ServerValidationHiddenVarsTests(TransactionWebTest):
+
+    list_url = reverse('apiv1server:provider:api_server-run-list')
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.test_scenario = PostmanTestFactory().test_scenario
+
+    def test_api_replace_hidden_vars_with_placeholders(self):
+        tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
+        tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
+        server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=server_run, url='https://url1.com/')
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=server_run, url='https://url2.com/')
+        response = self.app.get(self.list_url, user=self.user).json
+
+        self.assertEqual(len(response), 1)
+
+        self.assertEqual(len(response[0]['endpoints']), 2)
+
+        endpoint1, endpoint2 = response[0]['endpoints']
+        self.assertEqual(endpoint1['url'], '(hidden)')
+        self.assertEqual(endpoint1['test_scenario_url']['name'], 'tsu1')
+
+        self.assertEqual(endpoint2['url'], 'https://url2.com/')
+        self.assertEqual(endpoint2['test_scenario_url']['name'], 'tsu2')
