@@ -77,19 +77,18 @@ class K8S():
         res = run_command(fetch).decode('utf-8')
         return json.loads(res)
 
-    def delete(self):
-        clean_up = [
-            'kubectl',
-            'delete',
-            'deployment'
-        ]
-        deployments = self.fetch_resource('deployments')
-        for item in deployments['items']:
+    def delete_resource(self, resource, clean_up):
+        resources = self.fetch_resource(resource)
+        for item in resources['items']:
             if safeget(item, 'metadata', 'name'):
                 name = item['metadata']['name']
                 if self.app_name in name:
                     # Delete the workload
                     run_command([*clean_up, name])
+
+    def delete(self):
+        self.delete_resource('deployments', ['kubectl', 'delete', 'deployment'])
+        self.delete_resource('services', ['kubectl', 'delete', 'service'])
 
         # TODO: remove unused resources, remember that Kubernetes has a Garbage Collector integrated
         # svc still used
