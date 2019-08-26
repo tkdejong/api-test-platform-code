@@ -21,8 +21,15 @@
 </tr>
 {% for ep in server_run.endpoint_set.all %}
     <tr>
+
         <td>{{ ep.test_scenario_url.name }}</td>
-        <td>{{ ep.url }}</td>
+        <td>
+            {% if not ep.test_scenario_url.hidden %}
+                {{ ep.url}}
+            {% else %}
+                <i>{% trans "This field was marked as hidden" %}</i>
+            {% endif %}
+        </td>
     </tr>
 {% endfor %}
 

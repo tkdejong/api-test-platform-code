@@ -29,6 +29,14 @@ class EndpointSerializer(serializers.ModelSerializer):
         except Exception:
             raise serializers.ValidationError("The urls names provided do not match")
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        # If the variable was marked as hidden, show a generic hidden output
+        if instance.test_scenario_url.hidden:
+            ret['url'] = '(hidden)'
+        return ret
+
 
 class ServerRunSerializer(serializers.ModelSerializer):
 

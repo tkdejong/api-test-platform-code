@@ -1,6 +1,8 @@
 import uuid
 from zds_client import ClientAuth
 import traceback
+import re
+import json
 
 from django.core.files import File
 from django.utils import timezone
@@ -41,6 +43,14 @@ def execute_test_scheduled():
             failed = False
 
 
+def substitute_hidden_vars(server_run, file):
+    data = file.read()
+    hidden_vars = server_run.endpoint_set.filter(test_scenario_url__hidden=True)
+    for hidden in hidden_vars:
+        data = re.sub('{}'.format(hidden.url), '{hidden}', data)
+    return data
+
+
 @app.task
 def execute_test(server_run_pk, scheduled=False, email=False):
     server_run = ServerRun.objects.get(pk=server_run_pk)
@@ -78,14 +88,23 @@ def execute_test(server_run_pk, scheduled=False, email=False):
             for ep in endpoints:
                 param[ep.test_scenario_url.name] = ep.url
             nm.replace_parameters(param)
-            file = nm.execute_test()
+            file_html = nm.execute_test()
             file_json = nm.execute_test_json()
             ptr = PostmanTestResult(
                 postman_test=postman_test,
                 server_run=server_run
             )
-            ptr.log.save(file_name, File(file))
-            ptr.save_json(file_name, File(file_json))
+            data = substitute_hidden_vars(server_run, file_html)
+            data_json = substitute_hidden_vars(server_run, file_json)
+
+            with open(file_html.name, 'w') as f:
+                f.write(data)
+
+            with open(file_json.name, 'w') as f:
+                json.dump(json.loads(data_json), f, indent=4)
+
+            ptr.log.save(file_name, File(open(file_html.name)))
+            ptr.save_json(file_name, File(open(file_json.name)))
             ptr.status = ptr.get_outcome_json()
             ptr.save()
             failure = failure or (ptr.status == ResultChoices.failed)

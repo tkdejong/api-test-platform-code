@@ -52,6 +52,9 @@ class TestScenarioUrl(models.Model):
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
     url = models.BooleanField(default=True, help_text='''When enabled a single-line field is shown to the user
     when starting a session. When disabled a multi-line field is shown.''')
+    hidden = models.BooleanField(default=False, help_text=_(
+        "When enabled, the value of this field will not be shown on detail pages"
+    ))
     placeholder = models.TextField(blank=True, default='https://www.example.com')
 
     def __str__(self):
