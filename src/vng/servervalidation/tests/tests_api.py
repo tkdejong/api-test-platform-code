@@ -30,10 +30,8 @@ def create_server_run(name, tsu):
     endpoints = []
     for t in tsu:
         endpoints.append({
-            "test_scenario_url": {
-                "name": t.name
-            },
-            'url': 'https://google.com',
+            'name': t.name,
+            'value': 'https://google.com',
         })
     return {
         'test_scenario': name,
@@ -152,11 +150,11 @@ class ServerValidationHiddenVarsTests(TransactionWebTest):
         self.assertEqual(len(response[0]['endpoints']), 2)
 
         endpoint1, endpoint2 = response[0]['endpoints']
-        self.assertEqual(endpoint1['url'], '(hidden)')
-        self.assertEqual(endpoint1['test_scenario_url']['name'], 'tsu1')
+        self.assertEqual(endpoint1['value'], '(hidden)')
+        self.assertEqual(endpoint1['name'], 'tsu1')
 
-        self.assertEqual(endpoint2['url'], 'https://url2.com/')
-        self.assertEqual(endpoint2['test_scenario_url']['name'], 'tsu2')
+        self.assertEqual(endpoint2['value'], 'https://url2.com/')
+        self.assertEqual(endpoint2['name'], 'tsu2')
 
 
 class PostmanTestAPITests(TransactionWebTest):
