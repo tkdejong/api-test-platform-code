@@ -9,6 +9,8 @@ from django.db import transaction
 from django.db.models import Prefetch
 
 from rest_framework import permissions, viewsets, mixins, views
+from rest_framework.response import Response
+from rest_framework.decorators import action
 # from rest_framework.exceptions import bad_request
 
 from rest_framework.authentication import (
@@ -20,8 +22,8 @@ import vng.postman.utils as ptm
 
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
-from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield
-from .models import ServerRun, PostmanTestResult
+from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield, PostmanTestSerializer
+from .models import ServerRun, PostmanTestResult, PostmanTest
 from .task import execute_test
 from ..utils import choices
 
@@ -161,3 +163,22 @@ class ResultServerView(views.APIView):
             postman_res_output['status'] = postman.status
             response.append(postman_res_output)
         return JsonResponse(response, safe=False)
+
+
+class PostmanTestViewset(mixins.ListModelMixin,
+                         mixins.RetrieveModelMixin,
+                         viewsets.GenericViewSet):
+    serializer_class = PostmanTestSerializer
+    queryset = PostmanTest.objects.all()
+
+    @action(methods=['GET'], detail=False, url_path='get_versions/(?P<name>[^/.]+)')
+    def get_all_versions(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        serializer = self.serializer_class(qs.filter(name=kwargs.get('name')), many=True)
+        return Response(serializer.data)
+
+    @action(methods=['GET'], detail=False, url_path='get_version/(?P<name>[^/.]+)/(?P<version>[0-9]\.[0-9]\.[0-9])')
+    def get_specific_version(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        obj = get_object_or_404(PostmanTest, name=kwargs.get('name'), version=kwargs.get('version'))
+        return Response(obj.valid_file)

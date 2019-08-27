@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import TestScenarioUrl, Endpoint, ServerRun, TestScenario
+from .models import TestScenarioUrl, Endpoint, ServerRun, TestScenario, PostmanTest
 from .task import execute_test
 
 from django.db import transaction
@@ -127,3 +127,12 @@ class ServerRunResultShield(serializers.Serializer):
     label = serializers.CharField(max_length=200)
     message = serializers.CharField(max_length=200)
     color = serializers.CharField(max_length=200)
+
+
+class PostmanTestSerializer(serializers.ModelSerializer):
+
+    validation_file = serializers.FileField()
+
+    class Meta:
+        model = PostmanTest
+        fields = ('name', 'version', 'test_scenario', 'validation_file',)

@@ -64,12 +64,14 @@ class TestScenarioUrl(models.Model):
 class PostmanTest(OrderedModel):
 
     order_with_respect_to = 'test_scenario'
+    name = models.CharField(max_length=150)
+    version = models.CharField(max_length=20, default='1.0.0')
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
     validation_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL)
     published_url = models.URLField(null=True, blank=True)
 
     class Meta(OrderedModel.Meta):
-        pass
+        unique_together = ('name', 'version',)
 
     @property
     def valid_file(self):

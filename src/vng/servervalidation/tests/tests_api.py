@@ -7,6 +7,7 @@ from django.test import TestCase
 from django_webtest import TransactionWebTest, WebTest
 from django.urls import reverse
 
+from rest_framework import status
 from vng.accounts.models import User
 
 from ..models import PostmanTestResult
@@ -156,3 +157,59 @@ class ServerValidationHiddenVarsTests(TransactionWebTest):
 
         self.assertEqual(endpoint2['url'], 'https://url2.com/')
         self.assertEqual(endpoint2['test_scenario_url']['name'], 'tsu2')
+
+
+class PostmanTestAPITests(TransactionWebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+
+        self.postman_tests1 = PostmanTestFactory.create(name='postman_tests', version='1.0.0')
+        self.postman_tests2 = PostmanTestFactory.create(name='postman_tests', version='1.0.1')
+        PostmanTestFactory.create(name='different_tests', version='1.0.0')
+
+    def test_get_all_versions(self):
+        get_versions_url = reverse('apiv1server:provider:api_postman-test-get-all-versions', kwargs={
+            'name': 'postman_tests'
+        })
+        response = self.app.get(get_versions_url, user=self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.json), 2)
+
+        self.assertEqual(response.json[0]['name'], 'postman_tests')
+        self.assertEqual(response.json[0]['version'], '1.0.0')
+        self.assertIn(self.postman_tests1.validation_file.file.name, response.json[0]['validation_file'])
+
+        self.assertEqual(response.json[1]['name'], 'postman_tests')
+        self.assertEqual(response.json[1]['version'], '1.0.1')
+        self.assertIn(self.postman_tests2.validation_file.file.name, response.json[1]['validation_file'])
+
+    def test_get_all_versions_empty(self):
+        get_versions_url = reverse('apiv1server:provider:api_postman-test-get-all-versions', kwargs={
+            'name': 'some_non_existent_test'
+        })
+        response = self.app.get(get_versions_url, user=self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json, [])
+
+    def test_get_specific_version(self):
+        get_versions_url = reverse('apiv1server:provider:api_postman-test-get-specific-version', kwargs={
+            'name': 'postman_tests',
+            'version': '1.0.1'
+        })
+        response = self.app.get(get_versions_url, user=self.user)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json, self.postman_tests2.valid_file)
+
+    def test_get_specific_version_404(self):
+        get_versions_url = reverse('apiv1server:provider:api_postman-test-get-specific-version', kwargs={
+            'name': 'some_non_existent_test',
+            'version': '1.0.0'
+        })
+        response = self.app.get(get_versions_url, user=self.user, status='*')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

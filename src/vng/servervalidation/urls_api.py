@@ -11,6 +11,7 @@ app_name = apps.AppConfig.__name__
 
 router = routers.DefaultRouter()
 router.register('provider-run', api_views.ServerRunViewSet, base_name='api_server-run')
+router.register('postman-test', api_views.PostmanTestViewset, base_name='api_postman-test')
 
 
 urlpatterns = [
