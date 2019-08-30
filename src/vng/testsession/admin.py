@@ -110,6 +110,7 @@ class ScenarioCaseAdmin(OrderedModelAdmin):
     ]
     inlines = [QueryParamsScenarioInline]
     ordering = ('collection', 'order',)
+    list_filter = ['collection']
 
 
 @admin.register(model.QueryParamsScenario)
