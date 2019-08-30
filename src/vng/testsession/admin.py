@@ -128,9 +128,10 @@ class TestSessionAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.VNGEndpoint)
-class VNGEndpointAdmin(admin.ModelAdmin):
+class VNGEndpointAdmin(OrderedModelAdmin):
     list_display = [
         'url',
+        'move_up_down_links',
         'name',
         'path',
         'docker_image',
@@ -138,6 +139,8 @@ class VNGEndpointAdmin(admin.ModelAdmin):
         'port',
         'test_file',
     ]
+    ordering = ('session_type', 'order',)
+    list_filter = ['session_type']
 
 
 @admin.register(model.Report)

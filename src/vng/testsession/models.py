@@ -132,7 +132,7 @@ class ScenarioCaseCollection(models.Model):
     def __str__(self):
         return self.name
 
-class VNGEndpoint(models.Model):
+class VNGEndpoint(OrderedModel):
 
     port = models.PositiveIntegerField(default=8080, blank=True)
     url = models.URLField(
@@ -178,6 +178,10 @@ class VNGEndpoint(models.Model):
     session_type = models.ForeignKey(SessionType, on_delete=models.PROTECT)
     test_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL)
     scenario_collection = models.ForeignKey(ScenarioCaseCollection, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    order_with_respect_to = 'session_type'
+
+    class Meta(OrderedModel.Meta):
+        pass
 
     def __str__(self):
         # To show the session type when adding a scenario case
