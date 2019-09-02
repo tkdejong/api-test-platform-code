@@ -94,8 +94,10 @@
             {% for pr in postman_result %}
                 {{ pr.postman_test }}
                 <ul>
-                    <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid pr.id %}">{% trans "Visualize HTML log" %}</a></li>
-                    <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid pr.id %}">{% trans "Visualize JSON log" %}</a></li>
+                    {% if server_run.test_scenario.public_logs or request.user == server_run.user %}
+                        <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid pr.id %}">{% trans "Visualize HTML log" %}</a></li>
+                        <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid pr.id %}">{% trans "Visualize JSON log" %}</a></li>
+                    {% endif %}
                     <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid pr.id  %}">{% trans "Visualize PDF report" %}</a></li>
                 </ul>
             {% endfor %}
