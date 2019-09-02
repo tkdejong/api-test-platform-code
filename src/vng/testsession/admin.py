@@ -136,6 +136,7 @@ class VNGEndpointAdmin(OrderedModelAdmin):
         'path',
         'docker_image',
         'session_type',
+        'scenario_collection',
         'port',
         'test_file',
     ]
