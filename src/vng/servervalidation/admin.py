@@ -65,9 +65,9 @@ class ServerRunAdmin(admin.ModelAdmin):
 
 @admin.register(model.TestScenario)
 class TestScenarioAdmin(admin.ModelAdmin):
-    list_display = ['name', 'active']
+    list_display = ['name', 'active', 'public_logs']
     list_filter = ['name']
-    list_editable = ('active',)
+    list_editable = ('active', 'public_logs')
     search_fields = ['name']
 
     inlines = [TestScenarioUrlInline, PostmanTestInline]
