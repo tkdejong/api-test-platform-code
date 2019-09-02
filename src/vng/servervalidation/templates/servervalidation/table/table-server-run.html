@@ -10,7 +10,8 @@
     <td>{% trans "Test Scenario" %}</td>
     <td>
         <div class='col-xs-1'>
-                <input type="button" class="btn btn-primary" value="{% trans "Description" %}"
+                {{ server_run.test_scenario.name }}
+                <input type="button" class="btn btn-primary ml-2" value="{% trans "Description" %}"
                     onclick="location.href = '{% url 'server_run:testscenario-detail' server_run.test_scenario.pk  %}';"></br>
                 {% for pc in server_run.test_scenario.postmantest_set.all %}
                     <a class="btn btn-light btn-margin" href="{% url 'server_run:postman_download' pc.pk %}">Download {{ pc.validation_file.original_filename }}</a>
