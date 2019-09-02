@@ -52,11 +52,9 @@ class SessionType(models.Model):
 
     @property
     def scenario_cases(self):
-        if not hasattr(self, '_scenario_cases'):
-            endpoints = self.vngendpoint_set.all()
-            collection_ids = endpoints.values_list('scenario_collection')
-            self._scenario_cases = ScenarioCase.objects.filter(collection__in=collection_ids)
-        return self._scenario_cases
+        endpoints = self.vngendpoint_set.all()
+        collection_ids = endpoints.values_list('scenario_collection')
+        return ScenarioCase.objects.filter(collection__in=collection_ids)
 
     def add_auth_header(self):
         auth_header = self.injectheader_set.filter(key='Authorization').first()
