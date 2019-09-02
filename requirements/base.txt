@@ -39,7 +39,7 @@ django-ipware==2.1.0      # via django-axes
 django-js-asset==1.2.2    # via django-mptt
 django-mathfilters==0.4.0
 django-mptt==0.10.0       # via django-filer
-django-ordered-model==2.1.0
+django-ordered-model==3.3.0
 django-polymorphic==2.0.3  # via django-filer
 django-recaptcha==2.0.2
 django-redis==4.9.0
