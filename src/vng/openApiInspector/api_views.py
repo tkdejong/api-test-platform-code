@@ -26,6 +26,11 @@ class OpenAPIValidationException(APIException):
 
 
 class OpenApiInspectionAPIView(views.APIView):
+    """
+    OpenAPI inspector
+
+    Checks whether a URL to an API specification conforms to OAS 2.0 or higher
+    """
 
     @swagger_auto_schema(request_body=OpenApiInspectionSerializer, responses={200: OpenApiInspectionResponseSerializer})
     def post(self, request):

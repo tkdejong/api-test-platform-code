@@ -84,6 +84,11 @@ class TriggerServerRunView(viewsets.ViewSet):
 
 
 class ResultServerViewShield(views.APIView):
+    """
+    Provider run badge detail
+
+    Return the badge information of a specific provider run
+    """
 
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
