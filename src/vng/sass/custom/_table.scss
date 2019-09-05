@@ -25,3 +25,7 @@
 .scenario-detail tr td:nth-child(3), .scenario-detail tr th:nth-child(3) {
   width: 40%;
 }
+
+tr.border_bottom td {
+  border-bottom: 1pt solid rgb(102, 102, 102);
+}

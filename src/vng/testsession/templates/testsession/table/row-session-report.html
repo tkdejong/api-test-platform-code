@@ -1,12 +1,21 @@
 {% load subdomainurls %}
 {% load i18n %}
 {% spaceless %}
+{% if report.scenario_case.description %}
+    <tr>
+        <td><b>{% trans "Description: " %}</b>{{ report.scenario_case.description }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+{% endif %}
 {% if report.is_success %}
     <tr class='table-success'>
 {% elif report.is_failed %}
     <tr class='table-danger'>
 {% else %}
-    <tr>
+    <tr class="border_bottom">
 {% endif %}
         <td>{{ report.scenario_case.http_method }}</td>
         <td>{{ report.scenario_case.url }}</td>
