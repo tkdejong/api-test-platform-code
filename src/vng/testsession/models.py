@@ -251,6 +251,7 @@ class ScenarioCase(OrderedModel):
         "The HTTP method that must be tested for this scenario case"
     ))
     order_with_respect_to = 'collection'
+    description = models.TextField(default=None, null=True, blank=True)
 
     class Meta(OrderedModel.Meta):
         pass
