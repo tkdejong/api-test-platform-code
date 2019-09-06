@@ -28,6 +28,29 @@ from .task import execute_test
 from ..utils import choices
 
 
+def get_server_run_badge(server_run):
+    res = server_run.get_execution_result()
+    is_error = True
+    if res is None:
+        message = 'No results'
+        color = 'inactive'
+    elif res:
+        message = 'Success'
+        color = 'green'
+        is_error = False
+    else:
+        message = 'Failed'
+        color = 'red'
+    result = {
+        'schemaVersion': 1,
+        'label': 'API Test Platform (beta)',
+        'message': message,
+        'color': color,
+        'isError': is_error,
+    }
+    return result
+
+
 class ServerRunViewSet(
         mixins.CreateModelMixin,
         mixins.ListModelMixin,
@@ -93,27 +116,7 @@ class ResultServerViewShield(views.APIView):
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
-        res = server.get_execution_result()
-        is_error = True
-        if res is None:
-            message = 'No results'
-            color = 'inactive'
-        elif res:
-            message = 'Success'
-            color = 'green'
-            is_error = False
-        else:
-            message = 'Failed'
-            color = 'red'
-        result = {
-            'schemaVersion': 1,
-            'label': 'API Test Platform (beta)',
-            'message': message,
-            'color': color,
-            'isError': is_error,
-        }
-
-        return JsonResponse(result)
+        return JsonResponse(get_server_run_badge(server))
 
 
 class ResultServerView(views.APIView):
@@ -208,3 +211,16 @@ class PostmanTestViewset(mixins.ListModelMixin,
         qs = self.get_queryset()
         obj = get_object_or_404(PostmanTest, name=kwargs.get('name'), version=kwargs.get('version'))
         return Response(obj.valid_file)
+
+
+class ServerRunLatestResultView(views.APIView):
+
+    @swagger_auto_schema(responses={200: ServerRunResultShield})
+    def get(self, request, name, user):
+        latest_server_run = ServerRun.objects.filter(
+            test_scenario__name=name,
+            user__username=user
+        ).order_by('-stopped').first()
+        if not latest_server_run:
+            raise Http404
+        return JsonResponse(get_server_run_badge(latest_server_run))
