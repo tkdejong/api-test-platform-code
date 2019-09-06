@@ -16,6 +16,7 @@ from rest_framework.decorators import action
 from rest_framework.authentication import (
     SessionAuthentication, TokenAuthentication
 )
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 import vng.postman.utils as ptm
@@ -214,8 +215,29 @@ class PostmanTestViewset(mixins.ListModelMixin,
 
 
 class ServerRunLatestResultView(views.APIView):
+    """
+    Retrieve the latest badge for a test scenario
 
-    @swagger_auto_schema(responses={200: ServerRunResultShield})
+    Return the badge information of the latest provider run given a combination of
+    test scenario name and username of the user that starten the provider run
+    """
+
+    @swagger_auto_schema(
+        responses={200: ServerRunResultShield},
+        manual_parameters=[
+            openapi.Parameter(
+                'name',
+                openapi.IN_PATH,
+                type=openapi.TYPE_STRING,
+                description='Name of the test scenario'
+            ),
+            openapi.Parameter(
+                'user',
+                openapi.IN_PATH,
+                type=openapi.TYPE_STRING,
+                description='Name of the user that started the provider run for the test scenario'
+            ),
+        ])
     def get(self, request, name, user):
         latest_server_run = ServerRun.objects.filter(
             test_scenario__name=name,
