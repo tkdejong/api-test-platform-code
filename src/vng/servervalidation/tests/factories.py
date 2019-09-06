@@ -57,6 +57,7 @@ class PostmanTestFactory(Dmf):
         model = PostmanTest
     test_scenario = factory.SubFactory(TestScenarioFactory)
     validation_file = factory.SubFactory(FilerField)
+    name = factory.Sequence(lambda n: "Postman test %d" % n)
 
 
 class PostmanTestSubFolderFactory(Dmf):
