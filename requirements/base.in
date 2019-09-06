@@ -13,7 +13,7 @@ django-choices
 django-rosetta
 django-sniplates
 django-redis
-django_admin_index
+-e git+git://github.com/maykinmedia/django-admin-index@master#egg=django_admin_index
 django-import-export
 django-crispy-forms
 django-countries
