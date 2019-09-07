@@ -25,10 +25,14 @@ from ..utils import choices
 
 class TestScenario(models.Model):
 
-    name = models.CharField(_('name'), max_length=200, unique=True)
+    name = models.CharField(_('name'), max_length=200, unique=True, help_text=_(
+        "The name of the test scenario"
+    ))
     authorization = models.CharField(_('Authorization'), max_length=20, choices=choices.AuthenticationChoices.choices, default=choices.AuthenticationChoices.jwt)
-    description = HTMLField()
-    active = models.BooleanField(blank=True, default=True)
+    description = HTMLField(help_text=_("The description of this test scenario"))
+    active = models.BooleanField(blank=True, default=True, help_text=_(
+        "Indicates whether this test scenario can be used via the web interface and the API"
+    ))
 
     def __str__(self):
         return self.name
@@ -48,14 +52,20 @@ class TestScenario(models.Model):
 
 class TestScenarioUrl(models.Model):
 
-    name = models.CharField(_('name'), max_length=200)
-    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
-    url = models.BooleanField(default=True, help_text='''When enabled a single-line field is shown to the user
-    when starting a session. When disabled a multi-line field is shown.''')
+    name = models.CharField(_('name'), max_length=200, help_text=_(
+        "The name of the variable"
+    ))
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
+        "The test scenario to which this variable is linked"
+    ))
+    url = models.BooleanField(default=True, help_text=_('''When enabled a single-line field is shown to the user
+    when starting a session. When disabled a multi-line field is shown.'''))
     hidden = models.BooleanField(default=False, help_text=_(
         "When enabled, the value of this field will not be shown on detail pages"
     ))
-    placeholder = models.TextField(blank=True, default='https://www.example.com')
+    placeholder = models.TextField(blank=True, default='https://www.example.com', help_text=_(
+        "The default value that will be used for this variable"
+    ))
 
     def __str__(self):
         return '{} {}'.format(self.name, self.test_scenario)
@@ -64,11 +74,23 @@ class TestScenarioUrl(models.Model):
 class PostmanTest(OrderedModel):
 
     order_with_respect_to = 'test_scenario'
-    name = models.CharField(max_length=150)
-    version = models.CharField(max_length=20, default='1.0.0')
-    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
-    validation_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL)
-    published_url = models.URLField(null=True, blank=True)
+    name = models.CharField(max_length=150, help_text=_(
+        "The name of the Postman test suite"
+    ))
+    version = models.CharField(max_length=20, default='1.0.0', help_text=_(
+        """Indicates the version of the Postman test suite, allowing for different
+        versions under the same name
+        """
+    ))
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
+        "The name of the test scenario to which this Postman test is linked"
+    ))
+    validation_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL, help_text=_(
+        "The actual file containing the Postman collection"
+    ))
+    published_url = models.URLField(null=True, blank=True, help_text=_(
+        "The URL pointing to the published collection on the Postman website"
+    ))
 
     class Meta(OrderedModel.Meta):
         unique_together = ('name', 'version',)
@@ -89,21 +111,52 @@ class PostmanTest(OrderedModel):
 
 class ServerRun(models.Model):
 
-    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT)
-    started = models.DateTimeField(_('Started at'), default=timezone.now)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    stopped = models.DateTimeField(_('Stopped at'), null=True, default=None, blank=True)
-    last_exec = models.DateTimeField(_('Last run'), null=True, default=None, blank=True)
-    status = models.CharField(max_length=20, choices=choices.StatusWithScheduledChoices.choices, default=choices.StatusWithScheduledChoices.starting)
-    client_id = models.TextField(default=None, null=True, blank=True)
-    secret = models.TextField(default=None, null=True, blank=True)
-    percentage_exec = models.IntegerField(default=None, null=True, blank=True)
-    status_exec = models.TextField(default=None, null=True, blank=True)
-    scheduled = models.BooleanField(default=False)
-    supplier_name = models.CharField(max_length=100, blank=True, null=True)
-    software_product = models.CharField(max_length=100, blank=True, null=True)
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
+        "The test scenario for which this provider run was executed"
+    ))
+    started = models.DateTimeField(_('Started at'), default=timezone.now, help_text=_(
+        "The time at which the provider run was started"
+    ))
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, help_text=_(
+        "The user that started this provider run"
+    ))
+    stopped = models.DateTimeField(_('Stopped at'), null=True, default=None, blank=True, help_text=_(
+        "The time at which the provider run was stopped"
+    ))
+    last_exec = models.DateTimeField(_('Last run'), null=True, default=None, blank=True, help_text=_(
+        "The time at which the last provider run for the test scenario was executed"
+    ))
+    status = models.CharField(
+        max_length=20,
+        choices=choices.StatusWithScheduledChoices.choices,
+        default=choices.StatusWithScheduledChoices.starting,
+        help_text=_("Indicates the status of this provider run")
+    )
+    client_id = models.TextField(default=None, null=True, blank=True, help_text=_(
+        "If the test scenario requires JWT authentication, this field will be used to construct a JWT"
+    ))
+    secret = models.TextField(default=None, null=True, blank=True, help_text=_(
+        "If the test scenario requires JWT authentication, this field will be used to construct a JWT"
+    ))
+    percentage_exec = models.IntegerField(default=None, null=True, blank=True, help_text=_(
+        "Indicates what percentage of the provider run has been executed"
+    ))
+    status_exec = models.TextField(default=None, null=True, blank=True, help_text=_(
+        "Indicates the status of execution of the provider run"
+    ))
+    scheduled = models.BooleanField(default=False, help_text=_(
+        "If enabled, this provider run will be executed every day at midnight"
+    ))
+    supplier_name = models.CharField(max_length=100, blank=True, null=True, help_text=_(
+        "Name of the supplier of the software product"
+    ))
+    software_product = models.CharField(max_length=100, blank=True, null=True, help_text=_(
+        "Name of the software tested by this provider test"
+    ))
     product_role = models.CharField(max_length=100, blank=True, null=True)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, help_text=_(
+        "The universally unique identifier of this provider run, needed to retrieve the badge"
+    ))
 
     def __str__(self):
         return "{} - {}".format(self.started, self.status)
@@ -142,18 +195,30 @@ class ServerRun(models.Model):
 
 class ServerHeader(models.Model):
 
-    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE)
-    header_key = models.TextField()
-    header_value = models.TextField()
+    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
+        "The provider run for which this header was used"
+    ))
+    header_key = models.TextField(help_text=_("The name of the HTTP header"))
+    header_value = models.TextField(help_text=_("The value of the HTTP header"))
 
 
 class PostmanTestResult(models.Model):
 
-    postman_test = models.ForeignKey(PostmanTest, on_delete=models.CASCADE)
-    log = models.FileField(settings.MEDIA_FOLDER_FILES['servervalidation_log'], blank=True, null=True, default=None)
-    log_json = models.FileField(settings.MEDIA_FOLDER_FILES['servervalidation_log'], blank=True, null=True, default=None)
-    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=ResultChoices.choices, default=None, null=True)
+    postman_test = models.ForeignKey(PostmanTest, on_delete=models.CASCADE, help_text=_(
+        "The Postman test which this result belongs to"
+    ))
+    log = models.FileField(settings.MEDIA_FOLDER_FILES['servervalidation_log'], blank=True, null=True, default=None, help_text=_(
+        "The HTML log generated by Newman"
+    ))
+    log_json = models.FileField(settings.MEDIA_FOLDER_FILES['servervalidation_log'], blank=True, null=True, default=None, help_text=_(
+        "The JSON log generated by Newman"
+    ))
+    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
+        "The provider run which this result belongs to"
+    ))
+    status = models.CharField(max_length=10, choices=ResultChoices.choices, default=None, null=True, help_text=_(
+        "Indicates whether all test passed or not"
+    ))
 
     def __str__(self):
         if self.status is None:
@@ -281,7 +346,11 @@ class PostmanTestResult(models.Model):
 
 class Endpoint(models.Model):
 
-    test_scenario_url = models.ForeignKey(TestScenarioUrl, on_delete=models.CASCADE)
-    url = models.TextField()
+    test_scenario_url = models.ForeignKey(TestScenarioUrl, on_delete=models.CASCADE, help_text=_(
+        "The test scenario variable to which this endpoint belongs"
+    ))
+    url = models.TextField(help_text=_("The value of the variable"))
     jwt = models.TextField(null=True, default=None, blank=True)
-    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE)
+    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
+        "The provider run to which this endpoint belongs"
+    ))

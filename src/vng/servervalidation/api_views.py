@@ -84,6 +84,11 @@ class TriggerServerRunView(viewsets.ViewSet):
 
 
 class ResultServerViewShield(views.APIView):
+    """
+    Provider run badge detail
+
+    Return the badge information of a specific provider run
+    """
 
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
@@ -168,6 +173,27 @@ class ResultServerView(views.APIView):
 class PostmanTestViewset(mixins.ListModelMixin,
                          mixins.RetrieveModelMixin,
                          viewsets.GenericViewSet):
+    """
+    list:
+    Postman test list
+
+    Return a list of all the existing Postman tests
+
+    get_specific_version:
+    Retrieve a specific version of a Postman test
+
+    Return the Postman test collection that has the given name and version
+
+    get_all_versions:
+    Retrieve all versions of a Postman test
+
+    Return all the possible versions of a Postman test
+
+    retrieve:
+    Postman test detail
+
+    Return a specific Postman test
+    """
     serializer_class = PostmanTestSerializer
     queryset = PostmanTest.objects.all()
 

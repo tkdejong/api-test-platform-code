@@ -134,6 +134,7 @@ class ServerRunResultShield(serializers.Serializer):
     label = serializers.CharField(max_length=200)
     message = serializers.CharField(max_length=200)
     color = serializers.CharField(max_length=200)
+    isError = serializers.BooleanField()
 
 
 class PostmanTestSerializer(serializers.ModelSerializer):
