@@ -75,11 +75,9 @@ class SessionType(models.Model):
 
     @property
     def scenario_cases(self):
-        if not hasattr(self, '_scenario_cases'):
-            endpoints = self.vngendpoint_set.all()
-            collection_ids = endpoints.values_list('scenario_collection')
-            self._scenario_cases = ScenarioCase.objects.filter(collection__in=collection_ids)
-        return self._scenario_cases
+        endpoints = self.vngendpoint_set.all()
+        collection_ids = endpoints.values_list('scenario_collection')
+        return ScenarioCase.objects.filter(collection__in=collection_ids)
 
     def add_auth_header(self):
         auth_header = self.injectheader_set.filter(key='Authorization').first()
@@ -161,7 +159,7 @@ class ScenarioCaseCollection(models.Model):
     def __str__(self):
         return self.name
 
-class VNGEndpoint(models.Model):
+class VNGEndpoint(OrderedModel):
 
     port = models.PositiveIntegerField(default=8080, blank=True, help_text=_(
         "Specifies on which port endpoints for this service will be exposed"
@@ -220,6 +218,10 @@ class VNGEndpoint(models.Model):
         default=None, null=True, blank=True,
         help_text=_("The collection of scenario cases that must be tested for this service")
     )
+    order_with_respect_to = 'session_type'
+
+    class Meta(OrderedModel.Meta):
+        pass
 
     def __str__(self):
         # To show the session type when adding a scenario case

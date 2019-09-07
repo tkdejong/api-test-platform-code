@@ -35,14 +35,20 @@
                 </div>
                 <div class="card-body">
                 {% if object_list %}
-                <table class="table">
-                    {% include 'testsession/table/header-session-report.html' only %}
-                    {% for rp in object_list %}
-                    {% include 'testsession/table/row-session-report.html' with report=rp only %}
+                    {% for endpoint, cases in object_list %}
+                        <h5>{{ endpoint.scenario_collection }}</h5>
+                        {% if endpoint.url %}
+                            <p><a href="{{ endpoint.url }}">{{ endpoint.url }}</a></p>
+                        {% endif %}
+                        <table class="table">
+                            {% include 'testsession/table/header-session-report.html' with collection=collection only %}
+                            {% for rp in cases %}
+                                {% include 'testsession/table/row-session-report.html' with report=rp only %}
+                            {% endfor %}
+                        </table>
                     {% endfor %}
-                </table>
                 {% else %}
-                <p>{% trans "No requests have yet been received." %}</p>
+                    <p>{% trans "No requests have yet been received." %}</p>
                 {% endif %}
     </div>
 </article>

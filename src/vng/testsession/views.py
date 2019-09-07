@@ -231,16 +231,23 @@ class SessionReport(DetailView):
         context = super().get_context_data(**kwargs)
         report = list(Report.objects.filter(session_log__session=self.session))
         report_ordered = []
-        for case in context['session'].session_type.scenario_cases:
-            is_in = False
-            for rp in report:
-                if rp.scenario_case == case:
-                    report_ordered.append(rp)
-                    is_in = True
-                    break
-            if not is_in:
-                report_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoices.not_called))
+        for endpoint in context['session'].session_type.vngendpoint_set.all():
+            collection = endpoint.scenario_collection
+            cases = collection.scenariocase_set.all()
+            if not cases.exists():
+                continue
 
+            cases_ordered = []
+            for case in collection.scenariocase_set.all():
+                is_in = False
+                for rp in report:
+                    if rp.scenario_case == case:
+                        cases_ordered.append(rp)
+                        is_in = True
+                        break
+                if not is_in:
+                    cases_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoices.not_called))
+            report_ordered.append((endpoint, cases_ordered))
         context.update({
             'session': self.session,
             'object_list': report_ordered,
@@ -322,5 +329,13 @@ class SessionTypeDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['scenario_cases'] = context['sessiontype'].scenario_cases
+
+        endpoints = context['sessiontype'].vngendpoint_set.all()
+        grouped_cases = []
+        for endpoint in endpoints:
+            scenario_cases = endpoint.scenario_collection.scenariocase_set.all()
+            if scenario_cases.exists():
+                grouped_cases.append((endpoint, scenario_cases))
+
+        context['grouped_scenario_cases'] = grouped_cases
         return context
