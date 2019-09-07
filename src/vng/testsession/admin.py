@@ -1,4 +1,4 @@
-from ordered_model.admin import OrderedModelAdmin
+from ordered_model.admin import OrderedModelAdmin, OrderedTabularInline, OrderedInlineModelAdminMixin
 from django.contrib import admin
 
 
@@ -7,12 +7,20 @@ import vng.testsession.models as model
 from .forms import SessionTypeFormAdmin
 
 
-class VNGEndpointInline(admin.TabularInline):
+class VNGEndpointInline(OrderedTabularInline):
     model = model.VNGEndpoint
+    fields = ('url', 'move_up_down_links', 'name', 'path', 'docker_image', 'session_type', 'port', 'test_file', 'scenario_collection',)
+    readonly_fields = ('move_up_down_links',)
+    extra = 1
+    ordering = ('order',)
 
 
-class ScenarioCaseInline(admin.TabularInline):
+class ScenarioCaseInline(OrderedTabularInline):
     model = model.ScenarioCase
+    fields = ('url', 'move_up_down_links', 'http_method',)
+    readonly_fields = ('move_up_down_links',)
+    extra = 1
+    ordering = ('order',)
 
 
 class ScenarioCaseCollectionInline(admin.TabularInline):
@@ -46,7 +54,7 @@ class ExposedUrlAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.SessionType)
-class SessionTypeAdmin(admin.ModelAdmin):
+class SessionTypeAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     list_display = [
         'name',
         'standard',
@@ -92,7 +100,7 @@ class SessionLogAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.ScenarioCaseCollection)
-class ScenarioCaseCollectionAdmin(admin.ModelAdmin):
+class ScenarioCaseCollectionAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     list_display = [
         'name',
     ]
@@ -110,6 +118,7 @@ class ScenarioCaseAdmin(OrderedModelAdmin):
     ]
     inlines = [QueryParamsScenarioInline]
     ordering = ('collection', 'order',)
+    list_filter = ['collection']
 
 
 @admin.register(model.QueryParamsScenario)
@@ -127,16 +136,20 @@ class TestSessionAdmin(admin.ModelAdmin):
 
 
 @admin.register(model.VNGEndpoint)
-class VNGEndpointAdmin(admin.ModelAdmin):
+class VNGEndpointAdmin(OrderedModelAdmin):
     list_display = [
         'url',
+        'move_up_down_links',
         'name',
         'path',
         'docker_image',
         'session_type',
+        'scenario_collection',
         'port',
         'test_file',
     ]
+    ordering = ('session_type', 'order',)
+    list_filter = ['session_type']
 
 
 @admin.register(model.Report)
