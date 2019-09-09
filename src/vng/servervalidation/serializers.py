@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import TestScenarioUrl, Endpoint, ServerRun, TestScenario
+from .models import TestScenarioUrl, Endpoint, ServerRun, TestScenario, PostmanTest
 from .task import execute_test
 
 from django.db import transaction
@@ -13,21 +13,37 @@ class TestScenarioUrlSerializer(serializers.ModelSerializer):
 
 class EndpointSerializer(serializers.ModelSerializer):
 
-    test_scenario_url = TestScenarioUrlSerializer()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = Endpoint
-        fields = ['url', 'test_scenario_url']
+        fields = ['name', 'value']
+        extra_kwargs = {
+            'value': {
+                'source': 'url',
+            }
+        }
+
+    def get_name(self, obj):
+        return obj.test_scenario_url.name
 
     def create(self, validated_data):
         try:
             name = validated_data.pop('name')
-            url = validated_data['url']
+            value = validated_data['value']
             tsu = TestScenarioUrl.objects.get(name=name, test_scenario=validated_data['server'].test_scenario)
-            ep = Endpoint.objects.create(test_scenario_url=tsu, url=url, server_run=validated_data['server'])
+            ep = Endpoint.objects.create(test_scenario_url=tsu, url=value, server_run=validated_data['server'])
             return ep
         except Exception:
             raise serializers.ValidationError("The urls names provided do not match")
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        # If the variable was marked as hidden, show a generic hidden output
+        if instance.test_scenario_url.hidden:
+            ret['value'] = '(hidden)'
+        return ret
 
 
 class ServerRunSerializer(serializers.ModelSerializer):
@@ -63,14 +79,13 @@ class ServerRunSerializer(serializers.ModelSerializer):
             validated_data.pop('endpoints')
             instance = ServerRun.objects.create(**validated_data)
             for ep in endpoints:
-                if 'test_scenario_url' in ep and 'url' in ep:
-                    if 'name' in ep['test_scenario_url']:
-                        ep_serializer = EndpointSerializer()
-                        endpoint_created.append(ep_serializer.create({
-                            'name': ep['test_scenario_url']['name'],
-                            'url': ep['url'],
-                            'server': instance
-                        }))
+                if 'name' in ep and 'value' in ep:
+                    ep_serializer = EndpointSerializer()
+                    endpoint_created.append(ep_serializer.create({
+                        'name': ep['name'],
+                        'value': ep['value'],
+                        'server': instance
+                    }))
         else:
             instance = ServerRun.objects.create(**validated_data)
         instance.endpoints = endpoint_created
@@ -119,3 +134,13 @@ class ServerRunResultShield(serializers.Serializer):
     label = serializers.CharField(max_length=200)
     message = serializers.CharField(max_length=200)
     color = serializers.CharField(max_length=200)
+    isError = serializers.BooleanField()
+
+
+class PostmanTestSerializer(serializers.ModelSerializer):
+
+    validation_file = serializers.FileField()
+
+    class Meta:
+        model = PostmanTest
+        fields = ('name', 'version', 'test_scenario', 'validation_file',)

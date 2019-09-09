@@ -10,7 +10,7 @@ from django.conf import settings
 from vng.accounts.models import User
 from vng.testsession.tests.factories import UserFactory
 
-from ..models import ServerRun, TestScenario, TestScenarioUrl, PostmanTest, PostmanTestResult
+from ..models import ServerRun, TestScenario, TestScenarioUrl, PostmanTest, PostmanTestResult, Endpoint
 from ...utils.factories import UserFactory
 
 
@@ -57,6 +57,7 @@ class PostmanTestFactory(Dmf):
         model = PostmanTest
     test_scenario = factory.SubFactory(TestScenarioFactory)
     validation_file = factory.SubFactory(FilerField)
+    name = factory.Sequence(lambda n: "Postman test %d" % n)
 
 
 class PostmanTestSubFolderFactory(Dmf):
@@ -86,3 +87,23 @@ class ServerRunFactory(Dmf):
     started = timezone.now()
     client_id = 'client_id_field'
     secret = 'secret_field'
+
+
+class EndpointFactory(Dmf):
+
+    class Meta:
+        model = Endpoint
+
+    test_scenario_url = factory.SubFactory(TestScenarioUrlFactory)
+    server_run = factory.SubFactory(ServerRunFactory)
+
+
+class PostmanTestResultFactory(Dmf):
+
+    class Meta:
+        model = PostmanTestResult
+
+    postman_test = factory.SubFactory(PostmanTestFactory)
+    server_run = factory.SubFactory(ServerRunFactory)
+    log = factory.django.FileField()
+    log_json = factory.django.FileField()

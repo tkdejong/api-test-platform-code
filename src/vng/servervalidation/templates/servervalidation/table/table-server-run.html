@@ -10,7 +10,8 @@
     <td>{% trans "Test Scenario" %}</td>
     <td>
         <div class='col-xs-1'>
-                <input type="button" class="btn btn-primary" value="{% trans "Description" %}"
+                {{ server_run.test_scenario.name }}
+                <input type="button" class="btn btn-primary ml-2" value="{% trans "Description" %}"
                     onclick="location.href = '{% url 'server_run:testscenario-detail' server_run.test_scenario.pk  %}';"></br>
                 {% for pc in server_run.test_scenario.postmantest_set.all %}
                     <a class="btn btn-light btn-margin" href="{% url 'server_run:postman_download' pc.pk %}">Download {{ pc.validation_file.original_filename }}</a>
@@ -21,8 +22,15 @@
 </tr>
 {% for ep in server_run.endpoint_set.all %}
     <tr>
+
         <td>{{ ep.test_scenario_url.name }}</td>
-        <td>{{ ep.url }}</td>
+        <td>
+            {% if not ep.test_scenario_url.hidden %}
+                {{ ep.url}}
+            {% else %}
+                <i>{% trans "This field was marked as hidden" %}</i>
+            {% endif %}
+        </td>
     </tr>
 {% endfor %}
 
@@ -86,8 +94,10 @@
             {% for pr in postman_result %}
                 {{ pr.postman_test }}
                 <ul>
-                    <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid pr.id %}">{% trans "Visualize HTML log" %}</a></li>
-                    <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid pr.id %}">{% trans "Visualize JSON log" %}</a></li>
+                    {% if server_run.test_scenario.public_logs or request.user == server_run.user %}
+                        <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid pr.id %}">{% trans "Visualize HTML log" %}</a></li>
+                        <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid pr.id %}">{% trans "Visualize JSON log" %}</a></li>
+                    {% endif %}
                     <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid pr.id  %}">{% trans "Visualize PDF report" %}</a></li>
                 </ul>
             {% endfor %}

@@ -1,8 +1,9 @@
 {% load i18n %}
+{% load l10n %}
 {% spaceless %}
     <tr>
         <td>
-        <a href="{% url 'server_run:server-run_detail_uuid' server_run.uuid %}">#{{ server_run.id }}</a>
+        <a href="{% url 'server_run:server-run_detail_uuid' server_run.uuid %}">#{{ server_run.id|unlocalize }}</a>
         </td>
         <td>
             {% if server_run.status == choices.running %}
@@ -41,7 +42,7 @@
         {% endwith %}
     </td>
         {% if server_run.is_running %}
-            <td class='starting' server_run_id='{{server_run.id}}'>
+            <td class='starting' server_run_id='{{server_run.id|unlocalize}}'>
         {% else %}
             <td>
         {% endif %}

@@ -1,4 +1,4 @@
-
+from datetime import date
 import json
 
 from django.shortcuts import get_object_or_404
@@ -9,21 +9,47 @@ from django.db import transaction
 from django.db.models import Prefetch
 
 from rest_framework import permissions, viewsets, mixins, views
+from rest_framework.response import Response
+from rest_framework.decorators import action
 # from rest_framework.exceptions import bad_request
 
 from rest_framework.authentication import (
     SessionAuthentication, TokenAuthentication
 )
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 import vng.postman.utils as ptm
 
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
-from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield
-from .models import ServerRun, PostmanTestResult
+from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield, PostmanTestSerializer
+from .models import ServerRun, PostmanTestResult, PostmanTest
 from .task import execute_test
 from ..utils import choices
+
+
+def get_server_run_badge(server_run, label):
+    res = server_run.get_execution_result()
+    is_error = True
+    if res is None:
+        message = 'No results'
+        color = 'inactive'
+    elif res:
+        message = 'Success'
+        color = 'green'
+        is_error = False
+    else:
+        message = 'Failed'
+        color = 'red'
+    result = {
+        'schemaVersion': 1,
+        'label': label,
+        'message': message,
+        'color': color,
+        'isError': is_error,
+    }
+    return result
 
 
 class ServerRunViewSet(
@@ -82,31 +108,17 @@ class TriggerServerRunView(viewsets.ViewSet):
 
 
 class ResultServerViewShield(views.APIView):
+    """
+    Provider run badge detail
+
+    Return the badge information of a specific provider run
+    """
 
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
-        res = server.get_execution_result()
-        is_error = True
-        if res is None:
-            message = 'No results'
-            color = 'inactive'
-        elif res:
-            message = 'Success'
-            color = 'green'
-            is_error = False
-        else:
-            message = 'Failed'
-            color = 'red'
-        result = {
-            'schemaVersion': 1,
-            'label': 'API Test Platform',
-            'message': message,
-            'color': color,
-            'isError': is_error,
-        }
-
-        return JsonResponse(result)
+        date_stopped = date.strftime(server.stopped, '%Y-%m-%d %H:%m:%S')
+        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta) {}'.format(date_stopped)))
 
 
 class ResultServerView(views.APIView):
@@ -161,3 +173,77 @@ class ResultServerView(views.APIView):
             postman_res_output['status'] = postman.status
             response.append(postman_res_output)
         return JsonResponse(response, safe=False)
+
+
+class PostmanTestViewset(mixins.ListModelMixin,
+                         mixins.RetrieveModelMixin,
+                         viewsets.GenericViewSet):
+    """
+    list:
+    Postman test list
+
+    Return a list of all the existing Postman tests
+
+    get_specific_version:
+    Retrieve a specific version of a Postman test
+
+    Return the Postman test collection that has the given name and version
+
+    get_all_versions:
+    Retrieve all versions of a Postman test
+
+    Return all the possible versions of a Postman test
+
+    retrieve:
+    Postman test detail
+
+    Return a specific Postman test
+    """
+    serializer_class = PostmanTestSerializer
+    queryset = PostmanTest.objects.all()
+
+    @action(methods=['GET'], detail=False, url_path='get_versions/(?P<name>[^/.]+)')
+    def get_all_versions(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        serializer = self.serializer_class(qs.filter(name=kwargs.get('name')), many=True)
+        return Response(serializer.data)
+
+    @action(methods=['GET'], detail=False, url_path='get_version/(?P<name>[^/.]+)/(?P<version>[0-9]\.[0-9]\.[0-9])')
+    def get_specific_version(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        obj = get_object_or_404(PostmanTest, name=kwargs.get('name'), version=kwargs.get('version'))
+        return Response(obj.valid_file)
+
+
+class ServerRunLatestResultView(views.APIView):
+    """
+    Retrieve the latest badge for a test scenario
+
+    Return the badge information of the latest provider run given a combination of
+    test scenario name and username of the user that starten the provider run
+    """
+
+    @swagger_auto_schema(
+        responses={200: ServerRunResultShield},
+        manual_parameters=[
+            openapi.Parameter(
+                'name',
+                openapi.IN_PATH,
+                type=openapi.TYPE_STRING,
+                description='Name of the test scenario'
+            ),
+            openapi.Parameter(
+                'user',
+                openapi.IN_PATH,
+                type=openapi.TYPE_STRING,
+                description='Name of the user that started the provider run for the test scenario'
+            ),
+        ])
+    def get(self, request, name, user):
+        latest_server_run = ServerRun.objects.filter(
+            test_scenario__name=name,
+            user__username=user
+        ).order_by('-stopped').first()
+        if not latest_server_run:
+            raise Http404
+        return JsonResponse(get_server_run_badge(latest_server_run, 'API Test Platform (beta)'))

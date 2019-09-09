@@ -8,7 +8,6 @@ from zds_client import ClientAuth
 from subdomains.utils import reverse as reverse_sub
 from django.shortcuts import get_object_or_404
 from django.views import View
-from django.db import transaction
 from django.utils import timezone
 from django.db.models import Count
 from django.core.exceptions import PermissionDenied
@@ -20,11 +19,14 @@ from rest_framework import generics, permissions, viewsets, views, mixins
 from rest_framework.authentication import (
     SessionAuthentication, TokenAuthentication
 )
+from drf_yasg.utils import swagger_auto_schema
+
 from .models import (
     ScenarioCase, Session, SessionLog, SessionType, ExposedUrl, Report,
     QueryParamsScenario, InjectHeader
 )
 
+from ..servervalidation.serializers import ServerRunResultShield
 from ..utils import choices
 from ..utils.views import CSRFExemptMixin
 
@@ -45,6 +47,11 @@ logger = logging.getLogger(__name__)
 class SessionViewStatusSet(
         mixins.RetrieveModelMixin,
         viewsets.GenericViewSet):
+    """
+    Session status detail
+
+    Return the status details of a specific session
+    """
     serializer_class = SessionStatusSerializer
     authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
@@ -109,8 +116,7 @@ class StopSessionView(generics.ListAPIView):
             return
         stop_session.delay(session.pk)
         session.status = choices.StatusChoices.shutting_down
-        with transaction.atomic():
-            session.save()
+        session.save()
         run_tests.delay(session.pk)
 
     def get_queryset(self):
@@ -202,7 +208,7 @@ class SessionTypesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 class ExposedUrlView(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
-    Exposed url
+    Exposed url list
 
     Return a list of all the exposed url of a certain session.
     """
@@ -526,7 +532,13 @@ class RunTest(CSRFExemptMixin, View):
 
 
 class ResultTestsessionViewShield(views.APIView):
+    """
+    Session badge detail
 
+    Return the badge information of a specific session
+    """
+
+    @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         session = get_object_or_404(Session, uuid=uuid)
         report = list(Report.objects.filter(session_log__session=session))
@@ -564,7 +576,7 @@ class ResultTestsessionViewShield(views.APIView):
 
         result = {
             'schemaVersion': 1,
-            'label': 'API Test Platform',
+            'label': 'API Test Platform (beta)',
             'message': message,
             'color': color,
             'isError': is_error,

@@ -146,9 +146,12 @@ class CreationAndDeletion(WebTest):
         }), user=session.user)
 
     def test_deploy_docker_via_api(self):
-        self.app.post_json(reverse('apiv1session:test_session-list'), {
+        response = self.app.post_json(reverse('apiv1session:test_session-list'), {
             'session_type': self.session_type_docker.name
         }, headers=self.head)
+        session_id = response.json['id']
+        if settings.ENVIRONMENT != 'jenkins':
+            self.app.post(reverse('testsession:stop_session', kwargs={'session_id': session_id}), headers=self.head)
 
     def test_session_creation_permission(self):
         Session.objects.all().delete()

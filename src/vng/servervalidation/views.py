@@ -5,7 +5,6 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonRespons
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.urls import reverse_lazy
-from django.db import transaction
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.views import View
@@ -150,8 +149,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             self.server.status = choices.StatusWithScheduledChoices.scheduled
         else:
             self.server.status = choices.StatusWithScheduledChoices.running
-        with transaction.atomic():
-            self.server.save()
+        self.server.save()
         try:
             ep = form.instance
             ep.server_run = self.server
@@ -228,6 +226,15 @@ class ServerRunOutputUuid(DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
+
+        # Construct the URL of the changing badge
+        changing_badge_url = '{}://{}{}'.format(
+            self.request.scheme,
+            self.request.get_host(),
+            reverse('apiv1server:latest-badge', kwargs={'name': server_run.test_scenario.name, 'user': server_run.user})
+        )
+        context['changing_badge_url'] = changing_badge_url
+
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
         context["update_info"] = True
@@ -275,7 +282,10 @@ class ServerRunLogView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return HttpResponse(content=self.object.postmantestresult_set.get(pk=kwargs['test_result_pk']).log)
+        if self.request.user == self.object.user or self.object.test_scenario.public_logs:
+            return HttpResponse(content=self.object.postmantestresult_set.get(pk=kwargs['test_result_pk']).log)
+        else:
+            raise PermissionDenied
 
 
 class ServerRunLogJsonView(DetailView):
@@ -290,7 +300,10 @@ class ServerRunLogJsonView(DetailView):
         test_result_pk = self.kwargs.get('test_result_pk')
         test_result = self.object.postmantestresult_set.get(pk=test_result_pk)
         context['postman_test_result'] = test_result
-        return context
+        if self.request.user == test_result.server_run.user or test_result.server_run.test_scenario.public_logs:
+            return context
+        else:
+            raise PermissionDenied
 
 
 class ServerRunPdfView(PDFGenerator, ServerRunOutputUuid):

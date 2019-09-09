@@ -1,4 +1,5 @@
 import factory
+import json
 
 from django_webtest import WebTest
 from django.urls import reverse
@@ -7,7 +8,8 @@ from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User
 
 from .factories import (
-    TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory, UserFactory, PostmanTestSubFolderFactory
+    TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory,
+    UserFactory, PostmanTestSubFolderFactory, EndpointFactory, PostmanTestResultFactory
 )
 from ...utils import choices, forms
 
@@ -249,3 +251,158 @@ class TestScenarioDetail(WebTest):
             'pk': self.pts.test_scenario.id
         }))
         self.assertIn('test subsub', call.text)
+
+
+class ServerRunHiddenVarsTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.test_scenario = PostmanTestFactory().test_scenario
+
+    def test_detail_page_replace_hidden_vars_with_placeholders(self):
+        tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
+        tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
+        server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=server_run, url='https://url1.com/')
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=server_run, url='https://url2.com/')
+
+        detail_url = reverse('server_run:server-run_detail', kwargs={'pk': server_run.pk})
+        response = self.app.get(detail_url, user=self.user)
+
+        self.assertNotContains(response, 'https://url1.com/')
+        self.assertContains(response, 'https://url2.com/')
+
+
+class ServerRunPublicLogsTests(WebTest):
+
+    def setUp(self):
+        self.user1, self.user2 = UserFactory.create_batch(2)
+
+        test_result_public = PostmanTestResultFactory.create(
+            postman_test__name='test1',
+            server_run__test_scenario__public_logs=True,
+            server_run__user=self.user1,
+        )
+        server_run = test_result_public.server_run
+        self.detail_url_public = reverse('server_run:server-run_detail_uuid', kwargs={'uuid': server_run.uuid})
+        self.log_json_url_public = reverse('server_run:server-run_detail_log_json', kwargs={
+            'uuid': server_run.uuid,
+            'test_result_pk': test_result_public.pk,
+        })
+        self.log_html_url_public = reverse('server_run:server-run_detail_log', kwargs={
+            'uuid': server_run.uuid,
+            'test_result_pk': test_result_public.pk,
+        })
+        with open(test_result_public.log_json.path, 'w') as f:
+            json.dump(
+                {
+                    'run': {
+                        'executions': [{'request': {'url': 'test'}}],
+                        'timings': {'started': '100', 'stopped': '200'}
+                    }
+                },
+                f
+            )
+
+        test_result_private = PostmanTestResultFactory.create(
+            server_run__test_scenario__public_logs=False,
+            server_run__user=self.user1,
+        )
+        server_run = test_result_private.server_run
+        self.detail_url_private = reverse('server_run:server-run_detail_uuid', kwargs={'uuid': server_run.uuid})
+        self.log_json_url_private = reverse('server_run:server-run_detail_log_json', kwargs={
+            'uuid': server_run.uuid,
+            'test_result_pk': test_result_private.pk,
+        })
+        self.log_html_url_private = reverse('server_run:server-run_detail_log', kwargs={
+            'uuid': server_run.uuid,
+            'test_result_pk': test_result_private.pk,
+        })
+        with open(test_result_private.log_json.path, 'w') as f:
+            json.dump(
+                {
+                    'run': {
+                        'executions': [{'request': {'url': 'test'}}],
+                        'timings': {'started': '100', 'stopped': '200'}
+                    }
+                },
+                f
+            )
+
+    def test_show_public_logs_same_user(self):
+        response = self.app.get(self.detail_url_public, user=self.user1)
+
+        self.assertContains(response, self.log_json_url_public)
+        self.assertContains(response, self.log_html_url_public)
+
+    def test_show_public_logs_different_user(self):
+        response = self.app.get(self.detail_url_public, user=self.user2)
+
+        self.assertContains(response, self.log_json_url_public)
+        self.assertContains(response, self.log_html_url_public)
+
+    def test_show_public_logs_no_user(self):
+        response = self.app.get(self.detail_url_public)
+
+        self.assertContains(response, self.log_json_url_public)
+        self.assertContains(response, self.log_html_url_public)
+
+    def test_show_private_logs_same_user(self):
+        response = self.app.get(self.detail_url_private, user=self.user1)
+
+        self.assertContains(response, self.log_json_url_private)
+        self.assertContains(response, self.log_html_url_private)
+
+    def test_show_private_logs_different_user(self):
+        response = self.app.get(self.detail_url_private, user=self.user2)
+
+        self.assertNotContains(response, self.log_json_url_private)
+        self.assertNotContains(response, self.log_html_url_private)
+
+    def test_show_private_logs_no_user(self):
+        response = self.app.get(self.detail_url_private)
+
+        self.assertNotContains(response, self.log_json_url_private)
+        self.assertNotContains(response, self.log_html_url_private)
+
+    def test_access_public_logs_same_user(self):
+        response = self.app.get(self.log_json_url_public, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_public, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_public_logs_different_user(self):
+        response = self.app.get(self.log_json_url_public, user=self.user2)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_public, user=self.user2)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_public_logs_no_user(self):
+        response = self.app.get(self.log_json_url_public)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_public)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_private_logs_same_user(self):
+        response = self.app.get(self.log_json_url_private, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_private, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_private_logs_different_user(self):
+        response = self.app.get(self.log_json_url_private, user=self.user2, status=[403])
+        self.assertEqual(response.status_code, 403)
+
+        response = self.app.get(self.log_html_url_private, user=self.user2, status=[403])
+        self.assertEqual(response.status_code, 403)
+
+    def test_access_private_logs_no_user(self):
+        response = self.app.get(self.log_json_url_private, status=[403])
+        self.assertEqual(response.status_code, 403)
+
+        response = self.app.get(self.log_html_url_private, status=[403])
+        self.assertEqual(response.status_code, 403)

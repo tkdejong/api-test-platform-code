@@ -35,28 +35,42 @@
                     {% trans "Session type " %}{{ object.name }}
                 </div>
                 <div class="card-body">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th class="table__heading">{% trans "Http method" %}</th>
-                                <th class="table__heading">{% trans "Url" %}</th>
-                                <th class="table__heading">{% trans "Query params" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for sc in scenario_cases %}
+                    {% for endpoint, cases in grouped_scenario_cases %}
+                        <h5>{{ endpoint.scenario_collection }}</h5>
+                        {% if endpoint.url %}
+                            <p><a href="{{ endpoint.url }}">{{ endpoint.url }}</a></p>
+                        {% endif %}
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>{{sc.http_method}}</td>
-                                    <td>{{sc.url}}</td>
-                                    <td>
-                                    {% for qp in sc.queryparamsscenario_set.all %}
-                                        {{qp.name}}: {{qp.expected_value}}
-                                    {% endfor %}
-                                    </td>
+                                    <th class="table__heading">{% trans "Http method" %}</th>
+                                    <th class="table__heading">{% trans "Url" %}</th>
+                                    <th class="table__heading">{% trans "Query params" %}</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for sc in cases %}
+                                    {% if sc.description %}
+                                        <tr>
+                                            <td><b>{% trans "Description: " %}</b>{{ sc.description }}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr class="border_bottom">
+                                        <td>{{sc.http_method}}</td>
+                                        <td>{{sc.url}}</td>
+                                        <td>
+                                        {% for qp in sc.queryparamsscenario_set.all %}
+                                            {{qp.name}}: {{qp.expected_value}}
+                                        {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
                 </div>
             </div>
         </div>
