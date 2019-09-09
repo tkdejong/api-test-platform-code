@@ -9,9 +9,13 @@ from django.urls import reverse
 
 from rest_framework import status
 from vng.accounts.models import User
+from vng.postman.choices import ResultChoices
 
 from ..models import PostmanTestResult
-from .factories import ServerRunFactory, TestScenarioFactory, TestScenarioUrlFactory, PostmanTestFactory, PostmanTestNoAssertionFactory, EndpointFactory
+from .factories import (
+    ServerRunFactory, TestScenarioFactory, TestScenarioUrlFactory, PostmanTestFactory,
+    PostmanTestNoAssertionFactory, EndpointFactory, PostmanTestResultFactory
+)
 from ...utils.factories import UserFactory
 
 
@@ -209,5 +213,69 @@ class PostmanTestAPITests(TransactionWebTest):
             'version': '1.0.0'
         })
         response = self.app.get(get_versions_url, user=self.user, status='*')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class ServerRunLatestBadgeAPITests(TransactionWebTest):
+    def setUp(self):
+        self.user1, self.user2 = UserFactory.create_batch(2)
+        self.test_scenario1 = TestScenarioFactory.create(name='ZGW api tests')
+        self.test_scenario2 = TestScenarioFactory.create(name='ZGW oas tests')
+        self.test_scenario3 = TestScenarioFactory.create(name='APT tests')
+        self.server_run1 = ServerRunFactory.create(test_scenario=self.test_scenario1, stopped='2019-01-01T12:00:00Z', user=self.user1)
+        self.server_run2 = ServerRunFactory.create(test_scenario=self.test_scenario1, stopped='2019-01-01T13:00:00Z', user=self.user1)
+        self.server_run3 = ServerRunFactory.create(test_scenario=self.test_scenario1, stopped='2019-01-01T14:00:00Z', user=self.user2)
+        self.server_run4 = ServerRunFactory.create(test_scenario=self.test_scenario2, stopped='2019-01-01T14:00:00Z', user=self.user1)
+        PostmanTestResultFactory.create(server_run=self.server_run1, status=ResultChoices.failed)
+        PostmanTestResultFactory.create(server_run=self.server_run2, status=ResultChoices.success)
+        PostmanTestResultFactory.create(server_run=self.server_run3, status=ResultChoices.success)
+        PostmanTestResultFactory.create(server_run=self.server_run3, status=ResultChoices.failed)
+        PostmanTestResultFactory.create(server_run=self.server_run4, status=ResultChoices.failed)
+
+    def test_get_latest_success(self):
+        get_badge_url = reverse('apiv1server:latest-badge', kwargs={
+            'name': 'ZGW api tests',
+            'user': self.user1
+        })
+        response = self.app.get(get_badge_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json
+        expected_response = {
+            'schemaVersion': 1,
+            'label': 'API Test Platform (beta)',
+            'message': 'Success',
+            'color': 'green',
+            'isError': False
+        }
+        self.assertDictEqual(data, expected_response)
+
+    def test_get_latest_failure(self):
+        get_badge_url = reverse('apiv1server:latest-badge', kwargs={
+            'name': 'ZGW oas tests',
+            'user': self.user1
+        })
+        response = self.app.get(get_badge_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json
+        expected_response = {
+            'schemaVersion': 1,
+            'label': 'API Test Platform (beta)',
+            'message': 'Failed',
+            'color': 'red',
+            'isError': True
+        }
+        self.assertDictEqual(data, expected_response)
+
+    def test_get_latest_404(self):
+        get_badge_url = reverse('apiv1server:latest-badge', kwargs={
+            'name': 'nonexistent-test',
+            'user': self.user2
+        })
+        response = self.app.get(get_badge_url, status='*')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

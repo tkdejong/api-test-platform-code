@@ -226,6 +226,15 @@ class ServerRunOutputUuid(DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         server_run = context['object']
+
+        # Construct the URL of the changing badge
+        changing_badge_url = '{}://{}{}'.format(
+            self.request.scheme,
+            self.request.get_host(),
+            reverse('apiv1server:latest-badge', kwargs={'name': server_run.test_scenario.name, 'user': server_run.user})
+        )
+        context['changing_badge_url'] = changing_badge_url
+
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
         context["update_info"] = True
