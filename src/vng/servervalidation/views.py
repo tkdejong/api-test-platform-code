@@ -273,7 +273,10 @@ class ServerRunLogView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return HttpResponse(content=self.object.postmantestresult_set.get(pk=kwargs['test_result_pk']).log)
+        if self.request.user == self.object.user or self.object.test_scenario.public_logs:
+            return HttpResponse(content=self.object.postmantestresult_set.get(pk=kwargs['test_result_pk']).log)
+        else:
+            raise PermissionDenied
 
 
 class ServerRunLogJsonView(DetailView):
@@ -288,7 +291,10 @@ class ServerRunLogJsonView(DetailView):
         test_result_pk = self.kwargs.get('test_result_pk')
         test_result = self.object.postmantestresult_set.get(pk=test_result_pk)
         context['postman_test_result'] = test_result
-        return context
+        if self.request.user == test_result.server_run.user or test_result.server_run.test_scenario.public_logs:
+            return context
+        else:
+            raise PermissionDenied
 
 
 class ServerRunPdfView(PDFGenerator, ServerRunOutputUuid):
