@@ -1,4 +1,4 @@
-
+from datetime import date
 import json
 
 from django.shortcuts import get_object_or_404
@@ -29,7 +29,7 @@ from .task import execute_test
 from ..utils import choices
 
 
-def get_server_run_badge(server_run):
+def get_server_run_badge(server_run, label):
     res = server_run.get_execution_result()
     is_error = True
     if res is None:
@@ -44,7 +44,7 @@ def get_server_run_badge(server_run):
         color = 'red'
     result = {
         'schemaVersion': 1,
-        'label': 'API Test Platform (beta)',
+        'label': label,
         'message': message,
         'color': color,
         'isError': is_error,
@@ -117,7 +117,8 @@ class ResultServerViewShield(views.APIView):
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
-        return JsonResponse(get_server_run_badge(server))
+        date_stopped = date.strftime(server.stopped, '%Y-%m-%d %H:%m:%S')
+        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta) {}'.format(date_stopped)))
 
 
 class ResultServerView(views.APIView):
@@ -245,4 +246,4 @@ class ServerRunLatestResultView(views.APIView):
         ).order_by('-stopped').first()
         if not latest_server_run:
             raise Http404
-        return JsonResponse(get_server_run_badge(latest_server_run))
+        return JsonResponse(get_server_run_badge(latest_server_run, 'API Test Platform (beta)'))
