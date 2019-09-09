@@ -95,3 +95,14 @@ class EndpointFactory(Dmf):
 
     test_scenario_url = factory.SubFactory(TestScenarioUrlFactory)
     server_run = factory.SubFactory(ServerRunFactory)
+
+
+class PostmanTestResultFactory(Dmf):
+
+    class Meta:
+        model = PostmanTestResult
+
+    postman_test = factory.SubFactory(PostmanTestFactory)
+    server_run = factory.SubFactory(ServerRunFactory)
+    log = factory.django.FileField()
+    log_json = factory.django.FileField()
