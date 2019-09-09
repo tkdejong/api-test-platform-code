@@ -49,18 +49,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                    {% for sc in cases %}
+                                {% for sc in cases %}
+                                    {% if sc.description %}
                                         <tr>
-                                            <td>{{sc.http_method}}</td>
-                                            <td>{{sc.url}}</td>
-                                            <td>
-                                            {% for qp in sc.queryparamsscenario_set.all %}
-                                                {{qp.name}}: {{qp.expected_value}}
-                                            {% endfor %}
-                                            </td>
+                                            <td><b>{% trans "Description: " %}</b>{{ sc.description }}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
-                                    {% endfor %}
-
+                                    {% endif %}
+                                    <tr class="border_bottom">
+                                        <td>{{sc.http_method}}</td>
+                                        <td>{{sc.url}}</td>
+                                        <td>
+                                        {% for qp in sc.queryparamsscenario_set.all %}
+                                            {{qp.name}}: {{qp.expected_value}}
+                                        {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     {% endfor %}
