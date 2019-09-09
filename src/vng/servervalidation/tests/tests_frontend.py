@@ -364,3 +364,45 @@ class ServerRunPublicLogsTests(WebTest):
 
         self.assertNotContains(response, self.log_json_url_private)
         self.assertNotContains(response, self.log_html_url_private)
+
+    def test_access_public_logs_same_user(self):
+        response = self.app.get(self.log_json_url_public, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_public, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_public_logs_different_user(self):
+        response = self.app.get(self.log_json_url_public, user=self.user2)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_public, user=self.user2)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_public_logs_no_user(self):
+        response = self.app.get(self.log_json_url_public)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_public)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_private_logs_same_user(self):
+        response = self.app.get(self.log_json_url_private, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get(self.log_html_url_private, user=self.user1)
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_private_logs_different_user(self):
+        response = self.app.get(self.log_json_url_private, user=self.user2, status=[403])
+        self.assertEqual(response.status_code, 403)
+
+        response = self.app.get(self.log_html_url_private, user=self.user2, status=[403])
+        self.assertEqual(response.status_code, 403)
+
+    def test_access_private_logs_no_user(self):
+        response = self.app.get(self.log_json_url_private, status=[403])
+        self.assertEqual(response.status_code, 403)
+
+        response = self.app.get(self.log_html_url_private, status=[403])
+        self.assertEqual(response.status_code, 403)
