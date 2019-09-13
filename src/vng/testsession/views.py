@@ -71,7 +71,7 @@ class SessionFormView(FormView):
         form.instance.assign_name(self.request.user.id)
         form.instance.name = Session.assign_name(self.request.user.id)
         session = form.save()
-        bootstrap_session.delay(session.pk)
+        bootstrap_session.delay(session.uuid)
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -118,8 +118,8 @@ class SessionLogUpdateView(UpdateView):
     template_name = 'testsession/session-update.html'
     context_object_name = 'session'
     model = Session
-    slug_field = 'pk'
-    slug_url_kwarg = 'session_id'
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
     fields = [
         'supplier_name',
         'software_product',
@@ -156,7 +156,12 @@ class SessionLogUpdateView(UpdateView):
 class StopSession(OwnerSingleObject, View):
 
     model = Session
-    pk_name = 'session_id'
+    pk_name = 'uuid'
+
+    def get_object(self):
+        self.session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
+        return self.session
+
 
     def post(self, request, *args, **kwargs):
         session = self.get_object()
@@ -165,7 +170,7 @@ class StopSession(OwnerSingleObject, View):
 
         session.status = choices.StatusChoices.shutting_down
         session.save()
-        stop_session.delay(session.pk)
+        stop_session.delay(session.uuid)
         return HttpResponseRedirect(reverse('testsession:sessions'))
 
 

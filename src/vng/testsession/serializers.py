@@ -54,7 +54,7 @@ class SessionStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = [
-            'id',
+            'uuid',
             'session_type',
             'started',
             'stopped',
@@ -77,15 +77,14 @@ class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = [
-            'id',
+            'uuid',
             'session_type',
             'started',
             'stopped',
             'status',
             'exposedurl_set',
             'build_version',
-            'sandbox',
-            'uuid'
+            'sandbox'
         ]
         read_only_fields = ['started', 'stopped', 'status']
 
