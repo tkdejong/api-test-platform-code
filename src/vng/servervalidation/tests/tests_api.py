@@ -135,26 +135,31 @@ class TestNoAssertion(TransactionWebTest):
 
 class ServerValidationHiddenVarsTests(TransactionWebTest):
 
-    list_url = reverse('apiv1server:provider:api_server-run-list')
-
     def setUp(self):
-        self.user = UserFactory.create()
+        self.user, self.user2 = UserFactory.create_batch(2)
         self.test_scenario = PostmanTestFactory().test_scenario
 
-    def test_api_replace_hidden_vars_with_placeholders(self):
         tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
         tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
-        server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
-        _ = EndpointFactory(test_scenario_url=tsu1, server_run=server_run, url='https://url1.com/')
-        _ = EndpointFactory(test_scenario_url=tsu2, server_run=server_run, url='https://url2.com/')
-        response = self.app.get(self.list_url, user=self.user).json
+        self.server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/')
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/')
 
-        self.assertEqual(len(response), 1)
+        self.detail_url = reverse('apiv1server:provider:api_server-run-detail', kwargs={'uuid': self.server_run.uuid})
 
-        self.assertEqual(len(response[0]['endpoints']), 2)
 
-        endpoint1, endpoint2 = response[0]['endpoints']
-        self.assertEqual(endpoint1['value'], '(hidden)')
+    def test_api_provider_run_not_accessible_for_other_user(self):
+        response = self.app.get(self.detail_url, user=self.user2, status=[404])
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_api_show_hidden_vars_for_same_user(self):
+        response = self.app.get(self.detail_url, user=self.user).json
+
+        self.assertEqual(len(response['endpoints']), 2)
+
+        endpoint1, endpoint2 = response['endpoints']
+        self.assertEqual(endpoint1['value'], 'https://url1.com/')
         self.assertEqual(endpoint1['name'], 'tsu1')
 
         self.assertEqual(endpoint2['value'], 'https://url2.com/')
