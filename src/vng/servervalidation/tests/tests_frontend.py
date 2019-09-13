@@ -256,20 +256,34 @@ class TestScenarioDetail(WebTest):
 class ServerRunHiddenVarsTests(WebTest):
 
     def setUp(self):
-        self.user = UserFactory.create()
+        self.user, self.user2 = UserFactory.create_batch(2)
         self.test_scenario = PostmanTestFactory().test_scenario
 
-    def test_detail_page_replace_hidden_vars_with_placeholders(self):
         tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
         tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
-        server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
-        _ = EndpointFactory(test_scenario_url=tsu1, server_run=server_run, url='https://url1.com/')
-        _ = EndpointFactory(test_scenario_url=tsu2, server_run=server_run, url='https://url2.com/')
+        self.server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/')
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/')
 
-        detail_url = reverse('server_run:server-run_detail', kwargs={'pk': server_run.pk})
-        response = self.app.get(detail_url, user=self.user)
+        self.detail_url = reverse('server_run:server-run_detail_uuid', kwargs={'uuid': self.server_run.uuid})
+
+
+    def test_detail_page_replace_hidden_vars_with_placeholders_for_other_user(self):
+        response = self.app.get(self.detail_url, user=self.user2)
 
         self.assertNotContains(response, 'https://url1.com/')
+        self.assertContains(response, 'https://url2.com/')
+
+    def test_detail_page_replace_hidden_vars_with_placeholders_for_no_user(self):
+        response = self.app.get(self.detail_url)
+
+        self.assertNotContains(response, 'https://url1.com/')
+        self.assertContains(response, 'https://url2.com/')
+
+    def test_detail_page_hidden_vars_visible_for_same_user(self):
+        response = self.app.get(self.detail_url, user=self.user)
+
+        self.assertContains(response, 'https://url1.com/')
         self.assertContains(response, 'https://url2.com/')
 
 
