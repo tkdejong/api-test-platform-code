@@ -47,7 +47,7 @@
                         {% endblocktrans %}
                     </p>
                     <span display="block" style='width: 250px;' class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
-                        <a href="{% url 'server_run:server-run_detail_uuid' object.uuid %}">
+                        <a href="{% url 'server_run:server-run_detail' object.uuid %}">
 
                             <img id="badge" style='width:250px' alt="" src="">
                         </a>
@@ -381,14 +381,14 @@
             var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}})]({{changing_badge_url}})'
 
             var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
-                + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail_uuid' object.uuid %}">\n'
+                + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail' object.uuid %}">\n'
                 + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}"></span></a>'
         } else if(id == "providerRunBadge") {
             document.getElementById("badge-description").innerHTML = "Shown below is the persistent badge for this specific provider run.";
             document.getElementById("badge").src = "https://img.shields.io/endpoint.svg?style=for-the-badge&url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:api_server-run-shield' object.uuid %}"
-            var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url={{request.scheme}}://{{request.get_host}}{% url "apiv1server:api_server-run-shield" object.uuid %})]({{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail_uuid' object.uuid %})'
+            var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url={{request.scheme}}://{{request.get_host}}{% url "apiv1server:api_server-run-shield" object.uuid %})]({{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail' object.uuid %})'
             var htmlSnippet= '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
-                + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail_uuid' object.uuid %}">\n'
+                + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail' object.uuid %}">\n'
                 + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&url={{request.scheme}}://{{request.get_host}}{% url "apiv1server:api_server-run-shield" object.uuid %}"></span></a>'
         }
 
