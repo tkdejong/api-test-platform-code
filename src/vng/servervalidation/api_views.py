@@ -1,4 +1,3 @@
-from datetime import date
 import json
 
 from django.shortcuts import get_object_or_404
@@ -117,8 +116,7 @@ class ResultServerViewShield(views.APIView):
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
-        date_stopped = date.strftime(server.stopped, '%Y-%m-%d %H:%m:%S')
-        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta) {}'.format(date_stopped)))
+        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta)'))
 
 
 class ResultServerView(views.APIView):
