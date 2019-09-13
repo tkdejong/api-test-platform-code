@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls import include, url
+from django.urls import path
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import TemplateView
@@ -15,4 +16,5 @@ urlpatterns = base_urlpatterns + [
     url(r'^api/v1/', include('vng.openApiInspector.urls_api', namespace='apiv1inspector')),
     url(r'^server/', include('vng.servervalidation.urls', namespace='server_run')),
     url(r'^', include('vng.testsession.urls', namespace='testsession')),
+    path('', include('django.contrib.flatpages.urls')),
 ]

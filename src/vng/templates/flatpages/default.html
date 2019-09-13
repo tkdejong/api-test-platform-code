@@ -1,0 +1,29 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load subdomainurls %}
+{% load i18n %}
+
+
+{% block title %}{{ flatpage.title }}{% endblock %}
+
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    {{ flatpage.title }}
+                </div>
+                <div class="card-body">
+                    {{ flatpage.content }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
