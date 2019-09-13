@@ -16,5 +16,5 @@ urlpatterns = base_urlpatterns + [
     url(r'^api/v1/', include('vng.openApiInspector.urls_api', namespace='apiv1inspector')),
     url(r'^server/', include('vng.servervalidation.urls', namespace='server_run')),
     url(r'^', include('vng.testsession.urls', namespace='testsession')),
-    path('', include('django.contrib.flatpages.urls')),
+    url(r'^pages/', include('django.contrib.flatpages.urls')),
 ]

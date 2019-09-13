@@ -57,7 +57,7 @@
         </li>
         {% for flatpage in flatpages %}
             <li class="nav-item ">
-                <a class="nav-link" href="{{ flatpage.url }}">
+                <a class="nav-link" href="/pages{{ flatpage.url }}">
                     <i class="nav-icon icon-info"></i>{{ flatpage.title }}</a>
             </li>
         {% endfor %}
