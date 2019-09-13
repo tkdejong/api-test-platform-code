@@ -56,6 +56,7 @@ class SessionViewStatusSet(
     authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
     queryset = Session.objects.all()
+    lookup_field = 'uuid'
 
 
 class SessionViewSet(
@@ -82,6 +83,7 @@ class SessionViewSet(
     serializer_class = SessionSerializer
     authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsOwner)
+    lookup_field = 'uuid'
 
     def get_queryset(self):
         return Session.objects.all().prefetch_related('exposedurl_set').filter(user=self.request.user)
@@ -95,7 +97,7 @@ class SessionViewSet(
             started=timezone.now()
         )
         try:
-            bootstrap_session(session.id)
+            bootstrap_session(session.uuid)
         except Exception as e:
             logger.exception(e)
             session.delete()
@@ -114,17 +116,17 @@ class StopSessionView(generics.ListAPIView):
     def perform_operations(self, session):
         if session.status == choices.StatusChoices.stopped or session.status == choices.StatusChoices.shutting_down:
             return
-        stop_session.delay(session.pk)
+        stop_session.delay(session.uuid)
         session.status = choices.StatusChoices.shutting_down
         session.save()
-        run_tests.delay(session.pk)
+        run_tests.delay(session.uuid)
 
     def get_queryset(self):
-        pk = self.kwargs.get('pk')
-        if not pk:
+        uuid = self.kwargs.get('uuid')
+        if not uuid:
             return ScenarioCase.objects.none()
 
-        session = get_object_or_404(Session, id=pk)
+        session = get_object_or_404(Session, uuid=uuid)
         scenarios = session.session_type.scenario_cases
         if session.user != self.request.user:
             return HttpResponseForbidden()
@@ -141,7 +143,7 @@ class ResultSessionView(views.APIView):
     authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, uuid, *args, **kwargs):
         res = None
         session = self.get_object()
         if session.user != request.user:
@@ -188,7 +190,7 @@ class ResultSessionView(views.APIView):
         return response
 
     def get_object(self):
-        self.session = get_object_or_404(Session, pk=self.kwargs['pk'])
+        self.session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
         return self.session
 
 

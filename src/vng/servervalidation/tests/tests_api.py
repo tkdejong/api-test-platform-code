@@ -75,14 +75,14 @@ class RetrieveCreationTest(TransactionWebTest):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['secret'], self.server_run['secret'])
-        self.server_run['pk'] = call['id']
+        self.server_run['uuid'] = call['uuid']
         call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={
-            'pk': self.server_run['pk']
+            'uuid': self.server_run['uuid']
         }), headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['status'], 'stopped')
         call = self.app.get(reverse('apiv1server:provider_result', kwargs={
-            'pk': self.server_run['pk']
+            'uuid': self.server_run['uuid']
         }), headers=self.get_user_key())
         ptr = PostmanTestResult.objects.filter(postman_test__test_scenario=self.test_scenario.pk).first()
         self.assertEqual(call.json[0]['status'], ptr.status)
@@ -91,14 +91,14 @@ class RetrieveCreationTest(TransactionWebTest):
         headers = self.get_user_key()
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=headers)
         parsed = get_object(call.body)
-        call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={'pk': parsed['id']}).format(parsed['id']), headers=headers)
+        call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={'uuid': parsed['uuid']}).format(parsed['uuid']), headers=headers)
 
     def test_data_integrity(self):
         fake_pk = 999
 
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
         parsed = get_object(call.body)
-        self.assertNotEqual(parsed['id'], fake_pk)
+        self.assertNotEqual(parsed['uuid'], fake_pk)
 
     def test_creation_server_run_auth(self):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, expect_errors=True)
@@ -121,13 +121,13 @@ class TestNoAssertion(TransactionWebTest):
     def _test_creation(self):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
         call = call.json
-        self.server_run['pk'] = call['id']
+        self.server_run['uuid'] = call['uuid']
         self.assertEqual(call['test_scenario'], self.server_run['test_scenario'])
 
     def test_retrieve(self):
         self._test_creation()
         call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={
-            'pk': self.server_run['pk']
+            'uuid': self.server_run['uuid']
         }), headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['status'], 'stopped')
@@ -135,26 +135,31 @@ class TestNoAssertion(TransactionWebTest):
 
 class ServerValidationHiddenVarsTests(TransactionWebTest):
 
-    list_url = reverse('apiv1server:provider:api_server-run-list')
-
     def setUp(self):
-        self.user = UserFactory.create()
+        self.user, self.user2 = UserFactory.create_batch(2)
         self.test_scenario = PostmanTestFactory().test_scenario
 
-    def test_api_replace_hidden_vars_with_placeholders(self):
         tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
         tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
-        server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
-        _ = EndpointFactory(test_scenario_url=tsu1, server_run=server_run, url='https://url1.com/')
-        _ = EndpointFactory(test_scenario_url=tsu2, server_run=server_run, url='https://url2.com/')
-        response = self.app.get(self.list_url, user=self.user).json
+        self.server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/')
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/')
 
-        self.assertEqual(len(response), 1)
+        self.detail_url = reverse('apiv1server:provider:api_server-run-detail', kwargs={'uuid': self.server_run.uuid})
 
-        self.assertEqual(len(response[0]['endpoints']), 2)
 
-        endpoint1, endpoint2 = response[0]['endpoints']
-        self.assertEqual(endpoint1['value'], '(hidden)')
+    def test_api_provider_run_not_accessible_for_other_user(self):
+        response = self.app.get(self.detail_url, user=self.user2, status=[404])
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_api_show_hidden_vars_for_same_user(self):
+        response = self.app.get(self.detail_url, user=self.user).json
+
+        self.assertEqual(len(response['endpoints']), 2)
+
+        endpoint1, endpoint2 = response['endpoints']
+        self.assertEqual(endpoint1['value'], 'https://url1.com/')
         self.assertEqual(endpoint1['name'], 'tsu1')
 
         self.assertEqual(endpoint2['value'], 'https://url2.com/')

@@ -24,11 +24,11 @@ logger = get_task_logger(__name__)
 
 
 @app.task
-def stop_session(session_pk):
-    session = Session.objects.get(pk=session_pk)
+def stop_session(session_uuid):
+    session = Session.objects.get(uuid=session_uuid)
     if session.status == choices.StatusChoices.stopped:
         return
-    run_tests(session.pk)
+    run_tests(session.uuid)
     eu = ExposedUrl.objects.filter(session=session)
     for e_url in eu:
         if e_url.vng_endpoint.url is None:
@@ -67,7 +67,7 @@ def purge_sessions():
             .filter(status=choices.StatusChoices.running) \
             .filter(Q(exposedurl__vng_endpoint__docker_image__isnull=False) | Q(session_type__ZGW_images=True)):
         purged = True
-        stop_session(session.pk)
+        stop_session(session.uuid)
     return purged
 
 
@@ -215,12 +215,12 @@ def external_ip_pooling(k8s, session, n_trial=15, purge=True, percentage=36, max
 
 
 @app.task
-def bootstrap_session(session_pk, purged=False):
+def bootstrap_session(session_uuid, purged=False):
     '''
     Create all the necessary endpoint and exposes it so they can be used as proxy
     In case there is one or multiple docker images linked, it starts all of them
     '''
-    session = Session.objects.get(pk=session_pk)
+    session = Session.objects.get(uuid=session_uuid)
     if session.session_type.ZGW_images:
         ZGW_deploy(session)
         return
@@ -295,8 +295,8 @@ def bootstrap_session(session_pk, purged=False):
 
 
 @app.task
-def run_tests(session_pk):
-    session = Session.objects.get(pk=session_pk)
+def run_tests(session_uuid):
+    session = Session.objects.get(uuid=session_uuid)
     exposed_url = ExposedUrl.objects.filter(session=session,
                                             vng_endpoint__session_type=session.session_type)
 

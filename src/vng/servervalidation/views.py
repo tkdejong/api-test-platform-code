@@ -191,7 +191,7 @@ class ServerRunOutputUpdate(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy(
-            'server_run:server-run_detail_uuid',
+            'server_run:server-run_detail',
             kwargs={'uuid': self.object.uuid}
         )
 
@@ -219,7 +219,7 @@ class ServerRunOutputUuid(DetailView):
 
     def get_success_url(self):
         return reverse_lazy(
-            'server_run:server-run_detail_uuid',
+            'server_run:server-run_detail',
             kwargs={'uuid': self.object.uuid}
         )
 

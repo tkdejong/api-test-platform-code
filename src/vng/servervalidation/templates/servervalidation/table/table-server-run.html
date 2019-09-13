@@ -25,10 +25,10 @@
 
         <td>{{ ep.test_scenario_url.name }}</td>
         <td>
-            {% if not ep.test_scenario_url.hidden %}
-                {{ ep.url}}
+            {% if not ep.test_scenario_url.hidden or request.user == server_run.user %}
+                {{ ep.url }}
             {% else %}
-                <i>{% trans "This field was marked as hidden" %}</i>
+                <i>{% trans "hidden" %}</i>
             {% endif %}
         </td>
     </tr>

@@ -19,7 +19,7 @@ urlpatterns = [
     re_path(r'provider-latest-badge/(?P<name>[^/.]+)/(?P<user>[^/.]+)/', api_views.ServerRunLatestResultView.as_view(), name='latest-badge'),
     re_path(r'schema/openapi(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('schema', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('provider-run/<int:pk>/trigger/', api_views.TriggerServerRunView.as_view({'put': 'update'}), name='provider'),
-    path('provider-run/<int:pk>/result/', api_views.ResultServerView.as_view(), name='provider_result'),
+    path('provider-run/<uuid:uuid>/trigger/', api_views.TriggerServerRunView.as_view({'put': 'update'}), name='provider'),
+    path('provider-run/<uuid:uuid>/result/', api_views.ResultServerView.as_view(), name='provider_result'),
     path('', include((router.urls, 'server-api'), namespace='provider')),
 ]

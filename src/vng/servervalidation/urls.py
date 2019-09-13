@@ -17,8 +17,7 @@ urlpatterns = [
     path('<uuid:uuid>/log_json/<int:test_result_pk>/', views.ServerRunLogJsonView.as_view(), name='server-run_detail_log_json'),
     path('<uuid:uuid>/log/<int:test_result_pk>/', views.ServerRunLogView.as_view(), name='server-run_detail_log'),
     path('<uuid:uuid>/pdf/<int:test_result_pk>', views.ServerRunPdfView.as_view(), name='server-run_detail_pdf'),
-    path('<int:pk>/', views.ServerRunOutput.as_view(), name='server-run_detail'),
     path('<uuid:uuid>/update/', views.ServerRunOutputUpdate.as_view(), name='server-run_info-update'),
-    path('<uuid:uuid>/', views.ServerRunOutputUuid.as_view(), name='server-run_detail_uuid'),
+    path('<uuid:uuid>/', views.ServerRunOutputUuid.as_view(), name='server-run_detail'),
     path('', views.ServerRunList.as_view(), name='server-run_list'),
 ]
