@@ -75,14 +75,14 @@ class RetrieveCreationTest(TransactionWebTest):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['secret'], self.server_run['secret'])
-        self.server_run['pk'] = call['id']
+        self.server_run['uuid'] = call['uuid']
         call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={
-            'pk': self.server_run['pk']
+            'uuid': self.server_run['uuid']
         }), headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['status'], 'stopped')
         call = self.app.get(reverse('apiv1server:provider_result', kwargs={
-            'pk': self.server_run['pk']
+            'uuid': self.server_run['uuid']
         }), headers=self.get_user_key())
         ptr = PostmanTestResult.objects.filter(postman_test__test_scenario=self.test_scenario.pk).first()
         self.assertEqual(call.json[0]['status'], ptr.status)
@@ -91,14 +91,14 @@ class RetrieveCreationTest(TransactionWebTest):
         headers = self.get_user_key()
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=headers)
         parsed = get_object(call.body)
-        call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={'pk': parsed['id']}).format(parsed['id']), headers=headers)
+        call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={'uuid': parsed['uuid']}).format(parsed['uuid']), headers=headers)
 
     def test_data_integrity(self):
         fake_pk = 999
 
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
         parsed = get_object(call.body)
-        self.assertNotEqual(parsed['id'], fake_pk)
+        self.assertNotEqual(parsed['uuid'], fake_pk)
 
     def test_creation_server_run_auth(self):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, expect_errors=True)
@@ -121,13 +121,13 @@ class TestNoAssertion(TransactionWebTest):
     def _test_creation(self):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
         call = call.json
-        self.server_run['pk'] = call['id']
+        self.server_run['uuid'] = call['uuid']
         self.assertEqual(call['test_scenario'], self.server_run['test_scenario'])
 
     def test_retrieve(self):
         self._test_creation()
         call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={
-            'pk': self.server_run['pk']
+            'uuid': self.server_run['uuid']
         }), headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['status'], 'stopped')

@@ -83,7 +83,7 @@ class TestCreation(WebTest):
         server = ServerRun.objects.filter(status=choices.StatusChoices.stopped)[0]
 
         url = reverse('server_run:server-run_detail', kwargs={
-            'pk': server.pk
+            'uuid': server.uuid
         })
         call = self.app.get(url, user=self.user)
 
@@ -111,7 +111,7 @@ class TestCreation(WebTest):
     def test_postman_outcome(self):
         server = ServerRun.objects.filter(user=self.user).order_by('-started')[0]
         url = reverse('server_run:server-run_detail', kwargs={
-            'pk': server.pk
+            'uuid': server.uuid
         })
         call = self.app.get(url, user=self.user)
         self.assertIn(str(server.pk), call.text)
@@ -173,7 +173,7 @@ class IntegrationTest(WebTest):
         self.user = self.server_s.user
 
     def test_access(self):
-        call = self.app.get(reverse('server_run:server-run_detail_uuid', kwargs={
+        call = self.app.get(reverse('server_run:server-run_detail', kwargs={
             'uuid': self.server.uuid
         }))
         self.assertIn(str(self.server.id), call.text)
@@ -200,7 +200,7 @@ class IntegrationTest(WebTest):
         new_server = ServerRun.objects.latest('id')
 
         call = self.app.get(reverse('server_run:server-run_detail', kwargs={
-            'pk': new_server.id
+            'uuid': new_server.uuid
         }))
         self.assertIn(str(new_server.uuid), call.text)
         call = self.app.get(reverse('server_run:server-run_list'), user=self.user)
@@ -265,7 +265,7 @@ class ServerRunHiddenVarsTests(WebTest):
         _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/')
         _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/')
 
-        self.detail_url = reverse('server_run:server-run_detail_uuid', kwargs={'uuid': self.server_run.uuid})
+        self.detail_url = reverse('server_run:server-run_detail', kwargs={'uuid': self.server_run.uuid})
 
 
     def test_detail_page_replace_hidden_vars_with_placeholders_for_other_user(self):
@@ -298,7 +298,7 @@ class ServerRunPublicLogsTests(WebTest):
             server_run__user=self.user1,
         )
         server_run = test_result_public.server_run
-        self.detail_url_public = reverse('server_run:server-run_detail_uuid', kwargs={'uuid': server_run.uuid})
+        self.detail_url_public = reverse('server_run:server-run_detail', kwargs={'uuid': server_run.uuid})
         self.log_json_url_public = reverse('server_run:server-run_detail_log_json', kwargs={
             'uuid': server_run.uuid,
             'test_result_pk': test_result_public.pk,
@@ -323,7 +323,7 @@ class ServerRunPublicLogsTests(WebTest):
             server_run__user=self.user1,
         )
         server_run = test_result_private.server_run
-        self.detail_url_private = reverse('server_run:server-run_detail_uuid', kwargs={'uuid': server_run.uuid})
+        self.detail_url_private = reverse('server_run:server-run_detail', kwargs={'uuid': server_run.uuid})
         self.log_json_url_private = reverse('server_run:server-run_detail_log_json', kwargs={
             'uuid': server_run.uuid,
             'test_result_pk': test_result_private.pk,
