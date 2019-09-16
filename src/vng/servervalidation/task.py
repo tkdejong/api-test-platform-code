@@ -138,7 +138,7 @@ def send_email_failure(sl):
     })
 
     send_mail(
-        _('Failure of scheduled test'),
+        _('Results of scheduled tests'),
         msg_html,
         settings.DEFAULT_FROM_EMAIL,
         [sl[0][0].user.email],
