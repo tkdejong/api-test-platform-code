@@ -138,7 +138,7 @@ class CreationAndDeletion(WebTest):
 
         session = Session.objects.all().order_by('-id').first()
         self.app.post(reverse('testsession:stop_session', kwargs={
-            'session_id': session.id
+            'uuid': session.uuid
         }), user=session.user)
 
         self.app.get(reverse('testsession:session_log', kwargs={
@@ -149,9 +149,9 @@ class CreationAndDeletion(WebTest):
         response = self.app.post_json(reverse('apiv1session:test_session-list'), {
             'session_type': self.session_type_docker.name
         }, headers=self.head)
-        session_id = response.json['id']
+        session_uuid = response.json['uuid']
         if settings.ENVIRONMENT != 'jenkins':
-            self.app.post(reverse('testsession:stop_session', kwargs={'session_id': session_id}), headers=self.head)
+            self.app.post(reverse('testsession:stop_session', kwargs={'uuid': session_uuid}), headers=self.head)
 
     def test_session_creation_permission(self):
         Session.objects.all().delete()
@@ -170,13 +170,13 @@ class CreationAndDeletion(WebTest):
         head = {'Authorization': 'Token {}'.format(key)}
         call = self.app.post(reverse('apiv1session:test_session-list'), session, headers=head)
         response_parsed = get_object(call.body)
-        session = Session.objects.filter(pk=response_parsed['id'])[0]
+        session = Session.objects.filter(uuid=response_parsed['uuid'])[0]
         user = User.objects.all().first()
         self.assertEqual(session.user.pk, user.pk)
 
     def test_stop_session_no_auth(self):
         session = SessionFactory()
-        call = self.app.post(reverse('testsession:stop_session', kwargs={'session_id': session.id}), status=302)
+        call = self.app.post(reverse('testsession:stop_session', kwargs={'uuid': session.uuid}), status=302)
 
 
 @override_settings(SUBDOMAIN_SEPARATOR='-')
@@ -263,16 +263,16 @@ class TestLog(WebTest):
         ]), headers=head)
         call = get_object(call.body)
         url = call['exposedurl_set'][0]['subdomain']
-        session_id = call['id']
+        session_uuid = call['uuid']
         http_host = get_subdomain(url)
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(http_host)})
-        call = self.app.get(reverse('apiv1session:stop_session', kwargs={'pk': session_id}))
+        call = self.app.get(reverse('apiv1session:stop_session', kwargs={'uuid': session_uuid}))
         call = get_object(call.body)
         self.assertEqual(call, [])
-        session = Session.objects.get(pk=session_id)
+        session = Session.objects.get(uuid=session_uuid)
         self.assertEqual(session.status, choices.StatusChoices.stopped)
 
-        call = self.app.get(reverse('apiv1session:result_session', kwargs={'pk': session_id}))
+        call = self.app.get(reverse('apiv1session:result_session', kwargs={'uuid': session_uuid}))
         call = get_object(call.body)
         self.assertEqual(call['result'], 'No scenario cases available')
 
@@ -287,7 +287,7 @@ class TestLog(WebTest):
     def test_exposed_urls(self):
         call = self.app.get(reverse("apiv1session:test_session-list"), user=self.session.user)
         res = call.json
-        session = Session.objects.get(id=res[0]['id'])
+        session = Session.objects.get(uuid=res[0]['uuid'])
         endpoint = VNGEndpoint.objects.get(name=res[0]['exposedurl_set'][0]['vng_endpoint'])
         self.assertEqual(endpoint.session_type, session.session_type)
 
@@ -567,7 +567,7 @@ class TestAllProcedure(WebTest):
     def _test_stop_session(self):
         self.session = Session.objects.filter(user=self.user).filter(status=choices.StatusChoices.running)[0]
         url = reverse('testsession:stop_session', kwargs={
-            'session_id': self.session.pk,
+            'uuid': self.session.uuid,
         })
         call = self.app.post(url, user=self.session.user).follow()
         self.assertIn('Stopped', call.text)
@@ -597,7 +597,7 @@ class TestAllProcedure(WebTest):
         self._test_create_session()
         self.session = Session.objects.filter(user=self.user).filter(status=choices.StatusChoices.running)[0]
         url = reverse('testsession:stop_session', kwargs={
-            'session_id': self.session.pk,
+            'uuid': self.session.uuid,
         })
         call = self.app.post(url, user=self.session.user).follow()
         call = self.app.get(reverse('testsession:session_log', kwargs={
@@ -622,7 +622,7 @@ class TestAllProcedure(WebTest):
         call = self.app.get(
             reverse(
                 'testsession:session_update',
-                kwargs={'session_id': session.id}),
+                kwargs={'uuid': session.uuid}),
             user=self.user
         )
         form = call.forms[1]
@@ -662,17 +662,17 @@ class TestLogNewman(WebTest):
             ('session_type', self.vng_endpoint.session_type.name),
         ]), headers=self.head)
         call = get_object(call.body)
-        session_id = call['id']
+        session_uuid = call['uuid']
         url = call['exposedurl_set'][0]['subdomain']
 
         http_host = get_subdomain(call['exposedurl_set'][0]['subdomain'])
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(http_host)})
 
-        call = self.app.get(reverse('apiv1session:stop_session', kwargs={'pk': session_id}))
+        call = self.app.get(reverse('apiv1session:stop_session', kwargs={'uuid': session_uuid}))
         call = get_object(call.body)
         self.assertEqual(len(call), 2)
 
-        call = self.app.get(reverse('apiv1session:result_session', kwargs={'pk': session_id}))
+        call = self.app.get(reverse('apiv1session:result_session', kwargs={'uuid': session_uuid}))
         call = get_object(call.body)
         self.assertEqual(call['result'], 'Geen oproep uitgevoerd')
 
@@ -696,7 +696,7 @@ class TestHeaderInjection(WebTest):
             ('session_type', self.endpoint.session_type.name),
         ]), headers=self.head)
         call = get_object(call.body)
-        session_id = call['id']
+        session_uuid = call['uuid']
         url = call['exposedurl_set'][0]['subdomain']
 
         http_host = get_subdomain(call['exposedurl_set'][0]['subdomain'])
@@ -857,7 +857,7 @@ class TestPostmanRun(WebTest):
         self.eu = ExposedUrlFactory(session=self.session, vng_endpoint=self.endpoint)
 
     def test_rewrite(self):
-        run_tests(self.session.id)
+        run_tests(self.session.uuid)
         self.assertTrue(ExposedUrl.objects.get(id=self.eu.id).test_session.is_success_test())
 
 

@@ -37,14 +37,6 @@ class EndpointSerializer(serializers.ModelSerializer):
         except Exception:
             raise serializers.ValidationError("The urls names provided do not match")
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-
-        # If the variable was marked as hidden, show a generic hidden output
-        if instance.test_scenario_url.hidden:
-            ret['value'] = '(hidden)'
-        return ret
-
 
 class ServerRunSerializer(serializers.ModelSerializer):
 
@@ -58,7 +50,7 @@ class ServerRunSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServerRun
         fields = [
-            'id',
+            'uuid',
             'test_scenario',
             'started',
             'stopped',
@@ -67,8 +59,7 @@ class ServerRunSerializer(serializers.ModelSerializer):
             'endpoints',
             'status',
             'percentage_exec',
-            'status_exec',
-            'uuid'
+            'status_exec'
         ]
         read_only_fields = ['id', 'started', 'stopped', 'status']
 

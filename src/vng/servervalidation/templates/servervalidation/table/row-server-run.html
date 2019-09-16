@@ -3,7 +3,7 @@
 {% spaceless %}
     <tr>
         <td>
-        <a href="{% url 'server_run:server-run_detail_uuid' server_run.uuid %}">#{{ server_run.id|unlocalize }}</a>
+        <a href="{% url 'server_run:server-run_detail' server_run.uuid %}">#{{ server_run.id|unlocalize }}</a>
         </td>
         <td>
             {% if server_run.status == choices.running %}
@@ -74,7 +74,7 @@
     </td>
     <td>
         <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
-            <a href="{% url 'server_run:server-run_detail_uuid' server_run.uuid %}">
+            <a href="{% url 'server_run:server-run_detail' server_run.uuid %}">
                 <img style='height:30px ' alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:api_server-run-shield' server_run.uuid %}">
             </a>
         </span>
