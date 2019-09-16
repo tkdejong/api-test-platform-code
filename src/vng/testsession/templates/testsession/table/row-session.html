@@ -45,7 +45,7 @@
         </td>
 
         {% if session.is_starting and session.deploy_status %}
-            <td class='starting' id='test' class='td-20' session_id='{{session.id|unlocalize}}' >
+            <td class='starting' id='test' class='td-20' session_id='{{session.id|unlocalize}}' session_uuid='{{session.uuid}}'>
                 <div class="progress-group">
                     <div class="progress-group-header">
                         <i class="cui-cloud progress-group-icon"></i>
@@ -82,7 +82,7 @@
         {% endif %}
         <td>
             {% if session.is_running %}
-                <form method="POST" action="{% url 'testsession:stop_session' session.id %}">
+                <form method="POST" action="{% url 'testsession:stop_session' session.uuid %}">
                     {% csrf_token %}
                     <input type="submit" type="button" class="btn btn-primary" value="Stop">
                 </form>
@@ -93,7 +93,7 @@
                     <tr>
                         <td>
                             {% if endpoint.test_session %}
-                            <input type="button" class="btn btn-primary" value="{{endpoint.vng_endpoint.name}} Data test report" onclick="location.href = '{% url 'testsession:session-test_report' endpoint.session.id endpoint.test_session.id %}';">
+                            <input type="button" class="btn btn-primary" value="{{endpoint.vng_endpoint.name}} Data test report" onclick="location.href = '{% url 'testsession:session-test_report' endpoint.session.uuid endpoint.test_session.id %}';">
                             {% endif %}
                         <td>
                     </tr>

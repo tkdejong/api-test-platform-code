@@ -1,4 +1,3 @@
-from datetime import date
 import json
 
 from django.shortcuts import get_object_or_404
@@ -77,6 +76,7 @@ class ServerRunViewSet(
     authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ServerRunSerializer
+    lookup_field = 'uuid'
 
     @swagger_auto_schema(request_body=ServerRunPayloadExample)
     def create(self, *args, **kwargs):
@@ -99,12 +99,12 @@ class TriggerServerRunView(viewsets.ViewSet):
     authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
 
-    def update(self, request, pk):
-        server = get_object_or_404(ServerRun, pk=pk)
+    def update(self, request, uuid):
+        server = get_object_or_404(ServerRun, uuid=uuid)
         if server.status == choices.StatusWithScheduledChoices.stopped:
             raise Http404("Server already stopped")
         execute_test.delay(server.pk, scheduled=True)
-        return JsonResponse({"asd": pk})
+        return JsonResponse({"asd": uuid})
 
 
 class ResultServerViewShield(views.APIView):
@@ -117,8 +117,7 @@ class ResultServerViewShield(views.APIView):
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
-        date_stopped = date.strftime(server.stopped, '%Y-%m-%d %H:%m:%S')
-        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta) {}'.format(date_stopped)))
+        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta)'))
 
 
 class ResultServerView(views.APIView):
@@ -131,10 +130,10 @@ class ResultServerView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self):
-        self.server_run = get_object_or_404(ServerRun, pk=self.kwargs['pk'])
+        self.server_run = get_object_or_404(ServerRun, uuid=self.kwargs['uuid'])
         return self.server_run
 
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, uuid, *args, **kwargs):
         server_run = self.get_object()
         if not server_run.is_stopped():
             res = {

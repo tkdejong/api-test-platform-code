@@ -56,55 +56,6 @@ class SessionListView(LoginRequiredMixin, ListView):
         return Session.objects.filter(user=self.request.user).order_by('-started')
 
 
-class Dashboard(TemplateView):
-
-    template_name = 'testsession/dashboard.html'
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['sessions_active'] = (
-            Session.objects
-            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
-            .filter(user=self.request.user)
-            .count()
-        )
-        context['sessions_active_docker'] = (
-            Session.objects
-            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
-            .filter(session_type__vngendpoint__docker_image__isnull=False)
-            .filter(user=self.request.user)
-            .count()
-        )
-        context['sessions_active_hosted'] = (
-            Session.objects
-            .filter(Q(status=choices.StatusChoices.running) | Q(status=choices.StatusChoices.starting))
-            .filter(session_type__vngendpoint__docker_image__isnull=True)
-            .filter(user=self.request.user)
-            .count()
-        )
-        context['servers_scheduled'] = ServerRun.objects.filter(user=self.request.user) \
-            .filter(scheduled=True) \
-            .filter(
-                Q(status=choices.StatusWithScheduledChoices.running)
-                | Q(status=choices.StatusWithScheduledChoices.starting)
-                | Q(status=choices.StatusWithScheduledChoices.scheduled)) \
-            .order_by('-started') \
-            .filter(user=self.request.user) \
-            .count()
-        context['server_running'] = ServerRun.objects.filter(user=self.request.user) \
-            .filter(scheduled=False) \
-            .filter(
-                Q(status=choices.StatusWithScheduledChoices.running)
-                | Q(status=choices.StatusWithScheduledChoices.starting)) \
-            .order_by('-started') \
-            .filter(user=self.request.user) \
-            .count()
-        context['session_types'] = SessionType.objects.all().count()
-        context['test_scenario'] = TestScenario.objects.all().count()
-
-        return context
-
-
 class SessionFormView(FormView):
 
     template_name = 'testsession/session-form.html'
@@ -120,7 +71,7 @@ class SessionFormView(FormView):
         form.instance.assign_name(self.request.user.id)
         form.instance.name = Session.assign_name(self.request.user.id)
         session = form.save()
-        bootstrap_session.delay(session.pk)
+        bootstrap_session.delay(session.uuid)
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -167,8 +118,8 @@ class SessionLogUpdateView(UpdateView):
     template_name = 'testsession/session-update.html'
     context_object_name = 'session'
     model = Session
-    slug_field = 'pk'
-    slug_url_kwarg = 'session_id'
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
     fields = [
         'supplier_name',
         'software_product',
@@ -205,7 +156,12 @@ class SessionLogUpdateView(UpdateView):
 class StopSession(OwnerSingleObject, View):
 
     model = Session
-    pk_name = 'session_id'
+    pk_name = 'uuid'
+
+    def get_object(self):
+        self.session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
+        return self.session
+
 
     def post(self, request, *args, **kwargs):
         session = self.get_object()
@@ -214,7 +170,7 @@ class StopSession(OwnerSingleObject, View):
 
         session.status = choices.StatusChoices.shutting_down
         session.save()
-        stop_session.delay(session.pk)
+        stop_session.delay(session.uuid)
         return HttpResponseRedirect(reverse('testsession:sessions'))
 
 
