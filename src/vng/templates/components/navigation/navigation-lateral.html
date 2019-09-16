@@ -1,4 +1,6 @@
 {% load i18n %}
+{% load flatpages %}
+{% get_flatpages as flatpages %}
 {% spaceless %}
 <nav class="sidebar-nav">
     <ul class="nav">
@@ -48,11 +50,17 @@
                 <i class="nav-icon icon-magnifier"></i>OpenAPI Inspection</a>
         </li>
     </li> {% endcomment %}
-    <li class="nav-title">{% trans "Documentation" %}</li>
+    <li class="nav-title">{% trans "About API Test Platform" %}</li>
         <li class="nav-item ">
             <a class="nav-link" href="https://github.com/VNG-Realisatie/api-testvoorziening">
                 <i class="nav-icon icon-info"></i>{% trans "Documentation" %}</a>
         </li>
+        {% for flatpage in flatpages %}
+            <li class="nav-item ">
+                <a class="nav-link" href="/pages{{ flatpage.url }}">
+                    <i class="nav-icon icon-info"></i>{{ flatpage.title }}</a>
+            </li>
+        {% endfor %}
     </ul>
 </nav>
 {% endspaceless %}

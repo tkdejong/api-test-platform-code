@@ -17,5 +17,6 @@ urlpatterns = base_urlpatterns + [
     url(r'^api/v1/', include('vng.openApiInspector.urls_api', namespace='apiv1inspector')),
     url(r'^server/', include('vng.servervalidation.urls', namespace='server_run')),
     url(r'^consumer/', include('vng.testsession.urls', namespace='testsession')),
+    url(r'^pages/', include('django.contrib.flatpages.urls')),
     path('', views.Dashboard.as_view(), name='dashboard'),
 ]
