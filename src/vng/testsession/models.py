@@ -2,6 +2,10 @@ import json
 import uuid
 import re
 import time
+import operator
+import requests
+import yaml
+from functools import reduce
 
 from tinymce.models import HTMLField
 
@@ -9,6 +13,9 @@ from django.conf import settings
 from django.core.validators import RegexValidator
 from django.core.files import File
 from django.db import models
+from django.db import transaction
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -155,9 +162,67 @@ class TestSession(models.Model):
 
 class ScenarioCaseCollection(models.Model):
     name = models.CharField(max_length=100, help_text=_("The name of the collection"))
+    oas_link = models.URLField(blank=True, null=True, help_text=_(
+        "Optional field that takes a URL to an OAS3 schema, automatically generating "
+        "the scenario cases from this schema. Only works if no scenario cases are set manually"
+    ))
 
     def __str__(self):
         return self.name
+
+def get_parameter_from_ref(schema, ref_link):
+    """
+    Retrieve parameter information from a reference
+    """
+
+    # Only support local references
+    if ref_link.startswith('#'):
+        key_list = ref_link.split('/')[1:]
+        return reduce(operator.getitem, key_list, schema)
+    else:
+        raise NotImplementedError()
+
+@transaction.atomic()
+@receiver(post_save, sender=ScenarioCaseCollection, dispatch_uid='create_cases_from_oas')
+def create_cases_from_oas(sender, instance, **kwargs):
+    # Only proceed if a link to OAS is provided and if the collection does not
+    # have any ScenarioCases yet
+    if not instance.oas_link or instance.scenariocase_set.exists():
+        return
+
+    response = requests.get(instance.oas_link)
+
+    # Translate yaml to Python dict if needed
+    if instance.oas_link.endswith('.yaml'):
+        schema = yaml.load(response.content, Loader=yaml.FullLoader)
+    else:
+        schema = json.loads(response.content)
+
+    for path, methods in schema['paths'].items():
+        for method, details in methods.items():
+            if method == 'parameters':
+                continue
+
+            # Cannot bulk create, because we need the ScenarioCase id to create
+            # the QueryParamsScenario
+            sc = ScenarioCase.objects.create(
+                collection=instance,
+                url=path,
+                http_method=method.upper(),
+                description=details['summary'],
+            )
+
+            for parameter in details.get('parameters'):
+                # Retrieve parameter information from local reference
+                if '$ref' in parameter:
+                    parameter = get_parameter_from_ref(schema, parameter['$ref'])
+
+                if parameter['in'] == 'query':
+                    QueryParamsScenario.objects.create(
+                        scenario_case=sc,
+                        name=parameter['name'],
+                        expected_value='*',
+                    )
 
 class VNGEndpoint(OrderedModel):
 

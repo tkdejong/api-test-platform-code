@@ -39,6 +39,7 @@ idna
 requests
 pyjwt
 celery
+requests_mock
 coreapi
 django-bootstrap-breadcrumbs
 drf-yasg
