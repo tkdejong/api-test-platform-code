@@ -12,7 +12,7 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-DEFAULT_FROM_EMAIL = 'info@test.api-test.nl'
+DEFAULT_FROM_EMAIL = 'info@api-test.nl'
 
 DATABASES = {
     'default': {

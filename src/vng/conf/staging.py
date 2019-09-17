@@ -13,7 +13,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-DEFAULT_FROM_EMAIL = 'info@staging.api-test.nl'
+DEFAULT_FROM_EMAIL = 'info@api-test.nl'
 
 DATABASES = {
     'default': {
