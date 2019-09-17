@@ -7,6 +7,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic.base import TemplateView
 from .decorators import anonymous_required
 
+from vng.accounts.forms import CustomPasswordResetForm
+
 handler500 = 'vng.utils.views.server_error'
 admin.site.site_header = 'vng admin'
 admin.site.site_title = 'vng admin'
@@ -25,6 +27,7 @@ base_urlpatterns = [
 
     # Simply show the master template.
     url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^accounts/password/reset/$', auth_views.PasswordResetView.as_view(form_class=CustomPasswordResetForm), name='auth_password_reset'),
     url(r'accounts/', include('registration.backends.default.urls')),
 ]
 
