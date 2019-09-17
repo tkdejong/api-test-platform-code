@@ -12,6 +12,8 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+DEFAULT_FROM_EMAIL = 'info@test.api-test.nl'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

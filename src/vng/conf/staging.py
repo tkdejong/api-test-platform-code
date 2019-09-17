@@ -13,6 +13,8 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
+DEFAULT_FROM_EMAIL = 'info@staging.api-test.nl'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
