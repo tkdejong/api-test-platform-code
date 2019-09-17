@@ -42,7 +42,7 @@
         {% endwith %}
     </td>
         {% if server_run.is_running %}
-            <td class='starting' server_run_id='{{server_run.id|unlocalize}}'>
+            <td class='starting' server_run_uuid='{{server_run.uuid}}'>
         {% else %}
             <td>
         {% endif %}
