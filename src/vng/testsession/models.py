@@ -183,7 +183,7 @@ class ScenarioCaseCollection(models.Model):
         # Translate yaml to Python dict if needed
         if self.oas_link.endswith('.yaml'):
             try:
-                schema = yaml.load(response.content[100:], Loader=yaml.FullLoader)
+                schema = yaml.load(response.content, Loader=yaml.FullLoader)
             except yaml.scanner.ScannerError:
                 raise ValidationError({'oas_link': _("The URL does not point to a valid YAML file")})
         else:
