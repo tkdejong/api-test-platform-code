@@ -289,9 +289,11 @@ class SessionTypeDetail(DetailView):
         endpoints = context['sessiontype'].vngendpoint_set.all()
         grouped_cases = []
         for endpoint in endpoints:
-            scenario_cases = endpoint.scenario_collection.scenariocase_set.all()
-            if scenario_cases.exists():
-                grouped_cases.append((endpoint, scenario_cases))
+            collection = endpoint.scenario_collection
+            if collection:
+                scenario_cases = endpoint.scenario_collection.scenariocase_set.all()
+                if scenario_cases.exists():
+                    grouped_cases.append((endpoint, scenario_cases))
 
         context['grouped_scenario_cases'] = grouped_cases
         return context

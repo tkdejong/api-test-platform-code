@@ -9,6 +9,7 @@ from functools import reduce
 
 from tinymce.models import HTMLField
 
+from django.forms import ValidationError
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.core.files import File
@@ -170,6 +171,28 @@ class ScenarioCaseCollection(models.Model):
     def __str__(self):
         return self.name
 
+    def clean(self, *args, **kwargs):
+        if not self.oas_link:
+            return
+
+        try:
+            response = requests.get(self.oas_link)
+        except requests.exceptions.ConnectionError as e:
+            raise ValidationError({'oas_link': _("The URL did not resolve")})
+
+        # Translate yaml to Python dict if needed
+        if self.oas_link.endswith('.yaml'):
+            try:
+                schema = yaml.load(response.content[100:], Loader=yaml.FullLoader)
+            except yaml.scanner.ScannerError:
+                raise ValidationError({'oas_link': _("The URL does not point to a valid YAML file")})
+        else:
+            try:
+                schema = json.loads(response.content)
+            except json.decoder.JSONDecodeError:
+                raise ValidationError({'oas_link': _("The URL does not point to a valid JSON file")})
+
+
 def get_parameter_from_ref(schema, ref_link):
     """
     Retrieve parameter information from a reference
@@ -209,7 +232,7 @@ def create_cases_from_oas(sender, instance, **kwargs):
                 collection=instance,
                 url=path,
                 http_method=method.upper(),
-                description=details['summary'],
+                description=details.get('summary', None),
             )
 
             for parameter in details.get('parameters'):
