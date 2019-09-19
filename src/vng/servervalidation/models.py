@@ -111,11 +111,54 @@ class PostmanTest(OrderedModel):
     def __str__(self):
         return '{} {}'.format(self.test_scenario, self.validation_file)
 
+class Environment(models.Model):
+    name = models.CharField(max_length=100, help_text=_(""))
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.CASCADE, help_text=_(
+        ""
+    ))
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, help_text=_(
+        "The user that created this environment"
+    ))
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
+        "The universally unique identifier of this environment"
+    ))
+
+    def __str__(self):
+        return '{} - {}'.format(self.test_scenario.name, self.name)
+
+
+class ScheduledTestScenario(models.Model):
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
+        "The test scenario for which provider runs will be scheduled"
+    ))
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, help_text=_(
+        "The user that scheduled this test scenario"
+    ))
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
+        "The universally unique identifier of this scheduled test scenario, needed to retrieve the badge"
+    ))
+    environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.PROTECT, help_text=_(
+        "The environment that will be used for provider runs of this scheduled scenario"
+    ))
+
+    class Meta:
+        unique_together = ('test_scenario', 'user', 'environment',)
+
+    def __str__(self):
+        return '{} - {}'.format(self.test_scenario, self.user)
+
 
 class ServerRun(models.Model):
 
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
         "The test scenario for which this provider run was executed"
+    ))
+    scheduled_scenario = models.ForeignKey(
+        ScheduledTestScenario, on_delete=models.PROTECT,
+        null=True, blank=True, help_text=_("The scheduled test scenario for which this provider run was executed")
+    )
+    environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.PROTECT, help_text=_(
+        "The environment that will be used for this provider run"
     ))
     started = models.DateTimeField(_('Started at'), default=timezone.now, help_text=_(
         "The time at which the provider run was started"
@@ -194,15 +237,6 @@ class ServerRun(models.Model):
             success += positive
             failure += negative
         return success, failure
-
-
-class ServerHeader(models.Model):
-
-    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
-        "The provider run for which this header was used"
-    ))
-    header_key = models.TextField(help_text=_("The name of the HTTP header"))
-    header_value = models.TextField(help_text=_("The value of the HTTP header"))
 
 
 class PostmanTestResult(models.Model):
@@ -357,3 +391,18 @@ class Endpoint(models.Model):
     server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
         "The provider run to which this endpoint belongs"
     ))
+    environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
+        "The environment to which this endpoint belongs"
+    ))
+
+
+class ServerHeader(models.Model):
+
+    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
+        "The provider run for which this header was used"
+    ))
+    environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
+        "The environment to which this header belongs"
+    ))
+    header_key = models.TextField(help_text=_("The name of the HTTP header"))
+    header_value = models.TextField(help_text=_("The value of the HTTP header"))
