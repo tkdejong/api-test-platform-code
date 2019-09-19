@@ -9,6 +9,7 @@ from functools import reduce
 
 from tinymce.models import HTMLField
 
+from django.forms import ValidationError
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.core.files import File
@@ -209,7 +210,7 @@ def create_cases_from_oas(sender, instance, **kwargs):
                 collection=instance,
                 url=path,
                 http_method=method.upper(),
-                description=details['summary'],
+                description=details.get('summary', None),
             )
 
             for parameter in details.get('parameters'):
