@@ -18,13 +18,9 @@
             <span class="badge badge-pill badge-dark">{{ server_run.status }}</span>
         {% endif %}
     </td>
-    {% if not server_run.stopped %}
-        <td>00:01 {% trans "Every day" %}</td>
-    {% else %}
-        <td></td>
-    {% endif %}
 
     <td>{{ server_run.test_scenario.name }}</td>
+    <td>{{ server_run.environment.name }}</td>
     <td>
         {% if server_run.success != None %}
             {% if server_run.success  %}
@@ -35,8 +31,8 @@
         {% endif %}
     </td>
     <td>
-        {% if server_run.last_exec %}
-            {{server_run.last_exec}}
+        {% if server_run.stopped %}
+            {{server_run.stopped}}
         {% endif %}
     </td>
     <td>
@@ -45,9 +41,9 @@
                 {% csrf_token %}
                 <input type="submit" class="btn btn-danger"  value="Stop">
             </form>
-            {% if not server_run.is_running %}
+            {% comment %} {% if not server_run.is_running %}
                 <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">{% trans "Fire now" %}</a>
-            {% endif %}
+            {% endif %} {% endcomment %}
         {% endif %}
     </td>
     <td>

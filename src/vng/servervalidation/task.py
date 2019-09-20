@@ -15,7 +15,7 @@ from django.conf import settings
 from vng.postman.choices import ResultChoices
 
 from ..celery.celery import app
-from .models import PostmanTest, PostmanTestResult, Endpoint, ServerRun, ServerHeader
+from .models import PostmanTest, PostmanTestResult, Endpoint, ServerRun, ServerHeader, ScheduledTestScenario
 from ..utils import choices
 from ..utils.newman import NewmanManager
 from ..utils.auth import get_jwt
@@ -26,21 +26,29 @@ logger = get_task_logger(__name__)
 
 @app.task
 def execute_test_scheduled():
-    server_run = ServerRun.objects.filter(scheduled=True).filter(status=choices.StatusWithScheduledChoices.scheduled).order_by('user')
-    s_list = []
-    failed = False
-    for i, sr in enumerate(server_run):
-        sr.status = choices.StatusWithScheduledChoices.running
-        sr.save()
-        result = execute_test(sr.pk, scheduled=True)
-        failed = failed or result
-        s_list.append((sr, result))
-        if i == len(server_run) - 1 or sr.user != server_run[i + 1].user and s_list != []:
-            # Send email only if there is at least one failure
-            if result:
-                send_email_failure(s_list)
-            s_list = []
-            failed = False
+    scheduled_scenarios = ScheduledTestScenario.objects.filter(active=True)
+    for schedule in scheduled_scenarios:
+        # server_run = ServerRun.objects.filter(scheduled=True).filter(status=choices.StatusWithScheduledChoices.scheduled).order_by('user')
+        server_run = ServerRun.objects.create(
+            test_scenario=schedule.test_scenario,
+            scheduled_scenario=schedule,
+            environment=schedule.environment,
+            user=schedule.user
+        )
+        s_list = []
+        failed = False
+        for i, sr in enumerate(server_run):
+            sr.status = choices.StatusWithScheduledChoices.running
+            sr.save()
+            result = execute_test(sr.pk, scheduled=True)
+            failed = failed or result
+            s_list.append((sr, result))
+            if i == len(server_run) - 1 or sr.user != server_run[i + 1].user and s_list != []:
+                # Send email only if there is at least one failure
+                if result:
+                    send_email_failure(s_list)
+                s_list = []
+                failed = False
 
 
 def substitute_hidden_vars(server_run, file):
@@ -55,7 +63,7 @@ def substitute_hidden_vars(server_run, file):
 def execute_test(server_run_pk, scheduled=False, email=False):
     server_run = ServerRun.objects.get(pk=server_run_pk)
     server_run.status = choices.StatusWithScheduledChoices.running
-    endpoints = Endpoint.objects.filter(server_run=server_run)
+    endpoints = server_run.environment.endpoint_set.all()
 
     file_name = str(uuid.uuid4())
     postman_tests = PostmanTest.objects.filter(test_scenario=server_run.test_scenario).order_by('order')
@@ -114,13 +122,14 @@ def execute_test(server_run_pk, scheduled=False, email=False):
         server_run.status = choices.StatusChoices.error_deploy
         server_run.status_exec = traceback.format_exc()
     server_run.percentage_exec = 100
-    if not scheduled:
-        if server_run.status != choices.StatusChoices.error_deploy:
-            server_run.status = choices.StatusWithScheduledChoices.stopped
-        server_run.stopped = timezone.now()
-    else:
-        server_run.last_exec = timezone.now()
-        server_run.status = choices.StatusWithScheduledChoices.scheduled
+    # if not scheduled:
+    if server_run.status != choices.StatusChoices.error_deploy:
+        server_run.status = choices.StatusWithScheduledChoices.stopped
+    server_run.stopped = timezone.now()
+
+    # else:
+        # server_run.last_exec = timezone.now()
+        # server_run.status = choices.StatusWithScheduledChoices.scheduled
     if email and not failure:
         send_email_failure([(server_run, failure)])
     server_run.save()
