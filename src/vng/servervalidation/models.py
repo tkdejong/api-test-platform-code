@@ -126,6 +126,9 @@ class Environment(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.test_scenario.name, self.name)
 
+    def __str__(self):
+        return self.name
+
 
 class ScheduledTestScenario(models.Model):
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
@@ -140,6 +143,9 @@ class ScheduledTestScenario(models.Model):
     environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.PROTECT, help_text=_(
         "The environment that will be used for provider runs of this scheduled scenario"
     ))
+    active = models.BooleanField(default=True, help_text=_(
+        "Indicates whether this schedule is still active or not"
+    ))
 
     class Meta:
         unique_together = ('test_scenario', 'user', 'environment',)
@@ -147,6 +153,12 @@ class ScheduledTestScenario(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.test_scenario, self.user)
 
+    @property
+    def last_run(self):
+        server_runs = self.serverrun_set.order_by('-id')
+        if server_runs:
+            return server_runs.first().stopped
+        return None
 
 class ServerRun(models.Model):
 
@@ -388,7 +400,7 @@ class Endpoint(models.Model):
     ))
     url = models.TextField(help_text=_("The value of the variable"))
     jwt = models.TextField(null=True, default=None, blank=True)
-    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
+    server_run = models.ForeignKey(ServerRun, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
         "The provider run to which this endpoint belongs"
     ))
     environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
@@ -398,7 +410,7 @@ class Endpoint(models.Model):
 
 class ServerHeader(models.Model):
 
-    server_run = models.ForeignKey(ServerRun, on_delete=models.CASCADE, help_text=_(
+    server_run = models.ForeignKey(ServerRun, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
         "The provider run for which this header was used"
     ))
     environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
