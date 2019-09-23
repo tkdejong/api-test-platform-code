@@ -242,13 +242,11 @@ def bootstrap_session(session_uuid, purged=False):
             return
 
     # collecting all the containers
-    subdomains = list(range(100, 200))
-    random.shuffle(subdomains)
     for ep in endpoint:
         bind_url = ExposedUrl.objects.create(
             session=session,
             vng_endpoint=ep,
-            subdomain='{}{}'.format(int(time.time()), subdomains.pop()),
+            subdomain=uuid.uuid4(),
             port=ep.port
         )
         exposed_urls.append(bind_url)
