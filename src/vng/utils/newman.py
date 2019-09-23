@@ -17,15 +17,15 @@ class DidNotRunException(Exception):
 class NewmanManager:
     REPORT_FOLDER = settings.MEDIA_ROOT + '/newman'
     newman_path = os.path.join(settings.BASE_DIR, 'node_modules', 'newman', 'bin', 'newman.js')
-    RUN_HTML_REPORT = ('NODE_OPTIONS="--max-old-space-size=2048" '
-                       '{} run --reporters html {} -r htmlextra '
+    RUN_REPORT = ('NODE_OPTIONS="--max-old-space-size=2048" '
+                       '{} run --reporters "htmlextra,json" {} '
                        '--timeout-request 5000 '
                        '--reporter-htmlextra-darkTheme '
                        '--reporter-htmlextra-testPaging '
                        '--reporter-htmlextra-title '
                        '--reporter-htmlextra-logs '
-                       '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html {}')
-    RUN_JSON_REPORT = 'NODE_OPTIONS="--max-old-space-size=2048" {} run  {} -r json --reporter-json-export ' + REPORT_FOLDER + '/{}.json {} --timeout-request 5000 '
+                       '--reporter-htmlextra-export ' + REPORT_FOLDER + '/{}.html '
+                       '--reporter-json-export ' + REPORT_FOLDER + '/{}.json {}')
     ENV_VAR_SYNTAX = ' --env-var {}={} '
     TOKEN = 'TOKEN'
 
@@ -54,22 +54,15 @@ class NewmanManager:
     def execute_test(self):
         self.file_path = self.file.path
         filename = str(uuid.uuid4())
-        output, error = self.run_command(self.RUN_HTML_REPORT, self.newman_path, self.file_path, filename)
+        output, error = self.run_command(
+            self.RUN_REPORT, self.newman_path, self.file_path, filename, filename
+        )
         if error:
             assert False, error
             logger.exception(error)
             raise DidNotRunException()
-        f = open('{}/{}.html'.format(self.REPORT_FOLDER, filename))
-        self.file_to_be_discarted.append(f)
-        return f
-
-    def execute_test_json(self):
-        self.file_path = self.file.path
-        filename = str(uuid.uuid4())
-        output, error = self.run_command(self.RUN_JSON_REPORT, self.newman_path, self.file_path, filename)
-        if error:
-            logger.exception(error)
-            raise DidNotRunException(error)
-        f = open('{}/{}.json'.format(self.REPORT_FOLDER, filename))
-        self.file_to_be_discarted.append(f)
-        return f
+        f_html = open('{}/{}.html'.format(self.REPORT_FOLDER, filename))
+        f_json = open('{}/{}.json'.format(self.REPORT_FOLDER, filename))
+        self.file_to_be_discarted.append(f_html)
+        self.file_to_be_discarted.append(f_json)
+        return f_html, f_json
