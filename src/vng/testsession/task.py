@@ -312,11 +312,10 @@ def run_tests(session_uuid):
             newman.replace_parameters({
                 ep.name: '{}:{}{}'.format(eu.docker_url, ep.port, ep.path)
             })
-        result = newman.execute_test()
+        result, result_json = newman.execute_test()
         ts = TestSession()
         ts.save_test(result)
-        with newman.execute_test_json() as result_json:
-            ts.save_test_json(result_json)
+        ts.save_test_json(result_json)
 
         ts.save()
         eu.test_session = ts
