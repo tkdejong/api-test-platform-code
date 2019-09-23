@@ -132,8 +132,8 @@ class ScenarioCaseGenerateFromOASTests(TestCase):
 
         self.assertEqual(query_params.count(), 2)
 
-        self.assertEqual(query_params[0].name, 'identificatie')
-        self.assertEqual(query_params[1].name, 'verantwoordelijkeOrganisatie')
+        self.assertEqual(query_params.first().name, 'identificatie')
+        self.assertEqual(query_params.last().name, 'verantwoordelijkeOrganisatie')
 
     def test_generate_scenario_case_with_query_params_local_reference(self):
         with requests_mock.Mocker() as m:
@@ -193,8 +193,8 @@ class ScenarioCaseGenerateFromOASTests(TestCase):
 
         self.assertEqual(query_params.count(), 2)
 
-        self.assertEqual(query_params[0].name, 'identificatie')
-        self.assertEqual(query_params[1].name, 'verantwoordelijkeOrganisatie')
+        self.assertEqual(query_params.first().name, 'identificatie')
+        self.assertEqual(query_params.last().name, 'verantwoordelijkeOrganisatie')
 
     def test_generate_scenario_cases_from_oas_yaml(self):
         with requests_mock.Mocker() as m:
