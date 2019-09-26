@@ -10,7 +10,7 @@ from django.conf import settings
 from vng.accounts.models import User
 from vng.testsession.tests.factories import UserFactory
 
-from ..models import ServerRun, TestScenario, TestScenarioUrl, PostmanTest, PostmanTestResult, Endpoint
+from ..models import ServerRun, TestScenario, TestScenarioUrl, PostmanTest, PostmanTestResult, Endpoint, Environment
 from ...utils.factories import UserFactory
 
 
@@ -20,6 +20,15 @@ class TestScenarioFactory(Dmf):
         model = TestScenario
 
     name = factory.sequence(lambda n: 'testype %d' % n)
+
+
+class EnvironmentFactory(Dmf):
+
+    class Meta:
+        model = Environment
+
+    name = factory.sequence(lambda n: 'testenv %d' % n)
+    test_scenario = factory.SubFactory(TestScenarioFactory)
 
 
 class FilerField(Dmf):

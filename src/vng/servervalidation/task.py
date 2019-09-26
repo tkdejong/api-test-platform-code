@@ -121,6 +121,7 @@ def execute_test(server_run_pk, scheduled=False, email=False):
         logger.warning(e)
         server_run.status = choices.StatusChoices.error_deploy
         server_run.status_exec = traceback.format_exc()
+
     server_run.percentage_exec = 100
     # if not scheduled:
     if server_run.status != choices.StatusChoices.error_deploy:

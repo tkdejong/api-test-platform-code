@@ -226,22 +226,22 @@ class ServerRunLatestResultView(views.APIView):
         responses={200: ServerRunResultShield},
         manual_parameters=[
             openapi.Parameter(
-                'name',
+                'uuid',
                 openapi.IN_PATH,
                 type=openapi.TYPE_STRING,
-                description='Name of the test scenario'
+                description='UUID of the test scenario'
             ),
-            openapi.Parameter(
-                'user',
-                openapi.IN_PATH,
-                type=openapi.TYPE_STRING,
-                description='Name of the user that started the provider run for the test scenario'
-            ),
+            # openapi.Parameter(
+            #     'environment_uuid',
+            #     openapi.IN_PATH,
+            #     type=openapi.TYPE_STRING,
+            #     description='UUID of the environment that was used for the provider run'
+            # ),
         ])
-    def get(self, request, name, user):
+    def get(self, request, uuid):
         latest_server_run = ServerRun.objects.filter(
-            test_scenario__name=name,
-            user__username=user
+            # test_scenario__uuid=uuid,
+            environment__uuid=uuid
         ).order_by('-stopped').first()
         if not latest_server_run:
             raise Http404

@@ -126,11 +126,11 @@ class Environment(models.Model):
         "The universally unique identifier of this environment"
     ))
 
-    def __str__(self):
-        return '{} - {}'.format(self.test_scenario.name, self.name)
+    class Meta:
+        unique_together = ('name', 'test_scenario', 'user',)
 
     def __str__(self):
-        return self.name
+        return '{} - {}'.format(self.test_scenario.name, self.name)
 
 
 class ScheduledTestScenario(models.Model):

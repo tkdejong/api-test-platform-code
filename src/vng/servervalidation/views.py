@@ -24,6 +24,29 @@ from .models import (
 from .task import execute_test
 
 
+class TestScenarioList(LoginRequiredMixin, ListView):
+
+    template_name = 'servervalidation/test-scenario_list.html'
+    context_object_name = 'test-scenario_list'
+    paginate_by = 10
+
+    def get_queryset(self):
+        res = []
+        runs_for_user = ServerRun.objects.filter(user=self.request.user)
+        distinct_combinations = runs_for_user.select_related(
+            'test_scenario', 'environment'
+        ).order_by('test_scenario__id', 'environment__id', '-stopped').values_list(
+            'test_scenario',
+            'environment',
+            'stopped'
+        ).distinct('test_scenario', 'environment')
+        for test_scenario_id, environment_id, last_run in distinct_combinations:
+            test_scenario = TestScenario.objects.get(id=test_scenario_id)
+            environment = Environment.objects.get(id=environment_id)
+            res.append((test_scenario, environment, last_run))
+        return res
+
+
 class ServerRunList(LoginRequiredMixin, ListView):
 
     template_name = 'servervalidation/server-run_list.html'
@@ -32,7 +55,11 @@ class ServerRunList(LoginRequiredMixin, ListView):
     model = ServerRun
 
     def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user).filter(scheduled=False).order_by('-started')
+        return self.model.objects.filter(
+            user=self.request.user,
+            test_scenario__uuid=self.kwargs['scenario_uuid'],
+            environment__uuid=self.kwargs['env_uuid'],
+        ).filter(scheduled=False).order_by('-started')
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
@@ -114,7 +141,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
-        envs = test_scenario.environment_set.all()
+        envs = test_scenario.environment_set.filter(user=self.request.user)
         data['form'] = SelectEnvironmentForm(envs=envs)
         return data
 
@@ -151,9 +178,11 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
                     self.create_server_run(env)
                 return redirect(reverse('server_run:scheduled-test-scenario_list')) \
                     if self.request.session.get('server_run_scheduled', False) \
-                    else redirect(reverse('server_run:server-run_list'))
+                    else redirect(reverse('server_run:server-run_list', kwargs={
+                        'scenario_uuid': test_scenario.uuid,
+                        'env_uuid': env.uuid
+                    }))
         else:
-            # return redirect('server_run:server-run_select_environment', {'form': form}, test_id=self.kwargs.get('test_id'))
             return render(request, self.template_name, {'form': form})
 
     def fetch_server(self, scheduled=None):
@@ -189,7 +218,10 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
         if scheduled:
             return reverse('server_run:scheduled-test-scenario_list')
-        return reverse('server_run:server-run_list')
+        return reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.ts.uuid,
+            'env_uuid': self.env.uuid
+        })
 
     def fetch_server(self):
         self.env = get_object_or_404(Environment, pk=self.kwargs['env_id'])
@@ -212,6 +244,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
         data['ts'] = self.ts
         data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=self.ts)
+        data['environment'] = self.env
         url_vars = TestScenarioUrl.objects.filter(
             test_scenario=self.ts,
             url=True
@@ -232,7 +265,6 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             data['form'].add_text_area(['Authorization header'])
         else:
             pass
-        # data['form'].set_labels(url_names)
         for k, v in pre_form.errors.items():
             data['form'].errors[k] = v
         return data
@@ -267,46 +299,6 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
                 execute_test.delay(self.server.pk)
 
         return HttpResponseRedirect(self.get_success_url())
-
-    # def form_valid(self, form):
-    #     self.fetch_server()
-    #     if self.server.test_scenario.jwt_enabled():
-    #         self.server.client_id = form.data['Client ID']
-    #         self.server.secret = form.data['Secret']
-    #     elif self.server.test_scenario.custom_header():
-    #         ServerHeader(environment=self.env, header_key='Authorization', header_value=form.data['Authorization header']).save()
-    #     self.server.save()
-    #     self.endpoints = []
-    #     tsu = list(TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario))
-    #     import ipdb; ipdb.set_trace()
-    #     for key, value in form.data.items():
-    #         entry = list(filter(lambda x: x.name == key, tsu))
-    #         if len(entry) == 1:
-    #             entry = entry[0]
-    #             tsu.remove(entry)
-    #             ep = Endpoint(url=value, environment=self.env, test_scenario_url=entry)
-    #             ep.save()
-    #             self.endpoints.append(ep)
-    #     form.instance.server_run = self.server
-    #     if tsu:
-    #         form.instance.test_scenario_url = tsu[0]
-    #     if self.server.scheduled:
-    #         self.server.status = choices.StatusWithScheduledChoices.scheduled
-    #     else:
-    #         self.server.status = choices.StatusWithScheduledChoices.running
-    #     self.server.save()
-    #     try:
-    #         ep = form.instance
-    #         ep.server_run = self.server
-    #         ep.save()
-    #     except IntegrityError:
-    #         form.add_error(None, 'Endpoint url not configured, contact the admin.')
-    #         return super().form_invalid(form)
-    #     self.endpoints.append(ep)
-    #     if not self.server.scheduled:
-    #         execute_test.delay(self.server.pk)
-
-    #     return HttpResponseRedirect(self.get_success_url())
 
 
 class ServerRunOutput(OwnerSingleObject, DetailView):
@@ -376,7 +368,7 @@ class ServerRunOutputUuid(DetailView):
         changing_badge_url = '{}://{}{}'.format(
             self.request.scheme,
             self.request.get_host(),
-            reverse('apiv1server:latest-badge', kwargs={'name': server_run.test_scenario.name, 'user': server_run.user})
+            reverse('apiv1server:latest-badge', kwargs={'uuid': server_run.environment.uuid})
         )
         context['changing_badge_url'] = changing_badge_url
 

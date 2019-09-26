@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
-from .models import TestScenarioUrl, Endpoint, ServerRun, TestScenario, PostmanTest
+from .models import TestScenarioUrl, Endpoint, ServerRun, TestScenario, PostmanTest, Environment
 from .task import execute_test
 
 from django.db import transaction
@@ -27,20 +28,31 @@ class EndpointSerializer(serializers.ModelSerializer):
     def get_name(self, obj):
         return obj.test_scenario_url.name
 
+    def to_internal_value(self, data):
+        return data
+
     def create(self, validated_data):
         try:
             name = validated_data.pop('name')
             value = validated_data['value']
-            tsu = TestScenarioUrl.objects.get(name=name, test_scenario=validated_data['server'].test_scenario)
-            ep = Endpoint.objects.create(test_scenario_url=tsu, url=value, server_run=validated_data['server'])
+            tsu = TestScenarioUrl.objects.get(name=name, test_scenario=validated_data['environment'].test_scenario)
+            ep = Endpoint.objects.create(test_scenario_url=tsu, url=value, environment=validated_data['environment'])
             return ep
         except Exception:
             raise serializers.ValidationError("The urls names provided do not match")
 
 
+class EnvironmentSerializer(serializers.ModelSerializer):
+    endpoints = EndpointSerializer(many=True, source='endpoint_set')
+
+    class Meta:
+        model = Environment
+        fields = ('name', 'endpoints')
+
+
 class ServerRunSerializer(serializers.ModelSerializer):
 
-    endpoints = EndpointSerializer(many=True)
+    environment = EnvironmentSerializer()
 
     test_scenario = serializers.SlugRelatedField(
         queryset=TestScenario.objects.filter(active=True),
@@ -54,32 +66,54 @@ class ServerRunSerializer(serializers.ModelSerializer):
             'test_scenario',
             'started',
             'stopped',
+            'environment',
             'client_id',
             'secret',
-            'endpoints',
             'status',
             'percentage_exec',
             'status_exec'
         ]
         read_only_fields = ['id', 'started', 'stopped', 'status']
 
+    @transaction.atomic()
     def create(self, validated_data):
         endpoint_created = []
-        if 'endpoint_list' in validated_data:
-            endpoints = validated_data.pop('endpoint_list')
-            validated_data.pop('endpoints')
-            instance = ServerRun.objects.create(**validated_data)
-            for ep in endpoints:
-                if 'name' in ep and 'value' in ep:
-                    ep_serializer = EndpointSerializer()
-                    endpoint_created.append(ep_serializer.create({
-                        'name': ep['name'],
-                        'value': ep['value'],
-                        'server': instance
-                    }))
+        env = validated_data.pop('environment')
+        created = False
+        try:
+            environment = Environment.objects.get(
+                name=env['name'],
+                test_scenario=validated_data['test_scenario'],
+                user=self.context['request'].user
+            )
+        except Environment.DoesNotExist:
+            environment = Environment.objects.create(
+                name=env['name'],
+                test_scenario=validated_data['test_scenario'],
+                user=self.context['request'].user
+            )
+            created = True
+
+        validated_data['environment'] = environment
+        if created:
+            flattened_endpoints = {ep['name']: ep['value'] for ep in env['endpoint_set'] if 'name' in ep and 'value' in ep}
+            testscenariourls = validated_data['test_scenario'].testscenariourl_set.all()
+
+            for test_scenario_url in validated_data['test_scenario'].testscenariourl_set.all():
+                value = flattened_endpoints.get(test_scenario_url.name) or test_scenario_url.placeholder
+                ep_serializer = EndpointSerializer()
+                endpoint_created.append(ep_serializer.create({
+                    'name': test_scenario_url.name,
+                    'value': value,
+                    'environment': environment
+                }))
         else:
-            instance = ServerRun.objects.create(**validated_data)
-        instance.endpoints = endpoint_created
+            if env['endpoint_set']:
+                raise serializers.ValidationError({"environment.name": _(
+                    "An environment with this name already exists, please leave "
+                    "environment.endpoints empty to use this existing environment"
+                )})
+        instance = ServerRun.objects.create(**validated_data)
 
         transaction.on_commit(lambda: execute_test.delay(instance.pk))
         return instance

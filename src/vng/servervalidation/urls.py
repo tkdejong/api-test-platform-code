@@ -22,5 +22,7 @@ urlpatterns = [
     path('<uuid:uuid>/pdf/<int:test_result_pk>', views.ServerRunPdfView.as_view(), name='server-run_detail_pdf'),
     path('<uuid:uuid>/update/', views.ServerRunOutputUpdate.as_view(), name='server-run_info-update'),
     path('<uuid:uuid>/', views.ServerRunOutputUuid.as_view(), name='server-run_detail'),
-    path('', views.ServerRunList.as_view(), name='server-run_list'),
+    path('', views.TestScenarioList.as_view(), name='test-scenario_list'),
+    path('<uuid:scenario_uuid>/<uuid:env_uuid>/', views.ServerRunList.as_view(), name='server-run_list'),
+    # path('', views.ServerRunList.as_view(), name='server-run_list'),
 ]

@@ -14,7 +14,7 @@ from vng.postman.choices import ResultChoices
 from ..models import PostmanTestResult
 from .factories import (
     ServerRunFactory, TestScenarioFactory, TestScenarioUrlFactory, PostmanTestFactory,
-    PostmanTestNoAssertionFactory, EndpointFactory, PostmanTestResultFactory
+    PostmanTestNoAssertionFactory, EndpointFactory, PostmanTestResultFactory, EnvironmentFactory
 )
 from ...utils.factories import UserFactory
 
@@ -30,7 +30,7 @@ def get_username():
     return UserFactory().username
 
 
-def create_server_run(name, tsu):
+def create_server_run(name, tsu, env_name='environment1'):
     endpoints = []
     for t in tsu:
         endpoints.append({
@@ -41,7 +41,10 @@ def create_server_run(name, tsu):
         'test_scenario': name,
         'client_id': 'client_id_field',
         'secret': 'secret_field',
-        'endpoints': endpoints
+        'environment': {
+            'name': env_name,
+            'endpoints': endpoints
+        }
     }
 
 
@@ -108,7 +111,14 @@ class TestNoAssertion(TransactionWebTest):
 
     def setUp(self):
         self.postman_test = PostmanTestNoAssertionFactory()
-        self.server_run = create_server_run(self.postman_test.test_scenario.name, [])
+        self.test_scenario = self.postman_test.test_scenario
+        self.environment = EnvironmentFactory.create(
+            test_scenario=self.test_scenario,
+            name='environment2',
+        )
+        self.tsu = TestScenarioUrlFactory(test_scenario=self.test_scenario)
+        self.server_run1 = create_server_run(self.test_scenario.name, [], env_name=self.environment.name)
+        self.server_run2 = create_server_run(self.test_scenario.name, [self.tsu])
 
     def get_user_key(self):
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
@@ -119,15 +129,27 @@ class TestNoAssertion(TransactionWebTest):
         return head
 
     def _test_creation(self):
-        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
+        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run1, headers=self.get_user_key())
         call = call.json
-        self.server_run['uuid'] = call['uuid']
-        self.assertEqual(call['test_scenario'], self.server_run['test_scenario'])
+        self.server_run1['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.server_run1['test_scenario'])
+
+    def test_creation_new_env(self):
+        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run2, headers=self.get_user_key())
+        call = call.json
+        self.server_run2['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.server_run2['test_scenario'])
+
+    def test_creation_existing_env(self):
+        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run1, headers=self.get_user_key())
+        call = call.json
+        self.server_run1['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.server_run1['test_scenario'])
 
     def test_retrieve(self):
         self._test_creation()
         call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={
-            'uuid': self.server_run['uuid']
+            'uuid': self.server_run1['uuid']
         }), headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['status'], 'stopped')
