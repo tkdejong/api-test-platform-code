@@ -328,3 +328,65 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
         response = self.app.get(get_badge_url, status='*')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class EnvironmentAPITests(TransactionWebTest):
+
+    def setUp(self):
+        self.user1, self.user2 = UserFactory.create_batch(2)
+        self.test_scenario = TestScenarioFactory.create(name='ZGW api tests')
+        self.tsu = TestScenarioUrlFactory(test_scenario=self.test_scenario, name='url', placeholder='https://google.com/')
+        self.environment1 = EnvironmentFactory.create(user=self.user1, name='test', test_scenario=self.test_scenario)
+        self.environment2 = EnvironmentFactory.create(user=self.user2, name='test2', test_scenario=self.test_scenario)
+        EndpointFactory.create(environment=self.environment1, test_scenario_url=self.tsu, url='https://example.com/')
+        EndpointFactory.create(environment=self.environment2, test_scenario_url=self.tsu, url='https://example2.com/')
+
+    def get_user_key(self):
+        call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
+            ('username', get_username()),
+            ('password', 'password')]))
+        key = get_object(call.body)['key']
+        head = {'Authorization': 'Token {}'.format(key)}
+        return head
+
+    def test_create_server_run_with_new_env(self):
+        body = create_server_run(self.test_scenario.name, [self.tsu], env_name='newenv')
+        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), body, headers=self.get_user_key())
+        call = call.json
+        body['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.test_scenario.name)
+        self.assertEqual(call['environment']['name'], 'newenv')
+
+        endpoint = call['environment']['endpoints'][0]
+        self.assertEqual(endpoint['name'], 'url')
+
+    def test_create_server_run_with_existing_env(self):
+        body = create_server_run(self.test_scenario.name, [], env_name='test')
+        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), body, headers=self.get_user_key())
+        call = call.json
+        body['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.test_scenario.name)
+        self.assertEqual(call['environment']['name'], 'test')
+
+        endpoint = call['environment']['endpoints'][0]
+        self.assertEqual(endpoint['name'], 'url')
+
+    def test_create_server_run_with_existing_env_and_new_endpoints_fails(self):
+        body = create_server_run(self.test_scenario.name, [self.tsu], env_name='test')
+        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), body, headers=self.get_user_key(), status='*')
+
+        self.assertEqual(call.status_code, 400)
+
+        call = call.json
+        self.assertIn('environment.name', call)
+
+    def test_create_server_run_with_new_env_with_same_name_as_env_for_different_user(self):
+        body = create_server_run(self.test_scenario.name, [self.tsu], env_name='test2')
+        call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), body, headers=self.get_user_key(), status='*')
+        call = call.json
+        body['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.test_scenario.name)
+        self.assertEqual(call['environment']['name'], 'test2')
+
+        endpoint = call['environment']['endpoints'][0]
+        self.assertEqual(endpoint['name'], 'url')
