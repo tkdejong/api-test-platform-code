@@ -110,11 +110,13 @@ class RetrieveCreationTest(TransactionWebTest):
 class TestNoAssertion(TransactionWebTest):
 
     def setUp(self):
+        self.user = UserFactory.create()
         self.postman_test = PostmanTestNoAssertionFactory()
         self.test_scenario = self.postman_test.test_scenario
         self.environment = EnvironmentFactory.create(
             test_scenario=self.test_scenario,
             name='environment2',
+            user=self.user
         )
         self.tsu = TestScenarioUrlFactory(test_scenario=self.test_scenario)
         self.server_run1 = create_server_run(self.test_scenario.name, [], env_name=self.environment.name)
@@ -161,11 +163,13 @@ class ServerValidationHiddenVarsTests(TransactionWebTest):
         self.user, self.user2 = UserFactory.create_batch(2)
         self.test_scenario = PostmanTestFactory().test_scenario
 
+        self.environment = EnvironmentFactory.create()
+
         tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
         tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
-        self.server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
-        _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/')
-        _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/')
+        self.server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user, environment=self.environment)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/', environment=self.environment)
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/', environment=self.environment)
 
         self.detail_url = reverse('apiv1server:provider:api_server-run-detail', kwargs={'uuid': self.server_run.uuid})
 
@@ -178,9 +182,9 @@ class ServerValidationHiddenVarsTests(TransactionWebTest):
     def test_api_show_hidden_vars_for_same_user(self):
         response = self.app.get(self.detail_url, user=self.user).json
 
-        self.assertEqual(len(response['endpoints']), 2)
+        self.assertEqual(len(response['environment']['endpoints']), 2)
 
-        endpoint1, endpoint2 = response['endpoints']
+        endpoint1, endpoint2 = response['environment']['endpoints']
         self.assertEqual(endpoint1['value'], 'https://url1.com/')
         self.assertEqual(endpoint1['name'], 'tsu1')
 
@@ -247,23 +251,42 @@ class PostmanTestAPITests(TransactionWebTest):
 class ServerRunLatestBadgeAPITests(TransactionWebTest):
     def setUp(self):
         self.user1, self.user2 = UserFactory.create_batch(2)
+        self.environment1 = EnvironmentFactory.create(user=self.user1)
+        self.environment2 = EnvironmentFactory.create(user=self.user2)
+        self.environment3 = EnvironmentFactory.create(user=self.user1)
+        self.environment4 = EnvironmentFactory.create(user=self.user1)
         self.test_scenario1 = TestScenarioFactory.create(name='ZGW api tests')
         self.test_scenario2 = TestScenarioFactory.create(name='ZGW oas tests')
         self.test_scenario3 = TestScenarioFactory.create(name='APT tests')
-        self.server_run1 = ServerRunFactory.create(test_scenario=self.test_scenario1, stopped='2019-01-01T12:00:00Z', user=self.user1)
-        self.server_run2 = ServerRunFactory.create(test_scenario=self.test_scenario1, stopped='2019-01-01T13:00:00Z', user=self.user1)
-        self.server_run3 = ServerRunFactory.create(test_scenario=self.test_scenario1, stopped='2019-01-01T14:00:00Z', user=self.user2)
-        self.server_run4 = ServerRunFactory.create(test_scenario=self.test_scenario2, stopped='2019-01-01T14:00:00Z', user=self.user1)
+        self.server_run1 = ServerRunFactory.create(
+            test_scenario=self.test_scenario1, stopped='2019-01-01T12:00:00Z',
+            user=self.user1, environment=self.environment1
+        )
+        self.server_run2 = ServerRunFactory.create(
+            test_scenario=self.test_scenario1, stopped='2019-01-01T13:00:00Z',
+            user=self.user1, environment=self.environment1
+        )
+        self.server_run3 = ServerRunFactory.create(
+            test_scenario=self.test_scenario1, stopped='2019-01-01T14:00:00Z',
+            user=self.user2, environment=self.environment2
+        )
+        self.server_run4 = ServerRunFactory.create(
+            test_scenario=self.test_scenario2, stopped='2019-01-01T14:00:00Z',
+            user=self.user1, environment=self.environment3
+        )
+        self.server_run5 = ServerRunFactory.create(
+            test_scenario=self.test_scenario1, stopped='2019-01-01T12:00:00Z',
+            user=self.user1, environment=self.environment4
+        )
         PostmanTestResultFactory.create(server_run=self.server_run1, status=ResultChoices.failed)
         PostmanTestResultFactory.create(server_run=self.server_run2, status=ResultChoices.success)
-        PostmanTestResultFactory.create(server_run=self.server_run3, status=ResultChoices.success)
         PostmanTestResultFactory.create(server_run=self.server_run3, status=ResultChoices.failed)
         PostmanTestResultFactory.create(server_run=self.server_run4, status=ResultChoices.failed)
+        PostmanTestResultFactory.create(server_run=self.server_run5, status=ResultChoices.failed)
 
     def test_get_latest_success(self):
         get_badge_url = reverse('apiv1server:latest-badge', kwargs={
-            'name': 'ZGW api tests',
-            'user': self.user1
+            'uuid': self.environment1.uuid
         })
         response = self.app.get(get_badge_url)
 
@@ -281,8 +304,7 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
 
     def test_get_latest_failure(self):
         get_badge_url = reverse('apiv1server:latest-badge', kwargs={
-            'name': 'ZGW oas tests',
-            'user': self.user1
+            'uuid': self.environment3.uuid
         })
         response = self.app.get(get_badge_url)
 
@@ -299,9 +321,9 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
         self.assertDictEqual(data, expected_response)
 
     def test_get_latest_404(self):
+        environment = EnvironmentFactory.create()
         get_badge_url = reverse('apiv1server:latest-badge', kwargs={
-            'name': 'nonexistent-test',
-            'user': self.user2
+            'uuid': environment.uuid
         })
         response = self.app.get(get_badge_url, status='*')
 

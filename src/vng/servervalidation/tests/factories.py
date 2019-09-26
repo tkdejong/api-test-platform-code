@@ -10,7 +10,7 @@ from django.conf import settings
 from vng.accounts.models import User
 from vng.testsession.tests.factories import UserFactory
 
-from ..models import ServerRun, TestScenario, TestScenarioUrl, PostmanTest, PostmanTestResult, Endpoint, Environment
+from ..models import ServerRun, TestScenario, TestScenarioUrl, PostmanTest, PostmanTestResult, Endpoint, Environment, ScheduledTestScenario
 from ...utils.factories import UserFactory
 
 
@@ -92,6 +92,7 @@ class ServerRunFactory(Dmf):
         model = ServerRun
 
     test_scenario = factory.SubFactory(TestScenarioFactory)
+    environment = factory.SubFactory(EnvironmentFactory)
     user = factory.SubFactory(UserFactory)
     started = timezone.now()
     client_id = 'client_id_field'
@@ -116,3 +117,13 @@ class PostmanTestResultFactory(Dmf):
     server_run = factory.SubFactory(ServerRunFactory)
     log = factory.django.FileField()
     log_json = factory.django.FileField()
+
+
+class ScheduledTestScenarioFactory(Dmf):
+
+    class Meta:
+        model = ScheduledTestScenario
+
+    test_scenario = factory.SubFactory(TestScenarioFactory)
+    user = factory.SubFactory(UserFactory)
+    environment = factory.SubFactory(EnvironmentFactory)

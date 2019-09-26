@@ -10,7 +10,7 @@ from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResul
 from .factories import (
     TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory,
     UserFactory, PostmanTestSubFolderFactory, EndpointFactory, PostmanTestResultFactory,
-    EnvironmentFactory
+    EnvironmentFactory, ScheduledTestScenarioFactory
 )
 from ...utils import choices, forms
 
@@ -22,75 +22,125 @@ class TestMultipleEndpoint(WebTest):
         self.ts = TestScenarioFactory()
         self.ts.authorization = choices.AuthenticationChoices.no_auth
         self.ts.save()
-        TestScenarioUrlFactory(test_scenario=self.ts)
-        TestScenarioUrlFactory(test_scenario=self.ts)
+        TestScenarioUrlFactory(test_scenario=self.ts, name='url1')
+        TestScenarioUrlFactory(test_scenario=self.ts, name='url2')
 
     def test_run_collection(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
         form = call.forms[1]
         form['test_scenario'] = self.ts.pk
+
+        res = form.submit().follow()
+        form = res.forms[1]
+        form['create_env'] = 'created_env_name'
+
         res = form.submit().follow()
 
         form = res.forms[1]
-        for name, _ in form.field_order:
-            if name is not None and 'test_scenario' in name:
-                print(name)
-                n = name
-        form[n] = 'https://ref.tst.vng.cloud/drc/api/v1/'
-        form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
+        form['url1'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
+        form['url2'] = 'https://ref.tst.vng.cloud/zrc/api/v1/'
         form.submit()
 
 
 class TestCreation(WebTest):
 
     def setUp(self):
-        self.tsf = TestScenarioUrlFactory()
-        self.pt = PostmanTestFactory()
-        self.user = UserFactory()
-        self.server = ServerRunFactory()
+        self.test_scenario = TestScenarioFactory.create()
 
-        self.test_scenario = self.tsf.test_scenario
-        self.server.test_scenario = self.test_scenario
-        self.pt.test_scenario = self.test_scenario
-        self.server.user = self.user
-
-        self.pt.save()
-        self.server.save()
+        self.tsf = TestScenarioUrlFactory(name='url', test_scenario=self.test_scenario)
+        self.pt = PostmanTestFactory(test_scenario=self.test_scenario)
+        self.user = UserFactory(username='testuser1')
 
         self.environment = EnvironmentFactory.create(
-            name='testenv', test_scenario=self.test_scenario
+            name='testenv', test_scenario=self.test_scenario, user=self.user
         )
 
     def test_creation_error_list(self):
-        call = self.app.get(reverse('server_run:server-run_list'), user='test')
+        ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            user=self.user,
+            environment=self.environment
+        )
+
+        call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), user='test')
         self.assertNotIn('Starting', call.text)
 
         call = self.app.get(reverse('server_run:server-run_create_item'), user='test')
         form = call.forms[1]
         form['test_scenario'].force_value('9')
         form.submit()
-        call = self.app.get(reverse('server_run:server-run_list'), user='test')
+        call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), user='test')
         self.assertNotIn('Starting', call.text)
 
-    def test_scenarios(self):
-        import ipdb; ipdb.set_trace()
+    def test_scenarios_create_new_env(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
         form = call.forms[1]
         form['test_scenario'] = self.tsf.test_scenario.pk
 
         res = form.submit().follow()
         form = res.forms[1]
-        form['environment'] = '1'
+        form['create_env'] = 'created_env_name'
+
+        res = form.submit().follow()
+        form = res.forms[1]
+        form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
+        form['Client ID'] = 'client id'
+        form['Secret'] = 'secret'
         form.submit()
 
-        # res = form.submit().follow()
-        # form = res.forms[1]
-        # form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
-        # form['Client ID'] = 'client id'
-        # form['Secret'] = 'secret'
-        # form.submit()
-        call = self.app.get(reverse('server_run:server-run_list'), user=self.user)
+        call = self.app.get(reverse('server_run:test-scenario_list'), user=self.user)
         self.assertIn(self.user.username, call.text)
+        self.assertIn(self.test_scenario.name, call.text)
+        self.assertIn('created_env_name', call.text)
+        server = ServerRun.objects.filter(status=choices.StatusChoices.stopped)[0]
+
+        url = reverse('server_run:server-run_detail', kwargs={
+            'uuid': server.uuid
+        })
+        call = self.app.get(url, user=self.user)
+
+        ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
+        url = reverse('server_run:server-run_detail_log', kwargs={
+            'uuid': ptr.server_run.uuid,
+            'test_result_pk': ptr.pk
+        })
+        call = self.app.get(url, user=self.user)
+
+        ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
+        url = reverse('server_run:server-run_detail_log_json', kwargs={
+            'uuid': ptr.server_run.uuid,
+            'test_result_pk': ptr.pk
+        })
+        call = self.app.get(url, user=self.user)
+
+        ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
+        url = reverse('server_run:server-run_detail_pdf', kwargs={
+            'uuid': server.uuid,
+            'test_result_pk': ptr.pk
+        })
+        call = self.app.get(url, user=self.user)
+
+    def test_scenarios_use_existing_env(self):
+        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
+        form = call.forms[1]
+        form['test_scenario'] = self.tsf.test_scenario.pk
+
+        res = form.submit().follow()
+        form = res.forms[1]
+        form['environment'] = str(self.environment.id)
+
+        res = form.submit().follow()
+
+        call = self.app.get(reverse('server_run:test-scenario_list'), user=self.user)
+        self.assertIn(self.user.username, call.text)
+        self.assertIn(self.test_scenario.name, call.text)
+        self.assertIn(self.environment.name, call.text)
         server = ServerRun.objects.filter(status=choices.StatusChoices.stopped)[0]
 
         url = reverse('server_run:server-run_detail', kwargs={
@@ -120,6 +170,11 @@ class TestCreation(WebTest):
         call = self.app.get(url, user=self.user)
 
     def test_postman_outcome(self):
+        ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            user=self.user,
+            environment=self.environment
+        )
         server = ServerRun.objects.filter(user=self.user).order_by('-started')[0]
         url = reverse('server_run:server-run_detail', kwargs={
             'uuid': server.uuid
@@ -135,7 +190,7 @@ class TestList(WebTest):
         ServerRunFactory()
 
     def test_list(self):
-        call = self.app.get(reverse('server_run:server-run_list'), user='test')
+        call = self.app.get(reverse('server_run:test-scenario_list'), user='test')
         assert 'no session' not in str(call.body)
 
 
@@ -177,32 +232,51 @@ class TestUserRegistration(WebTest):
 class IntegrationTest(WebTest):
 
     def setUp(self):
+        self.user = UserFactory.create()
         self.server = ServerRunFactory()
-        self.test_scenario = TestScenarioUrlFactory().test_scenario
+        self.test_scenario = TestScenarioFactory.create()
+        TestScenarioUrlFactory.create(name='url', test_scenario=self.test_scenario)
+        self.environment = EnvironmentFactory.create(
+            test_scenario=self.test_scenario,
+            user=self.user
+        )
         PostmanTestFactory(test_scenario=self.test_scenario)
-        self.server_s = ServerRunFactory(test_scenario=self.test_scenario, scheduled=True)
-        self.user = self.server_s.user
+        self.scheduled = ScheduledTestScenarioFactory.create(
+            test_scenario=self.test_scenario,
+            user=self.user,
+            environment=self.environment
+        )
 
     def test_access(self):
+        server = ServerRunFactory(
+            test_scenario=self.test_scenario,
+            environment=self.environment,
+            user=self.user
+        )
         call = self.app.get(reverse('server_run:server-run_detail', kwargs={
-            'uuid': self.server.uuid
+            'uuid': server.uuid
         }))
-        self.assertIn(str(self.server.id), call.text)
+        self.assertIn(str(server.id), call.text)
 
     def test_trigger(self):
         prev = len(PostmanTestResult.objects.all())
         self.app.get(
             reverse('server_run:server-run_trigger', kwargs={
-                'server_id': self.server_s.id
-            }), user=self.server_s.user
+                'uuid': self.scheduled.uuid
+            }), user=self.user
         )
         self.assertEqual(prev, len(PostmanTestResult.objects.all()) - 1)
 
     def test_badge(self):
         call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
         form = call.forms[1]
-        form['test_scenario'] = self.server_s.test_scenario.pk
+        form['test_scenario'] = self.test_scenario.pk
         res = form.submit().follow()
+
+        form = res.forms[1]
+        form['create_env'] = 'env'
+        res = form.submit().follow()
+
         form = res.forms[1]
         form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
         form['Client ID'] = 'client id'
@@ -214,17 +288,37 @@ class IntegrationTest(WebTest):
             'uuid': new_server.uuid
         }))
         self.assertIn(str(new_server.uuid), call.text)
-        call = self.app.get(reverse('server_run:server-run_list'), user=self.user)
+        call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': new_server.test_scenario.uuid,
+            'env_uuid': new_server.environment.uuid
+        }), user=self.user)
         ptr = PostmanTestResult.objects.all()[0]
         self.assertIn(str(ptr.get_assertions_details()[0]), call.text)
 
     def test_session_number_no_user(self):
+        server = ServerRunFactory(
+            test_scenario=self.test_scenario,
+            environment=self.environment,
+            user=self.user
+        )
+
         # simply check that with no user it raises no errors
-        call = self.app.get(reverse('server_run:server-run_list'), status=[200, 302])
+        call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': server.test_scenario.uuid,
+            'env_uuid': server.environment.uuid
+        }), status=[200, 302])
 
     def test_session_number_user(self):
-        call = self.app.get(reverse('server_run:server-run_list'), user=self.user)
-        self.assertIn(str(ServerRun.objects.filter(user=self.user, scheduled=True).count()), call.text)
+        server = ServerRunFactory(
+            test_scenario=self.test_scenario,
+            environment=self.environment,
+            user=self.user
+        )
+        call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': server.test_scenario.uuid,
+            'env_uuid': server.environment.uuid
+        }), user=self.user)
+        self.assertIn(str(ServerRun.objects.filter(user=self.user).count()), call.text)
 
     def test_information_form(self):
         self.test_badge()
@@ -270,11 +364,13 @@ class ServerRunHiddenVarsTests(WebTest):
         self.user, self.user2 = UserFactory.create_batch(2)
         self.test_scenario = PostmanTestFactory().test_scenario
 
+        self.environment = EnvironmentFactory.create()
+
         tsu1 = TestScenarioUrlFactory(hidden=True, test_scenario=self.test_scenario, name='tsu1')
         tsu2 = TestScenarioUrlFactory(hidden=False, test_scenario=self.test_scenario, name='tsu2')
-        self.server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user)
-        _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/')
-        _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/')
+        self.server_run = ServerRunFactory.create(test_scenario=self.test_scenario, user=self.user, environment=self.environment)
+        _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/', environment=self.environment)
+        _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/', environment=self.environment)
 
         self.detail_url = reverse('server_run:server-run_detail', kwargs={'uuid': self.server_run.uuid})
 
@@ -302,6 +398,7 @@ class ServerRunPublicLogsTests(WebTest):
 
     def setUp(self):
         self.user1, self.user2 = UserFactory.create_batch(2)
+        # self.environment = EnvironmentFactory.create()
 
         test_result_public = PostmanTestResultFactory.create(
             postman_test__name='test1',
