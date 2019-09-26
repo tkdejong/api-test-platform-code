@@ -115,7 +115,7 @@ class PostmanTest(OrderedModel):
         return '{} {}'.format(self.test_scenario, self.validation_file)
 
 class Environment(models.Model):
-    name = models.CharField(max_length=100, help_text=_(""))
+    name = models.CharField(max_length=100, help_text=_("The name of this environment"))
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.CASCADE, help_text=_(
         ""
     ))
