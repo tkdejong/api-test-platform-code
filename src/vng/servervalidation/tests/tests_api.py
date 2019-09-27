@@ -250,7 +250,7 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
         data = response.json
         expected_response = {
             'schemaVersion': 1,
-            'label': 'API Test Platform (beta)',
+            'label': 'API Test Platform',
             'message': 'Success',
             'color': 'green',
             'isError': False
@@ -269,7 +269,7 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
         data = response.json
         expected_response = {
             'schemaVersion': 1,
-            'label': 'API Test Platform (beta)',
+            'label': 'API Test Platform',
             'message': 'Failed',
             'color': 'red',
             'isError': True
