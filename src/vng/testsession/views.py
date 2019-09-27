@@ -189,21 +189,22 @@ class SessionReport(DetailView):
         report_ordered = []
         for endpoint in context['session'].session_type.vngendpoint_set.all():
             collection = endpoint.scenario_collection
-            cases = collection.scenariocase_set.all()
-            if not cases.exists():
-                continue
+            if collection:
+                cases = collection.scenariocase_set.all()
+                if not cases.exists():
+                    continue
 
-            cases_ordered = []
-            for case in collection.scenariocase_set.all():
-                is_in = False
-                for rp in report:
-                    if rp.scenario_case == case:
-                        cases_ordered.append(rp)
-                        is_in = True
-                        break
-                if not is_in:
-                    cases_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoices.not_called))
-            report_ordered.append((endpoint, cases_ordered))
+                cases_ordered = []
+                for case in collection.scenariocase_set.all():
+                    is_in = False
+                    for rp in report:
+                        if rp.scenario_case == case:
+                            cases_ordered.append(rp)
+                            is_in = True
+                            break
+                    if not is_in:
+                        cases_ordered.append(Report(scenario_case=case, result=choices.HTTPCallChoices.not_called))
+                report_ordered.append((endpoint, cases_ordered))
         context.update({
             'session': self.session,
             'object_list': report_ordered,
