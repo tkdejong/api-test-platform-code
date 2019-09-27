@@ -213,13 +213,15 @@ def create_cases_from_oas(sender, instance, **kwargs):
     if not instance.oas_link or instance.scenariocase_set.exists():
         return
 
-    response = requests.get(instance.oas_link)
+    content = requests.get(instance.oas_link).content
 
     # Translate yaml to Python dict if needed
     if instance.oas_link.endswith('.yaml'):
-        schema = yaml.load(response.content, Loader=yaml.FullLoader)
+        schema = yaml.load(content, Loader=yaml.FullLoader)
     else:
-        schema = json.loads(response.content)
+        if isinstance(content, bytes):
+            content = content.decode('utf-8')
+        schema = json.loads(content)
 
     for path, methods in schema['paths'].items():
         for method, details in methods.items():
@@ -235,7 +237,7 @@ def create_cases_from_oas(sender, instance, **kwargs):
                 description=details.get('summary', None),
             )
 
-            for parameter in details.get('parameters'):
+            for parameter in details.get('parameters') or []:
                 # Retrieve parameter information from local reference
                 if '$ref' in parameter:
                     parameter = get_parameter_from_ref(schema, parameter['$ref'])
@@ -356,7 +358,7 @@ class QueryParamsScenario(models.Model):
     scenario_case = models.ForeignKey(ScenarioCase, on_delete=models.PROTECT, help_text=_(
         "The scenario case to which this query parameter test belongs"
     ))
-    name = models.CharField(max_length=50, help_text=_("The name of the query parameter"))
+    name = models.CharField(max_length=100, help_text=_("The name of the query parameter"))
     expected_value = models.CharField(max_length=50, default='*', help_text=_("The expected value of the query parameter"))
 
     def __str__(self):
