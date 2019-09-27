@@ -14,7 +14,9 @@ class TestScenarioUrlSerializer(serializers.ModelSerializer):
 
 class EndpointSerializer(serializers.ModelSerializer):
 
-    name = serializers.SerializerMethodField()
+    name = serializers.CharField(source='test_scenario_url.name', help_text=_(
+        "The name of the variable"
+    ))
 
     class Meta:
         model = Endpoint
@@ -24,9 +26,6 @@ class EndpointSerializer(serializers.ModelSerializer):
                 'source': 'url',
             }
         }
-
-    def get_name(self, obj):
-        return obj.test_scenario_url.name
 
     def to_internal_value(self, data):
         return data
@@ -43,11 +42,17 @@ class EndpointSerializer(serializers.ModelSerializer):
 
 
 class EnvironmentSerializer(serializers.ModelSerializer):
-    endpoints = EndpointSerializer(many=True, source='endpoint_set')
+    endpoints = EndpointSerializer(many=True, source='endpoint_set', required=False)
 
     class Meta:
         model = Environment
         fields = ('name', 'endpoints')
+
+        extra_kwargs = {
+            'endpoints': {
+                'help_text': _('The environment that will be used for the provider run')
+            }
+        }
 
 
 class ServerRunSerializer(serializers.ModelSerializer):
