@@ -26,6 +26,7 @@ django-axes==4.4.2
 django-background-tasks==1.2.0
 django-bootstrap-breadcrumbs==0.9.1
 django-choices==1.6.1
+django-ckeditor==5.7.1
 django-compat==1.0.15     # via django-background-tasks, django-hijack, django-hijack-admin
 django-countries==5.3.2
 django-crispy-forms==1.7.2
@@ -36,7 +37,7 @@ django-hijack-admin==2.1.10
 django-hijack==2.1.10
 django-import-export==1.1.0
 django-ipware==2.1.0      # via django-axes
-django-js-asset==1.2.2    # via django-mptt
+django-js-asset==1.2.2    # via django-ckeditor, django-mptt
 django-mathfilters==0.4.0
 django-mptt==0.10.0       # via django-filer
 django-ordered-model==3.3.0
@@ -90,7 +91,7 @@ requests-mock==1.7.0
 requests==2.20.1
 rsa==4.0                  # via google-auth, oauth2client
 ruamel.yaml==0.15.88      # via drf-yasg
-six==1.11.0               # via django-background-tasks, django-bootstrap-breadcrumbs, django-compat, django-dynamic-raw-id, django-rest-auth, django-rosetta, drf-yasg, google-api-python-client, google-auth, html5lib, oauth2client
+six==1.11.0               # via django-background-tasks, django-bootstrap-breadcrumbs, django-compat, django-dynamic-raw-id, django-rest-auth, django-rosetta, drf-yasg, google-api-python-client, google-auth, html5lib, oauth2client, requests-mock
 sqlparse==0.2.4           # via django
 tablib==0.12.1            # via django-import-export
 tinycss2==0.6.1           # via cairosvg, cssselect2, weasyprint
