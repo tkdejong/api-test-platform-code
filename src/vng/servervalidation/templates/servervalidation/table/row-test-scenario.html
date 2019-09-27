@@ -1,0 +1,23 @@
+{% load i18n %}
+{% spaceless %}
+<tr>
+    <td>
+       <a href="{% url 'server_run:server-run_list' scenario.uuid environment.uuid %}">#{{ environment.id }}</a>
+    </td>
+
+    <td>{{ scenario.name }}</td>
+    <td>{{ environment.name }}</td>
+    <td>
+        {% if last_run %}
+            {{ last_run }}
+        {% endif %}
+    </td>
+    <td>
+        <span display="block" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+            <a href="{% url 'server_run:server-run_list' scenario.uuid environment.uuid %}">
+                <img style="height:30px"  alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
+            </a>
+        </span>
+    </td>
+</tr>
+{% endspaceless %}
