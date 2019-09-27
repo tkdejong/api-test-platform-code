@@ -578,7 +578,7 @@ class ResultTestsessionViewShield(views.APIView):
 
         result = {
             'schemaVersion': 1,
-            'label': 'API Test Platform (beta)',
+            'label': 'API Test Platform',
             'message': message,
             'color': color,
             'isError': is_error,

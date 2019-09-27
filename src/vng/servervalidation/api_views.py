@@ -117,7 +117,7 @@ class ResultServerViewShield(views.APIView):
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
-        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta)'))
+        return JsonResponse(get_server_run_badge(server, 'API Test Platform'))
 
 
 class ResultServerView(views.APIView):
@@ -245,4 +245,4 @@ class ServerRunLatestResultView(views.APIView):
         ).order_by('-stopped').first()
         if not latest_server_run:
             raise Http404
-        return JsonResponse(get_server_run_badge(latest_server_run, 'API Test Platform (beta)'))
+        return JsonResponse(get_server_run_badge(latest_server_run, 'API Test Platform'))
