@@ -358,7 +358,7 @@ class QueryParamsScenario(models.Model):
     scenario_case = models.ForeignKey(ScenarioCase, on_delete=models.PROTECT, help_text=_(
         "The scenario case to which this query parameter test belongs"
     ))
-    name = models.CharField(max_length=50, help_text=_("The name of the query parameter"))
+    name = models.CharField(max_length=100, help_text=_("The name of the query parameter"))
     expected_value = models.CharField(max_length=50, default='*', help_text=_("The expected value of the query parameter"))
 
     def __str__(self):
