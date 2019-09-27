@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     # Optional applications.
     'django.contrib.flatpages',
+    'ckeditor',
     'ordered_model',
     'django_admin_index',
     'django.contrib.admin',
@@ -79,6 +80,7 @@ INSTALLED_APPS = [
     # 'vng.openApiInspector',
     'vng.celery',
     'vng.k8s_manager',
+    'vng',
 
     # Rest Framework
     'rest_framework',

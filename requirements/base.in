@@ -8,6 +8,7 @@ Django==2.2.4
 # django-admin-tools
 django-hijack
 django-hijack-admin
+django-ckeditor
 django-axes
 django-choices
 django-rosetta
