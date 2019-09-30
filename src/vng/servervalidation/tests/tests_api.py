@@ -367,6 +367,7 @@ class EnvironmentAPITests(TransactionWebTest):
         body['uuid'] = call['uuid']
         self.assertEqual(call['test_scenario'], self.test_scenario.name)
         self.assertEqual(call['environment']['name'], 'test')
+        self.assertEqual(call['environment']['uuid'], str(self.environment1.uuid))
 
         endpoint = call['environment']['endpoints'][0]
         self.assertEqual(endpoint['name'], 'url')
