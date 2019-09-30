@@ -15,6 +15,10 @@ class EndpointInline(admin.TabularInline):
     model = model.Endpoint
 
 
+class ServerHeaderInline(admin.TabularInline):
+    model = model.ServerHeader
+
+
 class TestScenarioUrlInline(admin.TabularInline):
     model = model.TestScenarioUrl
 
@@ -36,9 +40,23 @@ class PostmanTestResultAdmin(admin.ModelAdmin):
 
 @admin.register(model.Endpoint)
 class EndpointAdmin(admin.ModelAdmin):
-    list_display = ['test_scenario_url', 'jwt', 'server_run', 'url']
-    list_filter = ['test_scenario_url', 'server_run', 'url']
+    list_display = ['test_scenario_url', 'environment', 'jwt', 'server_run', 'url']
+    list_filter = ['test_scenario_url', 'environment', 'server_run', 'url']
     search_fields = ['test_scenario_url__name', 'server_run__id', 'url']
+
+
+@admin.register(model.ScheduledTestScenario)
+class ScheduledTestScenarioAdmin(admin.ModelAdmin):
+    list_display = ['test_scenario', 'user']
+    list_filter = ['test_scenario', 'user']
+
+
+@admin.register(model.Environment)
+class EnvironmentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'test_scenario']
+    list_filter = ['test_scenario',]
+
+    inlines = [EndpointInline, ServerHeaderInline]
 
 
 @admin.register(model.ServerRun)

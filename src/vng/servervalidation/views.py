@@ -1,8 +1,9 @@
 import json
 
+from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
@@ -16,11 +17,34 @@ import vng.postman.utils as postman
 
 from ..utils import choices
 from ..utils.views import OwnerSingleObject, PDFGenerator
-from .forms import CreateServerRunForm, CreateEndpointForm
+from .forms import CreateServerRunForm, CreateEndpointForm, SelectEnvironmentForm
 from .models import (
-    ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest, PostmanTestResult, ServerHeader
+    ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest, PostmanTestResult, ServerHeader, ScheduledTestScenario, Environment
 )
 from .task import execute_test
+
+
+class TestScenarioList(LoginRequiredMixin, ListView):
+
+    template_name = 'servervalidation/test-scenario_list.html'
+    context_object_name = 'test-scenario_list'
+    paginate_by = 10
+
+    def get_queryset(self):
+        res = []
+        runs_for_user = ServerRun.objects.filter(user=self.request.user)
+        distinct_combinations = runs_for_user.select_related(
+            'test_scenario', 'environment'
+        ).order_by('test_scenario__id', 'environment__id', '-stopped').values_list(
+            'test_scenario',
+            'environment',
+            'stopped'
+        ).distinct('test_scenario', 'environment')
+        for test_scenario_id, environment_id, last_run in distinct_combinations:
+            test_scenario = TestScenario.objects.get(id=test_scenario_id)
+            environment = Environment.objects.get(id=environment_id)
+            res.append((test_scenario, environment, last_run))
+        return res
 
 
 class ServerRunList(LoginRequiredMixin, ListView):
@@ -31,7 +55,11 @@ class ServerRunList(LoginRequiredMixin, ListView):
     model = ServerRun
 
     def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user).filter(scheduled=False).order_by('-started')
+        return self.model.objects.filter(
+            user=self.request.user,
+            test_scenario__uuid=self.kwargs['scenario_uuid'],
+            environment__uuid=self.kwargs['env_uuid'],
+        ).filter(scheduled=False).order_by('-started')
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
@@ -60,7 +88,7 @@ class ServerRunForm(CreateView):
         self.request.session['supplier_name'] = form.instance.supplier_name
         self.request.session['software_product'] = form.instance.software_product
         self.request.session['product_role'] = form.instance.product_role
-        return redirect(reverse('server_run:server-run_create', kwargs={
+        return redirect(reverse('server_run:server-run_select_environment', kwargs={
             "test_id": ts_id
         }))
 
@@ -70,96 +98,205 @@ class ServerRunListScheduled(ServerRunList):
     template_name = 'servervalidation/server-run_list_scheduled.html'
 
     def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user).filter(scheduled=True).order_by('-started')
+        uuid = self.kwargs.get('uuid')
+        qs = self.model.objects.filter(
+            user=self.request.user,
+            scheduled_scenario__uuid=uuid
+        ).order_by('-started')
+
+        return qs
 
 
-class CreateEndpoint(LoginRequiredMixin, CreateView):
+class ScheduledTestScenarioList(LoginRequiredMixin, ListView):
 
-    template_name = 'servervalidation/server-run_create.html'
-    form_class = CreateEndpointForm
+    template_name = 'servervalidation/scheduled-test-scenario_list.html'
+    context_object_name = 'scheduled_test_scenario_list'
+    paginate_by = 10
+    model = ScheduledTestScenario
 
-    def get_success_url(self):
-        return reverse('server_run:server-run_list_scheduled')\
-            if self.request.session.get('server_run_scheduled', False) \
-            else reverse('server_run:server-run_list')
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user).order_by('-id')
 
-    def fetch_server(self):
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
+        data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
+        # for sr in data['server_run_list']:
+        #     sr.success = sr.get_execution_result()
+        # if 'server_run_scheduled' in self.request.session:
+        #     data['second_tab'] = self.request.session['server_run_scheduled']
+        #     del self.request.session['server_run_scheduled']
+        return data
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        return super().get(request, *args, **kwargs)
+
+
+class SelectEnvironment(LoginRequiredMixin, CreateView):
+
+    template_name = 'servervalidation/server-run_select_environment.html'
+    form_class = SelectEnvironmentForm
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
+        envs = test_scenario.environment_set.filter(user=self.request.user)
+        data['form'] = SelectEnvironmentForm(envs=envs)
+        return data
+
+    @transaction.atomic()
+    def post(self, request, *args, **kwargs):
+        test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
+        envs = test_scenario.environment_set.all()
+        form = self.form_class(request.POST, envs=envs)
+        if form.is_valid():
+            new_env_name = request.POST.get('create_env')
+            if new_env_name:
+                env = Environment.objects.create(test_scenario=test_scenario, name=new_env_name)
+                if request.session.get('server_run_scheduled'):
+                    scheduled = ScheduledTestScenario.objects.create(
+                        test_scenario=test_scenario,
+                        environment=env,
+                        user=self.request.user
+                    )
+                return redirect(reverse('server_run:endpoints_create', kwargs={
+                    "test_id": env.test_scenario.id,
+                    "env_id": env.id
+                }))
+            else:
+                env_id = request.POST.get('environment')
+                env = Environment.objects.get(id=env_id)
+                if request.session.get('server_run_scheduled'):
+                    scheduled = ScheduledTestScenario.objects.create(
+                        test_scenario=test_scenario,
+                        environment=env,
+                        user=self.request.user
+                    )
+                else:
+                    self.fetch_server()
+                    self.create_server_run(env)
+                return redirect(reverse('server_run:scheduled-test-scenario_list')) \
+                    if self.request.session.get('server_run_scheduled', False) \
+                    else redirect(reverse('server_run:server-run_list', kwargs={
+                        'scenario_uuid': test_scenario.uuid,
+                        'env_uuid': env.uuid
+                    }))
+        else:
+            return render(request, self.template_name, {'form': form})
+
+    def fetch_server(self, scheduled=None):
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
         self.server = ServerRun(
             user=self.request.user,
             test_scenario=ts,
-            scheduled=self.request.session.get('server_run_scheduled', False),
+            # scheduled=self.request.session.get('server_run_scheduled', False),
+            scheduled_scenario=scheduled,
             supplier_name=self.request.session.get('supplier_name', ''),
             software_product=self.request.session.get('software_product', ''),
             product_role=self.request.session.get('product_role', '')
         )
 
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        pre_form = data['form']
-        ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
-        self.fetch_server()
-
-        data['ts'] = ts
-        data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=ts)
-        test_scenario_url = TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario).order_by('-url')
-        url_names = [tsu.name for tsu in test_scenario_url]
-        no_url = len(data['test_scenario'].filter(url=True))
-        data['form'] = CreateEndpointForm(
-            quantity=len(data['test_scenario'].filter(url=True)) - 1,
-            placeholders=[t.placeholder for t in test_scenario_url],
-            field_name=url_names[1:no_url],
-            text_area=data['test_scenario'].filter(url=False),
-            text_area_field_name=url_names[no_url:]
-        )
-        if ts.jwt_enabled():
-            data['form'].add_text_area(['Client ID', 'Secret'])
-        elif ts.custom_header():
-            data['form'].add_text_area(['Authorization header'])
-        else:
-            pass
-        data['form'].set_labels(url_names)
-        for k, v in pre_form.errors.items():
-            data['form'].errors[k] = v
-        return data
-
-    def form_valid(self, form):
-        self.fetch_server()
-        if self.server.test_scenario.jwt_enabled():
-            self.server.client_id = form.data['Client ID']
-            self.server.secret = form.data['Secret']
-        elif self.server.test_scenario.custom_header():
-            ServerHeader(server_run=self.server, header_key='Authorization', header_value=form.data['Authorization header']).save()
-        self.server.save()
-        self.endpoints = []
-        tsu = list(TestScenarioUrl.objects.filter(test_scenario=self.server.test_scenario))
-
-        for key, value in form.data.items():
-            entry = list(filter(lambda x: x.name == key, tsu))
-            if len(entry) == 1:
-                entry = entry[0]
-                tsu.remove(entry)
-                ep = Endpoint(url=value, server_run=self.server, test_scenario_url=entry)
-                ep.save()
-                self.endpoints.append(ep)
-        form.instance.server_run = self.server
-        if tsu:
-            form.instance.test_scenario_url = tsu[0]
-        if self.server.scheduled:
+    def create_server_run(self, env):
+        self.server.environment = env
+        if self.server.scheduled_scenario:
             self.server.status = choices.StatusWithScheduledChoices.scheduled
         else:
             self.server.status = choices.StatusWithScheduledChoices.running
         self.server.save()
-        try:
-            ep = form.instance
-            ep.server_run = self.server
-            ep.save()
-        except IntegrityError:
-            form.add_error(None, 'Endpoint url not configured, contact the admin.')
-            return super().form_invalid(form)
-        self.endpoints.append(ep)
-        if not self.server.scheduled:
+
+        if not self.server.scheduled_scenario:
             execute_test.delay(self.server.pk)
+
+class CreateEndpoint(LoginRequiredMixin, CreateView):
+
+    template_name = 'servervalidation/endpoints_create.html'
+    form_class = CreateEndpointForm
+
+    def get_success_url(self):
+        scheduled = self.request.session.get('server_run_scheduled')
+
+        if scheduled:
+            return reverse('server_run:scheduled-test-scenario_list')
+        return reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.ts.uuid,
+            'env_uuid': self.env.uuid
+        })
+
+    def fetch_server(self):
+        self.env = get_object_or_404(Environment, pk=self.kwargs['env_id'])
+        self.ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
+        if not self.request.session.get('server_run_scheduled'):
+            self.server = ServerRun(
+                user=self.request.user,
+                environment=self.env,
+                test_scenario=self.ts,
+                supplier_name=self.request.session.get('supplier_name', ''),
+                software_product=self.request.session.get('software_product', ''),
+                product_role=self.request.session.get('product_role', '')
+            )
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        pre_form = data['form']
+
+        self.fetch_server()
+
+        data['ts'] = self.ts
+        data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=self.ts)
+        data['environment'] = self.env
+        url_vars = TestScenarioUrl.objects.filter(
+            test_scenario=self.ts,
+            url=True
+        )
+        text_vars = TestScenarioUrl.objects.filter(
+            test_scenario=self.ts,
+            url=False
+        )
+        data['form'] = CreateEndpointForm(
+            url_vars=url_vars,
+            text_vars=text_vars,
+            url_placeholders=[url.placeholder for url in url_vars],
+            text_placeholders=[var.placeholder for var in text_vars]
+        )
+        if self.ts.jwt_enabled():
+            data['form'].add_text_area(['Client ID', 'Secret'])
+        elif self.ts.custom_header():
+            data['form'].add_text_area(['Authorization header'])
+        else:
+            pass
+        for k, v in pre_form.errors.items():
+            data['form'].errors[k] = v
+        return data
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+
+        self.fetch_server()
+
+        testscenariourls = TestScenarioUrl.objects.filter(test_scenario=self.ts)
+        tsu_names = [url.name for url in testscenariourls]
+        for key, value in data.items():
+            if key in tsu_names:
+                tsu = testscenariourls.get(name=key)
+                Endpoint.objects.create(url=value, environment=self.env, test_scenario_url=tsu)
+
+        if not self.request.session.get('server_run_scheduled'):
+            if self.ts.jwt_enabled():
+                self.server.client_id = data['Client ID']
+                self.server.secret = data['Secret']
+            elif self.ts.custom_header():
+                ServerHeader(environment=self.env, header_key='Authorization', header_value=data['Authorization header']).save()
+            self.server.save()
+
+            if self.server.scheduled:
+                self.server.status = choices.StatusWithScheduledChoices.scheduled
+            else:
+                self.server.status = choices.StatusWithScheduledChoices.running
+            self.server.save()
+
+            if not self.server.scheduled:
+                execute_test.delay(self.server.pk)
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -231,7 +368,7 @@ class ServerRunOutputUuid(DetailView):
         changing_badge_url = '{}://{}{}'.format(
             self.request.scheme,
             self.request.get_host(),
-            reverse('apiv1server:latest-badge', kwargs={'name': server_run.test_scenario.name, 'user': server_run.user})
+            reverse('apiv1server:latest-badge', kwargs={'uuid': server_run.environment.uuid})
         )
         context['changing_badge_url'] = changing_badge_url
 
@@ -243,18 +380,35 @@ class ServerRunOutputUuid(DetailView):
 
 class TriggerServerRun(OwnerSingleObject, View):
 
-    model = ServerRun
-    pk_name = 'server_id'
+    model = ScheduledTestScenario
+    pk_name = 'uuid'
+    slug_pk_name = 'uuid'
 
     def get(self, request, *args, **kwargs):
-        server = self.get_object()
-        if server.status == choices.StatusWithScheduledChoices.stopped:
-            raise Http404("Server already stopped")
-        self.request.session['server_run_scheduled'] = server.scheduled
+        scheduled = self.get_object()
+        server = ServerRun.objects.create(
+            test_scenario=scheduled.test_scenario,
+            environment=scheduled.environment,
+            scheduled_scenario=scheduled,
+            user=scheduled.user
+        )
         execute_test.delay(server.pk, scheduled=True, email=True)
-        if server.scheduled:
-            return redirect(reverse('server_run:server-run_list_scheduled'))
+        if server.scheduled_scenario:
+            return redirect(reverse('server_run:server-run_list_scheduled', kwargs={'uuid': scheduled.uuid}))
         return redirect(reverse('server_run:server-run_list'))
+
+
+class ScheduleActivate(OwnerSingleObject, View):
+
+    model = ScheduledTestScenario
+    pk_name = 'uuid'
+    slug_pk_name = 'uuid'
+
+    def get(self, request, *args, **kwargs):
+        scheduled = self.get_object()
+        scheduled.active = not scheduled.active
+        scheduled.save()
+        return redirect(reverse('server_run:scheduled-test-scenario_list'))
 
 
 class StopServer(OwnerSingleObject, View):

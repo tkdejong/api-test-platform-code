@@ -1,12 +1,13 @@
 import logging
 import copy
 import collections
+from copy import deepcopy
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from .models import ServerRun, Endpoint, TestScenario
+from .models import ServerRun, Endpoint, TestScenario, Environment
 from ..utils.newman import NewmanManager
 from ..utils.forms import CustomModelChoiceField
 
@@ -31,14 +32,23 @@ class CreateServerRunForm(forms.ModelForm):
         test_scenario = self.cleaned_data.get('test_scenario')
 
 
-class CreateEndpointForm(forms.ModelForm):
+class SelectEnvironmentForm(forms.Form):
 
-    class Meta:
-        model = Endpoint
-        fields = ['url']
-        labels = {
-            'url': 'url'
-        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args)
+        envs = kwargs.pop('envs', None)
+        if envs:
+            self.fields['environment'] = forms.ModelChoiceField(envs, required=False)
+        self.fields['create_env'] = forms.CharField(label=_('Create new environment'), required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('environment') and not cleaned_data.get('create_env'):
+            raise ValidationError(_("Please select either an environment or check create new environment"))
+        return cleaned_data
+
+
+class CreateEndpointForm(forms.Form):
 
     def set_labels(self, labels):
         tmp = collections.OrderedDict()
@@ -50,36 +60,30 @@ class CreateEndpointForm(forms.ModelForm):
             self.fields[e] = forms.CharField(widget=forms.Textarea)
 
     def __init__(self,
-                 quantity=0,
-                 placeholders=[],
-                 field_name='field',
-                 text_area=[],
-                 text_area_field_name=[],
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Override the field type since in the model is charfield
-        if not placeholders:
-            placeholders = ['http://www.example.com' for i in range(quantity + 1)]
-        self.fields['url'] = forms.URLField(
-            widget=forms.URLInput(
-                attrs={'placeholder': placeholders[0]}),
-            initial=placeholders[0]
-        )
-        for i in range(quantity):
-            if isinstance(field_name, str):
-                self.fields['{}-{}'.format(field_name, i + 1)] = forms.URLField(
-                    widget=forms.URLInput(
-                        attrs={'placeholder': placeholders[i + 1]}),
-                    initial=placeholders[i + 1]
+                 url_vars=None,
+                 text_vars=None,
+                 url_placeholders=None,
+                 text_placeholders=None,
+                 *args,
+                 **kwargs):
+        super().__init__(*args)
+
+        if url_vars:
+            if not url_placeholders:
+                url_placeholders = ['http://www.example.com' for i in range(len(url_vars))]
+
+            for url_var, placeholder in zip(url_vars, url_placeholders):
+                self.fields[url_var.name] = forms.URLField(
+                    widget=forms.URLInput(attrs={'placeholder': placeholder}),
+                    initial=placeholder
                 )
-            else:
-                self.fields[field_name[i]] = forms.URLField(
-                    widget=forms.URLInput(
-                        attrs={'placeholder': placeholders[i + 1]}),
-                    initial=placeholders[i + 1]
+
+        if text_vars:
+            if not text_placeholders:
+                text_placeholders = ['text' for i in range(len(text_vars))]
+
+            for text_var, placeholder in zip(text_vars, text_placeholders):
+                self.fields[text_var.name] = forms.CharField(
+                    widget=forms.Textarea(),
+                    initial=placeholder
                 )
-        for j, e in enumerate(text_area):
-            self.fields[text_area_field_name[j]] = forms.CharField(
-                widget=forms.Textarea(),
-                initial=placeholders[quantity + 1 + j]
-            )

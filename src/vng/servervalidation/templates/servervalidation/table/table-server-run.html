@@ -20,7 +20,15 @@
         </div>
     </td>
 </tr>
-{% for ep in server_run.endpoint_set.all %}
+
+<tr>
+    <td>{% trans "Environment" %}</td>
+    <td>
+        {{ server_run.environment }}
+    </td>
+</tr>
+
+{% for ep in server_run.environment.endpoint_set.all %}
     <tr>
 
         <td>{{ ep.test_scenario_url.name }}</td>

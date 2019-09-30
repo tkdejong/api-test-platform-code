@@ -49,7 +49,7 @@ def get_username():
 
 
 def get_subdomain(url):
-    return re.search('([0-9]+)\-', url).group(1)
+    return re.search('[\w]{8}(-[\w]{4}){3}-[\w]{12}', url).group()
 
 
 @override_settings(SUBDOMAIN_SEPARATOR='-')

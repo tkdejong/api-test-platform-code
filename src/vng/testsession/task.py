@@ -242,13 +242,11 @@ def bootstrap_session(session_uuid, purged=False):
             return
 
     # collecting all the containers
-    subdomains = list(range(100, 200))
-    random.shuffle(subdomains)
     for ep in endpoint:
         bind_url = ExposedUrl.objects.create(
             session=session,
             vng_endpoint=ep,
-            subdomain='{}{}'.format(int(time.time()), subdomains.pop()),
+            subdomain=uuid.uuid4(),
             port=ep.port
         )
         exposed_urls.append(bind_url)
@@ -314,11 +312,10 @@ def run_tests(session_uuid):
             newman.replace_parameters({
                 ep.name: '{}:{}{}'.format(eu.docker_url, ep.port, ep.path)
             })
-        result = newman.execute_test()
+        result, result_json = newman.execute_test()
         ts = TestSession()
         ts.save_test(result)
-        with newman.execute_test_json() as result_json:
-            ts.save_test_json(result_json)
+        ts.save_test_json(result_json)
 
         ts.save()
         eu.test_session = ts

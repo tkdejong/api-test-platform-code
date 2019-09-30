@@ -8,6 +8,7 @@ Django==2.2.4
 # django-admin-tools
 django-hijack
 django-hijack-admin
+django-ckeditor
 django-axes
 django-choices
 django-rosetta
@@ -39,6 +40,7 @@ idna
 requests
 pyjwt
 celery
+requests_mock
 coreapi
 django-bootstrap-breadcrumbs
 drf-yasg

@@ -51,7 +51,7 @@
                             <tbody>
                                 {% for sc in cases %}
                                     <tr>
-                                        <td>{{sc.http_method}} {% if sc.description %}<a href="#" data-toggle="tooltip" title="{{sc.description}}">?</a>{% endif %}</td>
+                                        <td>{{sc.http_method}} {% if sc.description %}<span class="case-description" data-toggle="tooltip" title="{{sc.description}}">?</span>{% endif %}</td>
                                         <td>{{sc.url}}</td>
                                         <td>
                                         {% for qp in sc.queryparamsscenario_set.all %}

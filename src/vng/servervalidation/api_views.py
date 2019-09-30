@@ -117,7 +117,7 @@ class ResultServerViewShield(views.APIView):
     @swagger_auto_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
-        return JsonResponse(get_server_run_badge(server, 'API Test Platform (beta)'))
+        return JsonResponse(get_server_run_badge(server, 'API Test Platform'))
 
 
 class ResultServerView(views.APIView):
@@ -216,33 +216,25 @@ class PostmanTestViewset(mixins.ListModelMixin,
 
 class ServerRunLatestResultView(views.APIView):
     """
-    Retrieve the latest badge for a test scenario
+    Retrieve the latest badge for a specific environment
 
-    Return the badge information of the latest provider run given a combination of
-    test scenario name and username of the user that starten the provider run
+    Return the badge information of the latest provider run for a specific environment
     """
 
     @swagger_auto_schema(
         responses={200: ServerRunResultShield},
         manual_parameters=[
             openapi.Parameter(
-                'name',
+                'uuid',
                 openapi.IN_PATH,
                 type=openapi.TYPE_STRING,
-                description='Name of the test scenario'
-            ),
-            openapi.Parameter(
-                'user',
-                openapi.IN_PATH,
-                type=openapi.TYPE_STRING,
-                description='Name of the user that started the provider run for the test scenario'
+                description='UUID of the environment'
             ),
         ])
-    def get(self, request, name, user):
+    def get(self, request, uuid):
         latest_server_run = ServerRun.objects.filter(
-            test_scenario__name=name,
-            user__username=user
+            environment__uuid=uuid
         ).order_by('-stopped').first()
         if not latest_server_run:
             raise Http404
-        return JsonResponse(get_server_run_badge(latest_server_run, 'API Test Platform (beta)'))
+        return JsonResponse(get_server_run_badge(latest_server_run, 'API Test Platform'))
