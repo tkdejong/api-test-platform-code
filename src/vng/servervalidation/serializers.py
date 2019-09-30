@@ -80,7 +80,6 @@ class ServerRunSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'started', 'stopped', 'status']
 
-    @transaction.atomic()
     def create(self, validated_data):
         endpoint_created = []
         env = validated_data.pop('environment')
