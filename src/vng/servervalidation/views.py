@@ -145,7 +145,6 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
         data['form'] = SelectEnvironmentForm(envs=envs)
         return data
 
-    @transaction.atomic()
     def post(self, request, *args, **kwargs):
         test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
         envs = test_scenario.environment_set.all()
