@@ -41,10 +41,27 @@ class SelectEnvironmentForm(forms.Form):
             self.fields['environment'] = forms.ModelChoiceField(envs, required=False)
         self.fields['create_env'] = forms.CharField(label=_('Create new environment'), required=False)
 
+        test_scenario = kwargs.pop('test_scenario', None)
+        if test_scenario:
+            self.test_scenario = test_scenario
+
+        user = kwargs.pop('user', None)
+        if user:
+            self.user = user
+
     def clean(self):
         cleaned_data = super().clean()
         if not cleaned_data.get('environment') and not cleaned_data.get('create_env'):
             raise ValidationError(_("Please select either an environment or check create new environment"))
+
+        qs = Environment.objects.filter(
+            test_scenario=self.test_scenario,
+            name=cleaned_data['create_env'],
+            user=self.user
+        )
+        if qs.exists():
+            raise ValidationError(_("An environment with this name for this test scenario already exists"))
+
         return cleaned_data
 
 
