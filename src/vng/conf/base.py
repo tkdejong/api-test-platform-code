@@ -402,6 +402,7 @@ SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 RECAPTCHA_PUBLIC_KEY = '6LfwbaoUAAAAAJ7Bl5o-7pe9DKluPOLX-URNB821'
 RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY', 'default')
 
+CELERY_TIMEZONE = 'Europe/Amsterdam'
 
 CELERY_BEAT_SCHEDULE = {
     'task-number-one': {
