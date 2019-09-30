@@ -148,11 +148,11 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
         envs = test_scenario.environment_set.all()
-        form = self.form_class(request.POST, envs=envs)
+        form = self.form_class(request.POST, envs=envs, test_scenario=test_scenario, user=self.request.user)
         if form.is_valid():
             new_env_name = request.POST.get('create_env')
             if new_env_name:
-                env = Environment.objects.create(test_scenario=test_scenario, name=new_env_name)
+                env = Environment.objects.create(test_scenario=test_scenario, name=new_env_name, user=self.request.user)
                 if request.session.get('server_run_scheduled'):
                     scheduled = ScheduledTestScenario.objects.create(
                         test_scenario=test_scenario,
