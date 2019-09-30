@@ -7,7 +7,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from .models import ServerRun, Endpoint, TestScenario, Environment
+from .models import ServerRun, Endpoint, TestScenario, Environment, ScheduledTestScenario
 from ..utils.newman import NewmanManager
 from ..utils.forms import CustomModelChoiceField
 
@@ -40,14 +40,9 @@ class SelectEnvironmentForm(forms.Form):
         if envs:
             self.fields['environment'] = forms.ModelChoiceField(envs, required=False)
         self.fields['create_env'] = forms.CharField(label=_('Create new environment'), required=False)
-
-        test_scenario = kwargs.pop('test_scenario', None)
-        if test_scenario:
-            self.test_scenario = test_scenario
-
-        user = kwargs.pop('user', None)
-        if user:
-            self.user = user
+        self.test_scenario = kwargs.pop('test_scenario', None)
+        self.user = kwargs.pop('user', None)
+        self.scheduled = kwargs.pop('scheduled', None)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -60,7 +55,23 @@ class SelectEnvironmentForm(forms.Form):
             user=self.user
         )
         if qs.exists():
-            raise ValidationError(_("An environment with this name for this test scenario already exists"))
+            raise ValidationError(_(
+                "An environment with this name for this test scenario already exists, please choose "
+                "a different name or select an existing environment."
+            ))
+
+        if self.scheduled and cleaned_data.get('environment'):
+            qs = ScheduledTestScenario.objects.filter(
+                test_scenario=self.test_scenario,
+                environment=cleaned_data.get('environment'),
+                user=self.user
+            )
+            if qs.exists():
+                raise ValidationError(_(
+                    "A schedule for this test scenario and environment already exists, please create "
+                    "a new environment or select an existing environment."
+                ))
+
 
         return cleaned_data
 
