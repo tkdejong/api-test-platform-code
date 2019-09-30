@@ -152,7 +152,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
         if form.is_valid():
             new_env_name = request.POST.get('create_env')
             if new_env_name:
-                env = Environment.objects.create(test_scenario=test_scenario, name=new_env_name)
+                env = Environment.objects.create(test_scenario=test_scenario, name=new_env_name, user=self.request.user)
                 if request.session.get('server_run_scheduled'):
                     scheduled = ScheduledTestScenario.objects.create(
                         test_scenario=test_scenario,
