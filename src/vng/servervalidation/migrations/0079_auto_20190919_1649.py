@@ -10,7 +10,8 @@ def create_scheduled_scenarios(apps, schema_editor):
     for server_run in ServerRun.objects.all():
         environment, _ = Environment.objects.get_or_create(
             test_scenario=server_run.test_scenario,
-            name=f"{server_run.test_scenario.name} {server_run.started}",
+            name="{} {}".format(server_run.test_scenario.name,
+                                server_run.started),
             user=server_run.user,
         )
 
