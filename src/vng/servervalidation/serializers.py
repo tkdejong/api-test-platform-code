@@ -46,7 +46,7 @@ class EnvironmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Environment
-        fields = ('name', 'endpoints')
+        fields = ('name', 'uuid', 'endpoints')
 
         extra_kwargs = {
             'endpoints': {
