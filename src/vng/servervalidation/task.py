@@ -6,6 +6,7 @@ import json
 
 from django.core.files import File
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from celery.utils.log import get_task_logger
@@ -27,29 +28,21 @@ logger = get_task_logger(__name__)
 @app.task
 def execute_test_scheduled():
     scheduled_scenarios = ScheduledTestScenario.objects.filter(active=True)
+    test_results = {user_id: [] for user_id in scheduled_scenarios.values_list('user', flat=True).distinct('user')}
+
     for schedule in scheduled_scenarios:
-        # server_run = ServerRun.objects.filter(scheduled=True).filter(status=choices.StatusWithScheduledChoices.scheduled).order_by('user')
         server_run = ServerRun.objects.create(
             test_scenario=schedule.test_scenario,
             scheduled_scenario=schedule,
             environment=schedule.environment,
-            user=schedule.user
+            user=schedule.user,
+            status=choices.StatusWithScheduledChoices.running
         )
-        s_list = []
-        failed = False
-        for i, sr in enumerate(server_run):
-            sr.status = choices.StatusWithScheduledChoices.running
-            sr.save()
-            result = execute_test(sr.pk, scheduled=True)
-            failed = failed or result
-            s_list.append((sr, result))
-            if i == len(server_run) - 1 or sr.user != server_run[i + 1].user and s_list != []:
-                # Send email only if there is at least one failure
-                if result:
-                    send_email_failure(s_list)
-                s_list = []
-                failed = False
+        result = execute_test(server_run.pk, scheduled=True)
+        test_results[schedule.user.id].append((server_run, result))
 
+    if test_results:
+        send_email_failure(test_results)
 
 def substitute_hidden_vars(server_run, file):
     data = file.read()
@@ -137,19 +130,23 @@ def execute_test(server_run_pk, scheduled=False, email=False):
     return failure
 
 
-def send_email_failure(sl):
+def send_email_failure(test_results):
     from django.contrib.sites.models import Site
     domain = Site.objects.get_current().domain
-    msg_html = render_to_string('servervalidation/failed_test_email.html', {
-        'successful': [s for s in sl if not s[1]],
-        'failure': [s for s in sl if s[1]],
-        'domain': domain
-    })
 
-    send_mail(
-        _('Results of scheduled tests'),
-        msg_html,
-        settings.DEFAULT_FROM_EMAIL,
-        [sl[0][0].user.email],
-        html_message=msg_html
-    )
+    for user_id, result_list in test_results.items():
+        msg_html = render_to_string('servervalidation/failed_test_email.html', {
+            'successful': [(run, failed) for run, failed in result_list if not failed],
+            'failure': [(run, failed) for run, failed in result_list if failed],
+            'domain': domain
+        })
+
+        user = get_user_model().objects.get(id=user_id)
+
+        send_mail(
+            _('Results of scheduled tests'),
+            msg_html,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            html_message=msg_html
+        )
