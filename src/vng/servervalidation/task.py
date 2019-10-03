@@ -60,8 +60,7 @@ def execute_test(server_run_pk, scheduled=False, email=False):
 
     file_name = str(uuid.uuid4())
     postman_tests = PostmanTest.objects.filter(test_scenario=server_run.test_scenario).order_by('order')
-    # remove previous results
-    PostmanTestResult.objects.filter(server_run=server_run).delete()
+
     failure = False
     try:
         for counter, postman_test in enumerate(postman_tests):
@@ -116,16 +115,12 @@ def execute_test(server_run_pk, scheduled=False, email=False):
         server_run.status_exec = traceback.format_exc()
 
     server_run.percentage_exec = 100
-    # if not scheduled:
     if server_run.status != choices.StatusChoices.error_deploy:
         server_run.status = choices.StatusWithScheduledChoices.stopped
     server_run.stopped = timezone.now()
 
-    # else:
-        # server_run.last_exec = timezone.now()
-        # server_run.status = choices.StatusWithScheduledChoices.scheduled
-    if email and not failure:
-        send_email_failure([(server_run, failure)])
+    if email:
+        send_email_failure({server_run.user.id: [(server_run, failure)]})
     server_run.save()
     return failure
 

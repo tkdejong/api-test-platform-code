@@ -95,7 +95,7 @@ class ServerRunViewSet(
             server = serializer.save(user=self.request.user, pk=None, started=timezone.now())
 
 
-class TriggerServerRunView(viewsets.ViewSet):
+class TriggerServerRunScheduledView(viewsets.ViewSet):
     authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
 

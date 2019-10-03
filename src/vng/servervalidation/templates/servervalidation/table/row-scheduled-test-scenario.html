@@ -19,7 +19,7 @@
     </td>
     <td>
         {% if scheduled.active %}
-            <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' scheduled.uuid %}">{% trans "Fire now" %}</a>
+            <a type="submit" class="btn btn-primary"  href="{% url 'server_run:scheduled-server-run_trigger' scheduled.uuid %}">{% trans "Fire now" %}</a>
             <a type="submit" class="btn btn-primary btn-danger"  href="{% url 'server_run:schedule_activate' scheduled.uuid %}">{% trans "Deactivate" %}</a>
         {% else %}
             <a type="submit" class="btn btn-primary btn-success"  href="{% url 'server_run:schedule_activate' scheduled.uuid %}">{% trans "Reactivate" %}</a>

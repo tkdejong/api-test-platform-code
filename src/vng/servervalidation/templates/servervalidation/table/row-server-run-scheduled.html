@@ -18,9 +18,6 @@
             <span class="badge badge-pill badge-dark">{{ server_run.status }}</span>
         {% endif %}
     </td>
-
-    <td>{{ server_run.test_scenario.name }}</td>
-    <td>{{ server_run.environment.name }}</td>
     <td>
         {% if server_run.success != None %}
             {% if server_run.success  %}
@@ -29,6 +26,14 @@
                 <p class='icon icon--cross'></p>
             {% endif %}
         {% endif %}
+    </td>
+    <td>
+        {% with server_run.get_all_call_results as results %}
+            {% if server_run.success is not None %}
+                {{results.0}}<i class="cui-circle-check "></i>
+                {{results.1}}<i class="cui-circle-x "></i>
+            {% endif %}
+        {% endwith %}
     </td>
     <td>
         {% if server_run.stopped %}
@@ -41,9 +46,6 @@
                 {% csrf_token %}
                 <input type="submit" class="btn btn-danger"  value="Stop">
             </form>
-            {% comment %} {% if not server_run.is_running %}
-                <a type="submit" class="btn btn-primary"  href="{% url 'server_run:server-run_trigger' server_run.pk %}">{% trans "Fire now" %}</a>
-            {% endif %} {% endcomment %}
         {% endif %}
     </td>
 </tr>

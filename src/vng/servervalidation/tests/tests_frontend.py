@@ -261,7 +261,7 @@ class IntegrationTest(WebTest):
     def test_trigger(self):
         prev = len(PostmanTestResult.objects.all())
         self.app.get(
-            reverse('server_run:server-run_trigger', kwargs={
+            reverse('server_run:scheduled-server-run_trigger', kwargs={
                 'uuid': self.scheduled.uuid
             }), user=self.user
         )
@@ -593,7 +593,7 @@ class ScheduledTestScenarioTests(WebTest):
             environment=self.environment
         )
 
-        call = self.app.get(reverse('server_run:server-run_trigger', kwargs={
+        call = self.app.get(reverse('server_run:scheduled-server-run_trigger', kwargs={
             'uuid': scheduled.uuid
         }), user=self.user)
 
