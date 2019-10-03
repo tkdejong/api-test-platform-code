@@ -154,7 +154,7 @@ class ScheduledTestScenario(models.Model):
         unique_together = ('test_scenario', 'user', 'environment',)
 
     def __str__(self):
-        return '{} - {}'.format(self.test_scenario, self.user)
+        return '{} - {}'.format(self.test_scenario, self.environment.name)
 
     @property
     def last_run(self):
