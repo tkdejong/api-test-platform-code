@@ -1,9 +1,16 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
 {% load i18n %}
 
 {% block title %}{% trans "Providers" %}{% endblock %}
 
+
+{% block breadcrumb %}
+{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' %}
+{% breadcrumb "Provider tests" 'server_run:server-run_list' object_list.0.test_scenario.uuid object_list.0.environment.uuid %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 {% block content %}
 <div id="ui-view">

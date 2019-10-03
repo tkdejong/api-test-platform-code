@@ -1,9 +1,15 @@
 {% extends 'master.html' %}
 {% load sniplates %}
 {% load i18n %}
+{% load django_bootstrap_breadcrumbs %}
 
 {% block title %}{% trans "Providers" %}{% endblock %}
 
+{% block breadcrumb %}
+{% breadcrumb "Scheduled test scenarios" 'server_run:scheduled-test-scenario_list' %}
+{% breadcrumb "Scheduled provider tests" 'server_run:server-run_list_scheduled' object_list.0.scheduled_scenario.uuid %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 {% block content %}
 <div id="ui-view">
@@ -11,7 +17,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                  {% trans "Scheduled tests" %}
+                  {% trans "Scheduled provider tests" %}
 		  <a href="{% url 'server_run:server-run_create_item' %}" class="btn btn-success float-right"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
                 </div>
                 <div class="card-body">
