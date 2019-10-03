@@ -59,7 +59,7 @@ class ServerRunList(LoginRequiredMixin, ListView):
             user=self.request.user,
             test_scenario__uuid=self.kwargs['scenario_uuid'],
             environment__uuid=self.kwargs['env_uuid'],
-        ).filter(scheduled=False).order_by('-started')
+        ).filter(scheduled_scenario=None).order_by('-started')
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
@@ -424,9 +424,14 @@ class StopServer(OwnerSingleObject, View):
         server.stopped = timezone.now()
         server.status = choices.StatusWithScheduledChoices.stopped
         server.save()
-        if server.scheduled:
-            return redirect(reverse('server_run:server-run_list_scheduled'))
-        return redirect(reverse('server_run:server-run_list'))
+        if server.scheduled_scenario:
+            return redirect(reverse('server_run:server-run_list_scheduled', kwargs={
+                'uuid': server.scheduled_scenario.uuid
+            }))
+        return redirect(reverse('server_run:server-run_list', kwargs={
+            'uuid': server.test_scenario.uuid,
+            'env_uuid': server.environment.uuid
+        }))
 
 
 class ServerRunLogView(DetailView):
