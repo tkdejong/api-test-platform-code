@@ -27,6 +27,11 @@ class PostmanTestInline(admin.TabularInline):
     model = model.PostmanTest
 
 
+@admin.register(model.API)
+class APIAdmin(admin.ModelAdmin):
+    list_display = ['name']
+
+
 @admin.register(model.PostmanTest)
 class PostmanTestAdmin(AdminChangeLinksMixin, OrderedModelAdmin):
     list_display = ['name', 'version', 'test_scenario', 'move_up_down_links',
