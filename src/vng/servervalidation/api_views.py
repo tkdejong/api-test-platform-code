@@ -154,7 +154,7 @@ class ResultServerView(views.APIView):
                 _call = {
                     'name': call['item']['name'],
                     'request': call['request']['method'],
-                    'response': call['response']['code'],
+                    'response': call.get('response', {}).get('code'),
                 }
                 if 'assertions' in call:
                     for _assertion in call['assertions']:
@@ -163,7 +163,7 @@ class ResultServerView(views.APIView):
                 else:
                     _call['assertions'] = []
 
-                if call['response']['code'] in ptm.get_error_codes():
+                if _call['response'] in ptm.get_error_codes() or not _call['response']:
                     _call['status'] = 'Error'
                 else:
                     _call['status'] = 'Success'
