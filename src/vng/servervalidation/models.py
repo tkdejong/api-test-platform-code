@@ -46,6 +46,9 @@ class TestScenario(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
         "The universally unique identifier of this test scenario"
     ))
+    api = models.ForeignKey(API, on_delete=models.PROTECT, null=True, blank=True, help_text=_(
+        "The API to which this test scenario belongs"
+    ))
 
     def __str__(self):
         return self.name
