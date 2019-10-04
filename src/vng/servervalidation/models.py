@@ -311,7 +311,7 @@ class PostmanTestResult(models.Model):
             return f
 
     def get_json_obj(self):
-        return postman.get_json_obj_file(self.log_json.path)
+        return postman.get_json_obj_file(self.log_json.path) if self.log_json else []
 
     def save_json(self, filename, file):
         content = json.load(file)
