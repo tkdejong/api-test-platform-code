@@ -372,14 +372,17 @@ class EnvironmentAPITests(TransactionWebTest):
         endpoint = call['environment']['endpoints'][0]
         self.assertEqual(endpoint['name'], 'url')
 
-    def test_create_server_run_with_existing_env_and_new_endpoints_fails(self):
+    def test_create_server_run_with_existing_env_and_new_endpoints(self):
         body = create_server_run(self.test_scenario.name, [self.tsu], env_name='test')
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), body, headers=self.get_user_key(), status='*')
-
-        self.assertEqual(call.status_code, 400)
-
         call = call.json
-        self.assertIn('environment.name', call)
+        body['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.test_scenario.name)
+        self.assertEqual(call['environment']['name'], 'test')
+        self.assertEqual(call['environment']['uuid'], str(self.environment1.uuid))
+
+        endpoint = call['environment']['endpoints'][0]
+        self.assertEqual(endpoint['name'], 'url')
 
     def test_create_server_run_with_new_env_with_same_name_as_env_for_different_user(self):
         body = create_server_run(self.test_scenario.name, [self.tsu], env_name='test2')
