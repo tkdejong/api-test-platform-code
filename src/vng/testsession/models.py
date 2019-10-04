@@ -180,15 +180,19 @@ class ScenarioCaseCollection(models.Model):
         except requests.exceptions.ConnectionError as e:
             raise ValidationError({'oas_link': _("The URL did not resolve")})
 
+        content = response.content
+
         # Translate yaml to Python dict if needed
         if self.oas_link.endswith('.yaml'):
             try:
-                schema = yaml.load(response.content, Loader=yaml.FullLoader)
+                schema = yaml.load(content, Loader=yaml.FullLoader)
             except yaml.scanner.ScannerError:
                 raise ValidationError({'oas_link': _("The URL does not point to a valid YAML file")})
         else:
             try:
-                schema = json.loads(response.content)
+                if isinstance(content, bytes):
+                    content = content.decode('utf-8')
+                schema = json.loads(content)
             except json.decoder.JSONDecodeError:
                 raise ValidationError({'oas_link': _("The URL does not point to a valid JSON file")})
 
