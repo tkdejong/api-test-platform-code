@@ -25,31 +25,40 @@ class TestAuth(WebTest):
 class SessionCreation(WebTest):
 
     def setUp(self):
-        SessionTypeFactory()
+        self.session_type = SessionTypeFactory.create()
 
     def test(self):
-        call = self.app.get(reverse('testsession:session_create'), user='admin')
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.session_type.api.id
+        }), user='admin')
         self.app.reset()
         form = call.forms[1]
         form['session_type'].force_value(value='1')
         response = form.submit(expect_errors=True)
 
     def test2(self):
-        call = self.app.get(reverse('testsession:session_create'), user='admin')
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.session_type.api.id
+        }), user='admin')
         form = call.forms[1]
-        form['session_type'] = '1'
+
+        form['session_type'] = self.session_type.id
         form.submit()
         call = self.app.get('/', user='admin')
         assert 'no session' not in str(call.body)
 
     def test3(self):
         SessionTypeFactory()
-        call = self.app.get(reverse('testsession:session_create'), user='admin')
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.session_type.api.id
+        }), user='admin')
         form = call.forms[1]
         form.submit(expect_errors=True)
 
     def test4(self):
-        call = self.app.get(reverse('testsession:session_create'), user='admin')
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.session_type.api.id
+        }), user='admin')
         form = call.forms[1]
         form['session_type'].force_value('2')
         form.submit(expect_errors=True)
