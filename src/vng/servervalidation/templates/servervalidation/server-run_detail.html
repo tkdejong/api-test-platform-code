@@ -223,26 +223,22 @@
                                     <b>{{calls.item.name}}</b>
                                 </td>
                                 <td>
-                                    {{calls.request.method}}
                                 </td>
                                 <td class="w-25">
-                                    <p class='icon icon--checkmark'></p>
                                 </td>
                                 {% else %}
                                 <td>
                                     <b>{{calls.item.name}}</b>
                                 </td>
                                 <td>
-                                    {{calls.request.method}}
                                 </td>
                                 <td class="w-25">
-                                    <p class='icon icon--cross'></p>
                                 </td>
                                 {% endif %}
                             </tr>
                             <tr>
                                 <td>
-                                    {{calls.request.url.url}}
+                                    {{calls.request.method}} {{calls.request.url.url}}
                                 </td>
                                 <td>
                                     {{ calls.response.code }} {{ calls.response.status }}
