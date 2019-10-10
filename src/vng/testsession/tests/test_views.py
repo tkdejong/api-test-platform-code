@@ -71,6 +71,33 @@ class RetrieveSessionType(WebTest):
         self.assertTrue(t[9]['id'] > 0)
 
 
+class SessionListTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.api1, self.api2 = APIFactory.create_batch(2)
+        self.sessiontype1 = SessionTypeFactory.create(api=self.api1, name='type1')
+        self.sessiontype2 = SessionTypeFactory.create(api=self.api2, name='type2')
+        SessionFactory.create(session_type=self.sessiontype1, user=self.user)
+        SessionFactory.create(session_type=self.sessiontype2, user=self.user)
+
+    def test_create_session_filters_by_api(self):
+        response = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.api1.id
+        }), user=self.user)
+
+        self.assertIn('type1', response.text)
+        self.assertNotIn('type2', response.text)
+
+    def test_list_filters_by_api(self):
+        response = self.app.get(reverse('testsession:sessions', kwargs={
+            'api_id': self.api1.id
+        }), user=self.user)
+
+        self.assertIn('type1', response.text)
+        self.assertNotIn('type2', response.text)
+
+
 @override_settings(SUBDOMAIN_SEPARATOR='-')
 class AuthorizationTests(WebTest):
 
