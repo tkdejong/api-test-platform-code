@@ -6,8 +6,15 @@
 {% block title %}{% trans "Server-run detail" %}{% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Home" 'server_run:server-run_list' %}
-{% breadcrumb 'Detail' 'testsession:sessions' %}
+{% if object.scheduled_scenario %}
+    {% breadcrumb "Scheduled test scenarios" 'server_run:scheduled-test-scenario_list' %}
+    {% breadcrumb "Scheduled rovider tests" 'server_run:server-run_list_scheduled' object.scheduled_scenario.uuid %}
+{% else %}
+    {% breadcrumb "Test scenarios" 'server_run:test-scenario_list' %}
+    {% breadcrumb "Provider tests" 'server_run:server-run_list' object.test_scenario.uuid object.environment.uuid %}
+{% endif %}
+
+{% breadcrumb 'Detail' 'server_run:server-run_detail' object.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
 

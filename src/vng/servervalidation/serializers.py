@@ -111,12 +111,7 @@ class ServerRunSerializer(serializers.ModelSerializer):
                     'value': value,
                     'environment': environment
                 }))
-        else:
-            if env['endpoint_set']:
-                raise serializers.ValidationError({"environment.name": _(
-                    "An environment with this name already exists, please leave "
-                    "environment.endpoints empty to use this existing environment"
-                )})
+
         instance = ServerRun.objects.create(**validated_data)
 
         transaction.on_commit(lambda: execute_test.delay(instance.pk))

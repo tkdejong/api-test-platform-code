@@ -116,7 +116,14 @@ class PostmanTestResultFactory(Dmf):
     postman_test = factory.SubFactory(PostmanTestFactory)
     server_run = factory.SubFactory(ServerRunFactory)
     log = factory.django.FileField()
-    log_json = factory.django.FileField()
+    log_json = factory.django.FileField(data=b'''
+        {
+            "run": {
+                "executions": [{"request": {"url": "test"}}],
+                "timings": {"started": "100", "stopped": "200"}
+            }
+        }
+    ''')
 
 
 class ScheduledTestScenarioFactory(Dmf):

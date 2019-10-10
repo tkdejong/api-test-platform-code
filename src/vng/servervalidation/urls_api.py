@@ -19,7 +19,8 @@ urlpatterns = [
     path('provider-latest-badge/<uuid:uuid>/', api_views.ServerRunLatestResultView.as_view(), name='latest-badge'),
     re_path(r'schema/openapi(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('schema', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('provider-run/<uuid:uuid>/trigger/', api_views.TriggerServerRunView.as_view({'put': 'update'}), name='provider'),
+    # TODO create new endpoint to trigger scheduled provide runs for scheduledtestscenario
+    # path('provider-run/<uuid:uuid>/trigger/', api_views.TriggerServerRunScheduledView.as_view({'put': 'update'}), name='provider'),
     path('provider-run/<uuid:uuid>/result/', api_views.ResultServerView.as_view(), name='provider_result'),
     path('', include((router.urls, 'server-api'), namespace='provider')),
 ]

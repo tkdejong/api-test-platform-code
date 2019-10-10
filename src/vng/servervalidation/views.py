@@ -32,7 +32,7 @@ class TestScenarioList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         res = []
-        runs_for_user = ServerRun.objects.filter(user=self.request.user)
+        runs_for_user = ServerRun.objects.filter(user=self.request.user, stopped__isnull=False)
         distinct_combinations = runs_for_user.select_related(
             'test_scenario', 'environment'
         ).order_by('test_scenario__id', 'environment__id', '-stopped').values_list(
@@ -59,10 +59,14 @@ class ServerRunList(LoginRequiredMixin, ListView):
             user=self.request.user,
             test_scenario__uuid=self.kwargs['scenario_uuid'],
             environment__uuid=self.kwargs['env_uuid'],
-        ).filter(scheduled=False).order_by('-started')
+        ).filter(scheduled_scenario=None).order_by('-started')
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
+
+        data['test_scenario'] = get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
+        data['environment'] = get_object_or_404(Environment, uuid=self.kwargs['env_uuid'])
+
         data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
         data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
         for sr in data['server_run_list']:
@@ -93,9 +97,12 @@ class ServerRunForm(CreateView):
         }))
 
 
-class ServerRunListScheduled(ServerRunList):
+class ServerRunListScheduled(LoginRequiredMixin, ListView):
 
     template_name = 'servervalidation/server-run_list_scheduled.html'
+    context_object_name = 'server_run_list_scheduled'
+    paginate_by = 10
+    model = ServerRun
 
     def get_queryset(self):
         uuid = self.kwargs.get('uuid')
@@ -105,6 +112,25 @@ class ServerRunListScheduled(ServerRunList):
         ).order_by('-started')
 
         return qs
+
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+
+        scheduled = get_object_or_404(ScheduledTestScenario, uuid=self.kwargs['uuid'])
+        data['scheduled_scenario'] = scheduled
+
+        data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
+        data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
+        for sr in data['server_run_list_scheduled']:
+            sr.success = sr.get_execution_result()
+        if 'server_run_scheduled' in self.request.session:
+            data['second_tab'] = self.request.session['server_run_scheduled']
+            del self.request.session['server_run_scheduled']
+        return data
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        return super().get(request, *args, **kwargs)
 
 
 class ScheduledTestScenarioList(LoginRequiredMixin, ListView):
@@ -148,7 +174,10 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
         envs = test_scenario.environment_set.all()
-        form = self.form_class(request.POST, envs=envs, test_scenario=test_scenario, user=self.request.user)
+        form = self.form_class(
+            request.POST, envs=envs, test_scenario=test_scenario,
+            user=self.request.user, scheduled=request.session.get('server_run_scheduled')
+        )
         if form.is_valid():
             new_env_name = request.POST.get('create_env')
             if new_env_name:
@@ -377,7 +406,7 @@ class ServerRunOutputUuid(DetailView):
         return context
 
 
-class TriggerServerRun(OwnerSingleObject, View):
+class TriggerServerRunScheduled(OwnerSingleObject, View):
 
     model = ScheduledTestScenario
     pk_name = 'uuid'
@@ -392,9 +421,27 @@ class TriggerServerRun(OwnerSingleObject, View):
             user=scheduled.user
         )
         execute_test.delay(server.pk, scheduled=True, email=True)
-        if server.scheduled_scenario:
-            return redirect(reverse('server_run:server-run_list_scheduled', kwargs={'uuid': scheduled.uuid}))
-        return redirect(reverse('server_run:server-run_list'))
+        return redirect(reverse('server_run:server-run_list_scheduled', kwargs={'uuid': scheduled.uuid}))
+
+
+class TriggerServerRun(OwnerSingleObject, View):
+
+    model = Environment
+    pk_name = 'uuid'
+    slug_pk_name = 'uuid'
+
+    def get(self, request, *args, **kwargs):
+        environment = self.get_object()
+        server = ServerRun.objects.create(
+            test_scenario=environment.test_scenario,
+            environment=environment,
+            user=environment.user
+        )
+        execute_test.delay(server.pk, email=False)
+        return redirect(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': environment.test_scenario.uuid,
+            'env_uuid': environment.uuid
+        }))
 
 
 class ScheduleActivate(OwnerSingleObject, View):
@@ -421,9 +468,14 @@ class StopServer(OwnerSingleObject, View):
         server.stopped = timezone.now()
         server.status = choices.StatusWithScheduledChoices.stopped
         server.save()
-        if server.scheduled:
-            return redirect(reverse('server_run:server-run_list_scheduled'))
-        return redirect(reverse('server_run:server-run_list'))
+        if server.scheduled_scenario:
+            return redirect(reverse('server_run:server-run_list_scheduled', kwargs={
+                'uuid': server.scheduled_scenario.uuid
+            }))
+        return redirect(reverse('server_run:server-run_list', kwargs={
+            'uuid': server.test_scenario.uuid,
+            'env_uuid': server.environment.uuid
+        }))
 
 
 class ServerRunLogView(DetailView):

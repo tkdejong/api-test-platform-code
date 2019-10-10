@@ -40,7 +40,7 @@ class ScenarioCaseRetrievalTests(TestCase):
         urls = ['/test1', '/test2a', '/test2b']
         for i, case in enumerate(scenario_cases):
             with self.subTest(case=case):
-                self.assertEqual(case.url, urls[i])
+                self.assertIn(case.url, urls)
 
         scenario_cases2 = sessiontype2.scenario_cases
         self.assertEqual(scenario_cases2.count(), 1)

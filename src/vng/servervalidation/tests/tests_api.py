@@ -10,6 +10,7 @@ from django.urls import reverse
 from rest_framework import status
 from vng.accounts.models import User
 from vng.postman.choices import ResultChoices
+from vng.utils.choices import StatusChoices
 
 from ..models import PostmanTestResult
 from .factories import (
@@ -372,14 +373,17 @@ class EnvironmentAPITests(TransactionWebTest):
         endpoint = call['environment']['endpoints'][0]
         self.assertEqual(endpoint['name'], 'url')
 
-    def test_create_server_run_with_existing_env_and_new_endpoints_fails(self):
+    def test_create_server_run_with_existing_env_and_new_endpoints(self):
         body = create_server_run(self.test_scenario.name, [self.tsu], env_name='test')
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), body, headers=self.get_user_key(), status='*')
-
-        self.assertEqual(call.status_code, 400)
-
         call = call.json
-        self.assertIn('environment.name', call)
+        body['uuid'] = call['uuid']
+        self.assertEqual(call['test_scenario'], self.test_scenario.name)
+        self.assertEqual(call['environment']['name'], 'test')
+        self.assertEqual(call['environment']['uuid'], str(self.environment1.uuid))
+
+        endpoint = call['environment']['endpoints'][0]
+        self.assertEqual(endpoint['name'], 'url')
 
     def test_create_server_run_with_new_env_with_same_name_as_env_for_different_user(self):
         body = create_server_run(self.test_scenario.name, [self.tsu], env_name='test2')
@@ -391,3 +395,68 @@ class EnvironmentAPITests(TransactionWebTest):
 
         endpoint = call['environment']['endpoints'][0]
         self.assertEqual(endpoint['name'], 'url')
+
+
+class ServerRunResultAPITests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.environment = EnvironmentFactory.create(user=self.user)
+        self.test_scenario = TestScenarioFactory.create(name='ZGW api tests')
+        self.server_run = ServerRunFactory.create(
+            test_scenario=self.test_scenario, stopped='2019-01-01T12:00:00Z',
+            user=self.user, environment=self.environment, status=StatusChoices.stopped
+        )
+
+    def test_get_result_request_without_response(self):
+        postman_result = PostmanTestResultFactory.create(server_run=self.server_run, status=ResultChoices.failed)
+        with open(postman_result.log_json.path, 'w') as f:
+            json.dump(
+                {
+                    'run': {
+                        'executions': [
+                            {
+                                'item': {'name': 'no response'},
+                                'request': {'method': 'GET', 'url': 'https://some-url.com'}
+                            }
+                        ],
+                        'timings': {'started': '100', 'stopped': '200'}
+                    }
+                },
+                f
+            )
+
+        response = self.app.get(reverse('apiv1server:provider_result', kwargs={
+            'uuid': self.server_run.uuid
+        }), user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json[0]['status'], ResultChoices.failed)
+        self.assertEqual(response.json[0]['calls'][0]['status'], 'Error')
+
+    def test_get_result_request_with_response(self):
+        postman_result = PostmanTestResultFactory.create(server_run=self.server_run, status=ResultChoices.success)
+        with open(postman_result.log_json.path, 'w') as f:
+            json.dump(
+                {
+                    'run': {
+                        'executions': [
+                            {
+                                'item': {'name': 'response'},
+                                'request': {'method': 'GET', 'url': 'https://some-url.com'},
+                                'response': {'code': 200}
+                            }
+                        ],
+                        'timings': {'started': '100', 'stopped': '200'}
+                    }
+                },
+                f
+            )
+
+        response = self.app.get(reverse('apiv1server:provider_result', kwargs={
+            'uuid': self.server_run.uuid
+        }), user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json[0]['status'], ResultChoices.success)
+        self.assertEqual(response.json[0]['calls'][0]['status'], 'Success')

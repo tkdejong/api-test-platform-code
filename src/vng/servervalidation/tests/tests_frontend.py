@@ -261,7 +261,7 @@ class IntegrationTest(WebTest):
     def test_trigger(self):
         prev = len(PostmanTestResult.objects.all())
         self.app.get(
-            reverse('server_run:server-run_trigger', kwargs={
+            reverse('server_run:scheduled-server-run_trigger', kwargs={
                 'uuid': self.scheduled.uuid
             }), user=self.user
         )
@@ -398,7 +398,6 @@ class ServerRunPublicLogsTests(WebTest):
 
     def setUp(self):
         self.user1, self.user2 = UserFactory.create_batch(2)
-        # self.environment = EnvironmentFactory.create()
 
         test_result_public = PostmanTestResultFactory.create(
             postman_test__name='test1',
@@ -415,16 +414,6 @@ class ServerRunPublicLogsTests(WebTest):
             'uuid': server_run.uuid,
             'test_result_pk': test_result_public.pk,
         })
-        with open(test_result_public.log_json.path, 'w') as f:
-            json.dump(
-                {
-                    'run': {
-                        'executions': [{'request': {'url': 'test'}}],
-                        'timings': {'started': '100', 'stopped': '200'}
-                    }
-                },
-                f
-            )
 
         test_result_private = PostmanTestResultFactory.create(
             server_run__test_scenario__public_logs=False,
@@ -440,16 +429,6 @@ class ServerRunPublicLogsTests(WebTest):
             'uuid': server_run.uuid,
             'test_result_pk': test_result_private.pk,
         })
-        with open(test_result_private.log_json.path, 'w') as f:
-            json.dump(
-                {
-                    'run': {
-                        'executions': [{'request': {'url': 'test'}}],
-                        'timings': {'started': '100', 'stopped': '200'}
-                    }
-                },
-                f
-            )
 
     def test_show_public_logs_same_user(self):
         response = self.app.get(self.detail_url_public, user=self.user1)
@@ -593,7 +572,7 @@ class ScheduledTestScenarioTests(WebTest):
             environment=self.environment
         )
 
-        call = self.app.get(reverse('server_run:server-run_trigger', kwargs={
+        call = self.app.get(reverse('server_run:scheduled-server-run_trigger', kwargs={
             'uuid': scheduled.uuid
         }), user=self.user)
 
@@ -601,3 +580,54 @@ class ScheduledTestScenarioTests(WebTest):
 
         self.assertEqual(server_runs.count(), 1)
         self.assertEqual(server_runs.first().scheduled_scenario, scheduled)
+
+
+class TestServerRunList(WebTest):
+
+    def setUp(self):
+        self.test_scenario = TestScenarioFactory.create()
+
+        self.tsf = TestScenarioUrlFactory(name='url', test_scenario=self.test_scenario)
+        self.pt = PostmanTestFactory(test_scenario=self.test_scenario)
+        self.user = UserFactory(username='testuser1')
+
+        self.environment = EnvironmentFactory.create(
+            name='testenv', test_scenario=self.test_scenario, user=self.user
+        )
+        self.server_run = ServerRunFactory(
+            test_scenario=self.test_scenario,
+            environment=self.environment,
+            user=self.user
+        )
+        self.postman_result = PostmanTestResultFactory(server_run=self.server_run)
+
+    def test_server_run_list(self):
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), auto_follow=True, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('testenv', response.text)
+
+    def test_server_run_list_without_json_file(self):
+        self.postman_result.log_json = None
+        self.postman_result.save()
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), auto_follow=True, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('testenv', response.text)
+
+    def test_server_run_list_without_html_file(self):
+        self.postman_result.log = None
+        self.postman_result.save()
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), auto_follow=True, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('testenv', response.text)

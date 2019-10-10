@@ -154,7 +154,7 @@ class ScheduledTestScenario(models.Model):
         unique_together = ('test_scenario', 'user', 'environment',)
 
     def __str__(self):
-        return '{} - {}'.format(self.test_scenario, self.user)
+        return '{} - {}'.format(self.test_scenario, self.environment.name)
 
     @property
     def last_run(self):
@@ -311,7 +311,7 @@ class PostmanTestResult(models.Model):
             return f
 
     def get_json_obj(self):
-        return postman.get_json_obj_file(self.log_json.path)
+        return postman.get_json_obj_file(self.log_json.path) if self.log_json else []
 
     def save_json(self, filename, file):
         content = json.load(file)
