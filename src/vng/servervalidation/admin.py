@@ -52,8 +52,8 @@ class EndpointAdmin(admin.ModelAdmin):
 
 @admin.register(model.ScheduledTestScenario)
 class ScheduledTestScenarioAdmin(admin.ModelAdmin):
-    list_display = ['test_scenario', 'user']
-    list_filter = ['test_scenario', 'user']
+    list_display = ['environment']
+    list_filter = ['environment']
 
 
 @admin.register(model.Environment)
