@@ -1,6 +1,6 @@
 ---
 
-- hosts: rachel
+- hosts: alice
   vars_files:
     - vars/test-secrets.yml
     - vars/test.yml
@@ -18,7 +18,7 @@
     - include: maykin-deployment/ansible/tasks/newrelic.yml
     - include: maykin-deployment/ansible/tasks/firewall.yml
     - include: maykin-deployment/ansible/tasks/logrotate.yml
-    - include: maykin-deployment/ansible/tasks/postgresql-9.6.yml
+    - include: maykin-deployment/ansible/tasks/postgresql-11.yml
     - include: maykin-deployment/ansible/tasks/npm.yml
     - include: maykin-deployment/ansible/tasks/set-maintenance-mode.yml
     - include: maykin-deployment/ansible/tasks/django-project-1.7.yml
