@@ -4,20 +4,22 @@ from factory.django import DjangoModelFactory as Dmf
 import factory
 from .factories import SessionTypeFactory
 from ..models import SessionType, Session
+from django.contrib.flatpages.models import FlatPage
+from django.contrib.sites.models import Site
 
 
 class TestCaseBase(WebTest):
 
-    def test(self):
+    def setUp(self):
+        flatpage = FlatPage.objects.create(url='/', title='tmp')
+        flatpage.sites.set([Site.objects.first()])
+
+    def test_no_auth(self):
         call = self.app.get('/')
-        self.assertEqual(call.status, '302 Found')
+        self.assertEqual(call.status, '200 OK')
 
 
-class TestAuth(WebTest):
-
-    def test(self):
-        call = self.app.get('/')
-        self.assertNotEqual(call.status, '200 OK')
+    def test_auth(self):
         call = self.app.get('/', user='test')
         self.assertEqual(call.status, '200 OK')
 
@@ -25,6 +27,8 @@ class TestAuth(WebTest):
 class SessionCreation(WebTest):
 
     def setUp(self):
+        flatpage = FlatPage.objects.create(url='/', title='tmp')
+        flatpage.sites.set([Site.objects.first()])
         self.session_type = SessionTypeFactory.create()
 
     def test(self):
