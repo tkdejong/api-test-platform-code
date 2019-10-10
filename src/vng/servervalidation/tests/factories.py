@@ -143,6 +143,4 @@ class ScheduledTestScenarioFactory(Dmf):
     class Meta:
         model = ScheduledTestScenario
 
-    test_scenario = factory.SubFactory(TestScenarioFactory)
-    user = factory.SubFactory(UserFactory)
     environment = factory.SubFactory(EnvironmentFactory)
