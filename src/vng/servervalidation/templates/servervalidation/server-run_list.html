@@ -43,18 +43,19 @@
                                 {% endif %}
                             {% endif %}
                         </table>
-
-                        <table class="ml-auto mt-auto mr-auto mb-3">
-                            <tr>
-                                <td>
-                                    <span display="block" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
-                                        <a href="{% url 'server_run:server-run_list' test_scenario.uuid environment.uuid %}">
-                                            <img style="height:30px"  alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
-                                        </a>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
+                        {% if environment.last_run %}
+                            <table class="ml-auto mt-auto mr-auto mb-3">
+                                <tr>
+                                    <td>
+                                        <span display="block" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                                            <a href="{% url 'server_run:server-run_list' test_scenario.uuid environment.uuid %}">
+                                                <img style="height:30px"  alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        {% endif %}
                     </div>
                     <table class="table">
                         {% include 'servervalidation/table/header-server-run.html' only %}

@@ -142,6 +142,11 @@ class Environment(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.test_scenario.name, self.name)
 
+    @property
+    def last_run(self):
+        latest = self.serverrun_set.exclude(stopped=None).order_by('-stopped').first()
+        return getattr(latest, 'stopped', None)
+
 
 class ScheduledTestScenario(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
