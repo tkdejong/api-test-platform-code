@@ -161,6 +161,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'vng.utils.context_processors.settings',
+                'vng.utils.context_processors.api_list',
                 # REQUIRED FOR ADMIN INDEX
                 'django_admin_index.context_processors.dashboard',
             ],
