@@ -10,7 +10,7 @@ from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResul
 from .factories import (
     TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory,
     UserFactory, PostmanTestSubFolderFactory, EndpointFactory, PostmanTestResultFactory,
-    EnvironmentFactory, ScheduledTestScenarioFactory
+    EnvironmentFactory, ScheduledTestScenarioFactory, APIFactory
 )
 from ...utils import choices, forms
 
@@ -26,7 +26,9 @@ class TestMultipleEndpoint(WebTest):
         TestScenarioUrlFactory(test_scenario=self.ts, name='url2')
 
     def test_run_collection(self):
-        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.ts.api.id
+        }), user=self.user)
         form = call.forms[1]
         form['test_scenario'] = self.ts.pk
 
@@ -68,7 +70,9 @@ class TestCreation(WebTest):
         }), user='test')
         self.assertNotIn('Starting', call.text)
 
-        call = self.app.get(reverse('server_run:server-run_create_item'), user='test')
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user='test')
         form = call.forms[1]
         form['test_scenario'].force_value('9')
         form.submit()
@@ -79,7 +83,9 @@ class TestCreation(WebTest):
         self.assertNotIn('Starting', call.text)
 
     def test_scenarios_create_new_env(self):
-        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
         form = call.forms[1]
         form['test_scenario'] = self.tsf.test_scenario.pk
 
@@ -94,7 +100,9 @@ class TestCreation(WebTest):
         form['Secret'] = 'secret'
         form.submit()
 
-        call = self.app.get(reverse('server_run:test-scenario_list'), user=self.user)
+        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
         self.assertIn(self.user.username, call.text)
         self.assertIn(self.test_scenario.name, call.text)
         self.assertIn('created_env_name', call.text)
@@ -127,7 +135,9 @@ class TestCreation(WebTest):
         call = self.app.get(url, user=self.user)
 
     def test_scenarios_use_existing_env(self):
-        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
         form = call.forms[1]
         form['test_scenario'] = self.tsf.test_scenario.pk
 
@@ -137,7 +147,9 @@ class TestCreation(WebTest):
 
         res = form.submit().follow()
 
-        call = self.app.get(reverse('server_run:test-scenario_list'), user=self.user)
+        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
         self.assertIn(self.user.username, call.text)
         self.assertIn(self.test_scenario.name, call.text)
         self.assertIn(self.environment.name, call.text)
@@ -186,12 +198,20 @@ class TestCreation(WebTest):
 class TestList(WebTest):
 
     def setUp(self):
-        TestScenarioFactory()
-        ServerRunFactory()
+        self.user = UserFactory.create()
+        self.api1, self.api2 = APIFactory.create_batch(2)
+        self.test_scenario1 = TestScenarioFactory(name='scenario1', api=self.api1)
+        self.test_scenario2 = TestScenarioFactory.create(name='scenario2', api=self.api2)
+        ServerRunFactory.create(test_scenario=self.test_scenario1, user=self.user, stopped='2019-01-01T00:00:00Z')
+        ServerRunFactory.create(test_scenario=self.test_scenario2, user=self.user, stopped='2019-01-01T00:00:00Z')
 
     def test_list(self):
-        call = self.app.get(reverse('server_run:test-scenario_list'), user='test')
-        assert 'no session' not in str(call.body)
+        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.api1.id
+        }), user=self.user)
+
+        self.assertIn('scenario1', call.text)
+        self.assertNotIn('scenario2', call.text)
 
 
 class TestUserRegistration(WebTest):
@@ -232,20 +252,24 @@ class TestUserRegistration(WebTest):
 class IntegrationTest(WebTest):
 
     def setUp(self):
+        self.api1, self.api2 = APIFactory.create_batch(2)
         self.user = UserFactory.create()
         self.server = ServerRunFactory()
-        self.test_scenario = TestScenarioFactory.create()
+        self.test_scenario = TestScenarioFactory.create(name='scenario1', api=self.api1)
+        self.test_scenario2 = TestScenarioFactory.create(name='scenario2', api=self.api2)
         TestScenarioUrlFactory.create(name='url', test_scenario=self.test_scenario)
         self.environment = EnvironmentFactory.create(
             test_scenario=self.test_scenario,
             user=self.user
         )
         PostmanTestFactory(test_scenario=self.test_scenario)
-        self.scheduled = ScheduledTestScenarioFactory.create(
-            test_scenario=self.test_scenario,
-            user=self.user,
-            environment=self.environment
-        )
+
+    def test_create_provider_run_filters_by_api(self):
+        response = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.api1.id
+        }))
+        self.assertIn('scenario1', response.text)
+        self.assertNotIn('scenario2', response.text)
 
     def test_access(self):
         server = ServerRunFactory(
@@ -261,14 +285,16 @@ class IntegrationTest(WebTest):
     def test_trigger(self):
         prev = len(PostmanTestResult.objects.all())
         self.app.get(
-            reverse('server_run:scheduled-server-run_trigger', kwargs={
-                'uuid': self.scheduled.uuid
+            reverse('server_run:server-run_trigger', kwargs={
+                'uuid': self.environment.uuid
             }), user=self.user
         )
         self.assertEqual(prev, len(PostmanTestResult.objects.all()) - 1)
 
     def test_badge(self):
-        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
         form = call.forms[1]
         form['test_scenario'] = self.test_scenario.pk
         res = form.submit().follow()
@@ -344,6 +370,54 @@ class IntegrationTest(WebTest):
             user='random',
             status=[403]
         )
+
+    def test_add_schedule_to_env(self):
+        response = self.app.get(reverse('server_run:server-run_create_schedule', kwargs={
+            'uuid': self.environment.uuid
+        }), user=self.user, auto_follow=True)
+
+        self.assertIn("Scheduled to run", response.text)
+
+        scheduled = ScheduledTestScenario.objects.filter(environment=self.environment)
+
+        self.assertEqual(scheduled.count(), 1)
+        self.assertEqual(scheduled.first().active, True)
+
+    def test_deactivate_schedule(self):
+        self.app.get(reverse('server_run:server-run_create_schedule', kwargs={
+            'uuid': self.environment.uuid
+        }), user=self.user)
+
+        response = self.app.get(reverse('server_run:schedule_activate', kwargs={
+            'uuid': self.environment.uuid
+        }), user=self.user, auto_follow=True)
+
+        self.assertIn("Schedule is currently not active", response.text)
+
+        scheduled = ScheduledTestScenario.objects.filter(environment=self.environment)
+
+        self.assertEqual(scheduled.count(), 1)
+        self.assertEqual(scheduled.first().active, False)
+
+    def test_reactivate_schedule(self):
+        self.app.get(reverse('server_run:server-run_create_schedule', kwargs={
+            'uuid': self.environment.uuid
+        }), user=self.user)
+
+        self.app.get(reverse('server_run:schedule_activate', kwargs={
+            'uuid': self.environment.uuid
+        }), user=self.user, auto_follow=True)
+
+        response = self.app.get(reverse('server_run:schedule_activate', kwargs={
+            'uuid': self.environment.uuid
+        }), user=self.user, auto_follow=True)
+
+        self.assertIn("Scheduled to run", response.text)
+
+        scheduled = ScheduledTestScenario.objects.filter(environment=self.environment)
+
+        self.assertEqual(scheduled.count(), 1)
+        self.assertEqual(scheduled.first().active, True)
 
 
 class TestScenarioDetail(WebTest):
@@ -507,79 +581,6 @@ class ServerRunPublicLogsTests(WebTest):
 
         response = self.app.get(self.log_html_url_private, status=[403])
         self.assertEqual(response.status_code, 403)
-
-
-class ScheduledTestScenarioTests(WebTest):
-
-    def setUp(self):
-        self.test_scenario = TestScenarioFactory.create()
-
-        self.tsf = TestScenarioUrlFactory(name='url', test_scenario=self.test_scenario)
-        self.pt = PostmanTestFactory(test_scenario=self.test_scenario)
-        self.user = UserFactory(username='testuser1')
-
-        self.environment = EnvironmentFactory.create(
-            name='testenv', test_scenario=self.test_scenario, user=self.user
-        )
-
-    def test_create_scheduled_scenario_with_new_env(self):
-        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
-        form = call.forms[1]
-        form['test_scenario'] = self.tsf.test_scenario.pk
-        form['scheduled'] = True
-
-        res = form.submit().follow()
-        form = res.forms[1]
-        form['create_env'] = 'created_env_name'
-
-        res = form.submit().follow()
-        form = res.forms[1]
-        form['url'] = 'https://ref.tst.vng.cloud/drc/api/v1/'
-        form['Client ID'] = 'client id'
-        form['Secret'] = 'secret'
-        form.submit()
-
-        scheduled = ScheduledTestScenario.objects.get(user=self.user)
-
-        call = self.app.get(reverse('server_run:scheduled-test-scenario_list'), user=self.user)
-        self.assertIn(self.user.username, call.text)
-        self.assertIn(self.test_scenario.name, call.text)
-        self.assertIn('created_env_name', call.text)
-
-    def test_create_scheduled_scenario_with_existing_env(self):
-        call = self.app.get(reverse('server_run:server-run_create_item'), user=self.user)
-        form = call.forms[1]
-        form['test_scenario'] = self.tsf.test_scenario.pk
-        form['scheduled'] = True
-
-        res = form.submit().follow()
-        form = res.forms[1]
-        form['environment'] = self.environment.id
-
-        res = form.submit().follow()
-
-        scheduled = ScheduledTestScenario.objects.get(user=self.user)
-
-        call = self.app.get(reverse('server_run:scheduled-test-scenario_list'), user=self.user)
-        self.assertIn(self.user.username, call.text)
-        self.assertIn(self.test_scenario.name, call.text)
-        self.assertIn(self.environment.name, call.text)
-
-    def test_trigger_server_run(self):
-        scheduled = ScheduledTestScenarioFactory.create(
-            test_scenario=self.test_scenario,
-            user=self.user,
-            environment=self.environment
-        )
-
-        call = self.app.get(reverse('server_run:scheduled-server-run_trigger', kwargs={
-            'uuid': scheduled.uuid
-        }), user=self.user)
-
-        server_runs = ServerRun.objects.all()
-
-        self.assertEqual(server_runs.count(), 1)
-        self.assertEqual(server_runs.first().scheduled_scenario, scheduled)
 
 
 class TestServerRunList(WebTest):
