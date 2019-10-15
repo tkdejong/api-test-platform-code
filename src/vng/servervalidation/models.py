@@ -190,9 +190,6 @@ class ServerRun(models.Model):
     stopped = models.DateTimeField(_('Stopped at'), null=True, default=None, blank=True, help_text=_(
         "The time at which the provider run was stopped"
     ))
-    last_exec = models.DateTimeField(_('Last run'), null=True, default=None, blank=True, help_text=_(
-        "The time at which the last provider run for the test scenario was executed"
-    ))
     status = models.CharField(
         max_length=20,
         choices=choices.StatusWithScheduledChoices.choices,
