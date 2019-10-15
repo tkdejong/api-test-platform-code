@@ -329,10 +329,10 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
         if not self.request.session.get('server_run_scheduled'):
             if self.ts.jwt_enabled():
-                self.server.client_id = data['Client ID']
-                self.server.secret = data['Secret']
+                self.server.client_id = data['Client ID'].strip()
+                self.server.secret = data['Secret'].strip()
             elif self.ts.custom_header():
-                ServerHeader(environment=self.env, header_key='Authorization', header_value=data['Authorization header']).save()
+                ServerHeader(environment=self.env, header_key='Authorization', header_value=data['Authorization header'].strip()).save()
             self.server.save()
 
             if self.server.scheduled:
