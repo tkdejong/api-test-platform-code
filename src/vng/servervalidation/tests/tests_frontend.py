@@ -5,7 +5,10 @@ from django_webtest import WebTest
 from django.urls import reverse
 
 from vng.testsession.tests.factories import UserFactory
-from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User, ScheduledTestScenario
+from vng.servervalidation.models import (
+    ServerRun, PostmanTest, PostmanTestResult,
+    User, ScheduledTestScenario, Endpoint
+)
 
 from .factories import (
     TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory,
@@ -133,6 +136,32 @@ class TestCreation(WebTest):
             'test_result_pk': ptr.pk
         })
         call = self.app.get(url, user=self.user)
+
+    def test_scenarios_strip_endpoint_values(self):
+        TestScenarioUrlFactory(name='token', test_scenario=self.test_scenario, url=False)
+
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
+        form = call.forms[1]
+        form['test_scenario'] = self.tsf.test_scenario.pk
+
+        res = form.submit().follow()
+        form = res.forms[1]
+        form['create_env'] = 'created_env_name'
+
+        res = form.submit().follow()
+        form = res.forms[1]
+        form['url'] = '    https://ref.tst.vng.cloud/drc/api/v1/    '
+        form['token'] = '   some-token  \n'
+        form['Client ID'] = 'client id'
+        form['Secret'] = 'secret'
+        form.submit()
+
+        endpoint1, endpoint2 = Endpoint.objects.all()
+
+        self.assertEqual(endpoint1.url, endpoint1.url.strip())
+        self.assertEqual(endpoint2.url, endpoint2.url.strip())
 
     def test_scenarios_use_existing_env(self):
         call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
