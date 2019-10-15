@@ -325,7 +325,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
         for key, value in data.items():
             if key in tsu_names:
                 tsu = testscenariourls.get(name=key)
-                Endpoint.objects.create(url=value, environment=self.env, test_scenario_url=tsu)
+                Endpoint.objects.create(url=value.strip(), environment=self.env, test_scenario_url=tsu)
 
         if not self.request.session.get('server_run_scheduled'):
             if self.ts.jwt_enabled():
