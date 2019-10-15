@@ -8,7 +8,8 @@
 {% else %}
     <tr>
 {% endif %}
-        <td>{{ report.scenario_case.http_method }} {% if report.scenario_case.description %}<span class="case-description" data-toggle="tooltip" title="{{report.scenario_case.description}}">?</span>{% endif %}</td>
+        <td>{{ report.scenario_case.http_method }}</td>
+        <td>{{ report.scenario_case.description }}</td>
         <td>{{ report.scenario_case.url }}</td>
         <td>
             {% for qps in report.scenario_case.queryparamsscenario_set.all %}
