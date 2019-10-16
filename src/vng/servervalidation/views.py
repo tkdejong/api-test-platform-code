@@ -40,18 +40,18 @@ class TestScenarioList(LoginRequiredMixin, ListView):
         runs_for_user = ServerRun.objects.filter(
             test_scenario__api=self.kwargs['api_id'],
             user=self.request.user,
-            stopped__isnull=False
         )
         distinct_combinations = runs_for_user.select_related(
             'test_scenario', 'environment'
-        ).order_by('test_scenario__id', 'environment__id', '-stopped').values_list(
+        ).order_by('test_scenario__id', 'environment__id').values_list(
             'test_scenario',
-            'environment',
-            'stopped'
+            'environment'
         ).distinct('test_scenario', 'environment')
-        for test_scenario_id, environment_id, last_run in distinct_combinations:
+        for test_scenario_id, environment_id in distinct_combinations:
             test_scenario = TestScenario.objects.get(id=test_scenario_id)
             environment = Environment.objects.get(id=environment_id)
+
+            last_run = environment.last_run
             res.append((test_scenario, environment, last_run))
         return res
 

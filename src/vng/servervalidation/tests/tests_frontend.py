@@ -1,9 +1,11 @@
 import factory
 import json
+import re
 
 from django_webtest import WebTest
 from django.urls import reverse
 
+from vng.postman.choices import ResultChoices
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import ServerRun, PostmanTest, PostmanTestResult, User, ScheduledTestScenario
 
@@ -632,3 +634,141 @@ class TestServerRunList(WebTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('testenv', response.text)
+
+
+class BadgesWithoutResultsTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.test_scenario = TestScenarioFactory.create()
+
+    def test_scenario_list_with_results(self):
+        ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped='2019-01-01T12:00:00Z',
+            user=self.user
+        )
+        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
+
+        self.assertIn('https://img.shields.io/', response.text)
+        self.assertNotIn('No results yet', response.text)
+
+    def test_scenario_list_without_results(self):
+        ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped=None,
+            user=self.user
+        )
+        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
+
+        self.assertIn('No results yet', response.text)
+        self.assertNotIn('https://img.shields.io/', response.text)
+
+    def test_server_run_list_with_results(self):
+        server_run = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped='2019-01-01T12:00:00Z',
+            user=self.user
+        )
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': server_run.environment.uuid
+        }), user=self.user)
+
+        self.assertIn('https://img.shields.io/', response.text)
+
+    def test_server_run_list_without_results(self):
+        server_run = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped=None,
+            user=self.user
+        )
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': server_run.environment.uuid
+        }), user=self.user)
+
+        self.assertNotIn('https://img.shields.io/', response.text)
+
+    def test_server_run_list_uses_latest_results(self):
+        server_run_with_results = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped='2019-01-01T12:00:00Z',
+            user=self.user
+        )
+        PostmanTestResultFactory.create(
+            server_run=server_run_with_results,
+            status=ResultChoices.success
+        )
+        ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            environment=server_run_with_results.environment,
+            stopped=None,
+            user=self.user
+        )
+
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': server_run_with_results.environment.uuid
+        }), user=self.user)
+
+        self.assertIn('https://img.shields.io/', response.text)
+
+    def test_server_run_detail_with_results(self):
+        server_run = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped='2019-01-01T12:00:00Z',
+            user=self.user
+        )
+        response = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'uuid': server_run.uuid
+        }), user=self.user)
+
+        self.assertIn('https://img.shields.io/', response.text)
+        self.assertNotIn('no results yet for this environment', response.text)
+
+    def test_server_run_detail_without_results(self):
+        server_run = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped=None,
+            user=self.user
+        )
+        response = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'uuid': server_run.uuid
+        }), user=self.user)
+
+        badge_div = response.html.find(
+            'div', {'class': 'card-header'},
+            text=re.compile('.*Test\sscenario\sbadge.*')
+        )
+
+        self.assertIn('no results yet for this environment', badge_div.nextSibling.text)
+        self.assertNotIn('https://img.shields.io/', badge_div.nextSibling.text)
+
+    def test_server_run_detail_uses_latest_results(self):
+        server_run_with_results = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            stopped='2019-01-01T12:00:00Z',
+            user=self.user
+        )
+        PostmanTestResultFactory.create(
+            server_run=server_run_with_results,
+            status=ResultChoices.success
+        )
+        server_run_without_results = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            environment=server_run_with_results.environment,
+            stopped=None,
+            user=self.user
+        )
+
+        response = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'uuid': server_run_without_results.uuid
+        }), user=self.user)
+
+        self.assertIn('https://img.shields.io/', response.text)
+        self.assertNotIn('no results yet for this environment', response.text)
