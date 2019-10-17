@@ -801,3 +801,35 @@ class BadgesWithoutResultsTests(WebTest):
 
         self.assertIn('https://img.shields.io/', response.text)
         self.assertNotIn('no results yet for this environment', response.text)
+
+
+class LatestServerRunTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.test_scenario = TestScenarioFactory.create()
+        self.environment = EnvironmentFactory.create(
+            test_scenario=self.test_scenario,
+            user=self.user
+        )
+
+    def test_latest_run_page_redirects_to_latest_run(self):
+        server_run1 = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            user=self.user,
+            stopped="2019-01-01T12:00:00Z",
+            environment=self.environment
+        )
+        server_run2 = ServerRunFactory.create(
+            test_scenario=self.test_scenario,
+            user=self.user,
+            stopped="2019-01-01T15:00:00Z",
+            environment=self.environment
+        )
+
+        response = self.app.get(reverse('server_run:server-run_latest', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), user=self.user)
+
+        self.assertIn(str(server_run2.id), response.text)
