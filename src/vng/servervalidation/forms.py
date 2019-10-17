@@ -22,7 +22,6 @@ class CreateServerRunForm(forms.ModelForm):
         model = ServerRun
         fields = [
             'test_scenario',
-            'scheduled',
         ]
 
     def __init__(self, *args, **kwargs):
