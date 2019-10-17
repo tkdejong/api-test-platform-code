@@ -586,3 +586,17 @@ class CreateSchedule(OwnerSingleObject, View):
             'scenario_uuid': environment.test_scenario.uuid,
             'env_uuid': environment.uuid
         }))
+
+
+class LatestRunView(ServerRunOutputUuid):
+    model = ServerRun
+    template_name = 'servervalidation/server-run_detail.html'
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
+
+    def get_object(self):
+        server_runs = ServerRun.objects.filter(
+            environment__uuid=self.kwargs['env_uuid'],
+            test_scenario__uuid=self.kwargs['scenario_uuid']
+        ).order_by('-stopped')
+        return server_runs.first()
