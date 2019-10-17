@@ -66,7 +66,7 @@ LOGGING['loggers'].update({
     },
     'django': {
         'handlers': ['django'],
-        'level': 'INFO',
+        'level': 'WARNING',
         'propagate': True,
     },
     'django.security.DisallowedHost': {
