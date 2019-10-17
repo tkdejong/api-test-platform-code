@@ -29,6 +29,7 @@ import vng.postman.utils as postman
 
 from vng.accounts.models import User
 from vng.postman.choices import ResultChoices
+from vng.servervalidation.models import API
 
 from ..utils import choices
 from ..utils.auth import get_jwt
@@ -71,6 +72,9 @@ class SessionType(models.Model):
     ))
     active = models.BooleanField(blank=True, default=True, help_text=_(
         "Indicates whether this test scenario can be used via the web interface and the API"
+    ))
+    api = models.ForeignKey(API, on_delete=models.PROTECT, null=True, blank=True, help_text=_(
+        "The API to which this session type belongs"
     ))
 
     class Meta:

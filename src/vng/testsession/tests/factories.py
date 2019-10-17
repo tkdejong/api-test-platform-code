@@ -10,6 +10,7 @@ from ..models import (
     SessionType, Session, ScenarioCaseCollection, ScenarioCase, VNGEndpoint, ExposedUrl,
     SessionLog, TestSession, QueryParamsScenario, InjectHeader
 )
+from ...servervalidation.tests.factories import APIFactory
 from ...utils import choices
 from ...utils.factories import UserFactory
 
@@ -24,6 +25,7 @@ class SessionTypeFactory(Dmf):
     role = 'Role'
     application = 'Application'
     version = '1.2.4'
+    api = factory.SubFactory(APIFactory)
 
 
 class TestSessionFactory(Dmf):

@@ -27,6 +27,11 @@ class PostmanTestInline(admin.TabularInline):
     model = model.PostmanTest
 
 
+@admin.register(model.API)
+class APIAdmin(admin.ModelAdmin):
+    list_display = ['name']
+
+
 @admin.register(model.PostmanTest)
 class PostmanTestAdmin(AdminChangeLinksMixin, OrderedModelAdmin):
     list_display = ['name', 'version', 'test_scenario', 'move_up_down_links',
@@ -47,8 +52,8 @@ class EndpointAdmin(admin.ModelAdmin):
 
 @admin.register(model.ScheduledTestScenario)
 class ScheduledTestScenarioAdmin(admin.ModelAdmin):
-    list_display = ['test_scenario', 'user']
-    list_filter = ['test_scenario', 'user']
+    list_display = ['environment']
+    list_filter = ['environment']
 
 
 @admin.register(model.Environment)
