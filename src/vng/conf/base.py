@@ -334,6 +334,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'test': {
+            'handlers': ['performance'],
+            'level': 'DEBUG',
+            'propagate': True
+        }
     }
 }
 
