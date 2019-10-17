@@ -74,11 +74,6 @@ LOGGING['loggers'].update({
         'level': 'CRITICAL',
         'propagate': False,
     },
-    'test': {
-        'handlers': ['sentry'],
-        'level': 'DEBUG',
-        'propagate': True
-    }
 })
 
 #

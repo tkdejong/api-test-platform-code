@@ -106,7 +106,7 @@
                         <li><a href="{% url 'server_run:server-run_detail_log' pr.server_run.uuid pr.id %}">{% trans "Visualize HTML log" %}</a></li>
                         <li><a href="{% url 'server_run:server-run_detail_log_json' pr.server_run.uuid pr.id %}">{% trans "Visualize JSON log" %}</a></li>
                     {% endif %}
-                    {% comment %} <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid pr.id  %}">{% trans "Visualize PDF report" %}</a></li> {% endcomment %}
+                    <li><a href="{% url 'server_run:server-run_detail_pdf' pr.server_run.uuid pr.id  %}">{% trans "Visualize PDF report" %}</a></li>
                 </ul>
             {% endfor %}
         </td>

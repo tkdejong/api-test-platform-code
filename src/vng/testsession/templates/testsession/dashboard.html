@@ -10,24 +10,6 @@
 
 {% block content %}
 <div id="ui-view">
-    {% comment %} <div class="row">
-        {% for api in api_list %}
-            <div class="col-sm-6 col-md-2">
-                <a href="{% url 'server_run:scheduled-test-scenario_list' %}" class="unvisited">
-                    <div class="card card-short text-white bg-info">
-                        <div class="card-body">
-                            <div class="h1 text-muted text-right mb-4">
-                                <i class="icon-calendar"></i>
-                            </div>
-                            <div class="text-value">{{servers_scheduled}}</div>
-                            <h4>{{ api.name }}</h3>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        {% endfor %}
-    </div> {% endcomment %}
-
     <div class="row">
         <div class="col-sm-6 col-md-2">
             <a href="{% url 'server_run:scheduled-test-scenario_list' %}" class="unvisited">
@@ -43,7 +25,7 @@
             </a>
         </div>
         <div class="col-sm-6 col-md-2">
-            {% comment %} <a href="{% url 'server_run:test-scenario_list' api.id %}" class="unvisited"> {% endcomment %}
+            <a href="{% url 'server_run:test-scenario_list' %}" class="unvisited">
                 <div class="card card-short bg-light">
                     <div class="card-body">
                         <div class="h1 text-muted text-right mb-4">
@@ -53,11 +35,11 @@
                         <small class="text-muted text-uppercase font-weight-bold">{% trans "Provider tests running" %}</small>
                     </div>
                 </div>
-            {% comment %} </a> {% endcomment %}
+            </a>
         </div>
         <div class="col-sm-6 col-md-2">
             <div class="card card-short text-white bg-success">
-                {% comment %} <a href="{% url 'testsession:sessions' api.id %}" class="unvisited"> {% endcomment %}
+                <a href="{% url 'testsession:sessions' %}" class="unvisited">
                     <div class="card-body">
                         <div class="h1 text-muted text-right mb-4">
                             <i class="icon-list"></i>
@@ -65,12 +47,12 @@
                         <div class="text-value">{{sessions_active}}</div>
                         <small class="text-muted text-uppercase font-weight-bold">{% trans "Consumer session active" %}</small>
                     </div>
-                {% comment %} </a> {% endcomment %}
+                </a>
             </div>
         </div>
         <div class="col-sm-6 col-md-2">
             <div class="card card-short text-white bg-secondary">
-                {% comment %} <a href="{% url 'testsession:sessions' api.id %}" class="unvisited"> {% endcomment %}
+                <a href="{% url 'testsession:sessions' %}" class="unvisited">
                     <div class="card-body">
                         <div class="h1 text-muted text-right mb-4">
                             <i class="icon-speedometer"></i>
@@ -78,11 +60,11 @@
                         <div class="text-value">{{sessions_active_docker}}</div>
                         <small class="text-muted text-uppercase font-weight-bold">{% trans "Consumer session kubernetes" %}</small>
                     </div>
-                {% comment %} </a> {% endcomment %}
+                </a>
             </div>
         </div>
         <div class="col-sm-6 col-md-2">
-            {% comment %} <a href="{% url 'testsession:sessions' api.id %}" class="unvisited"> {% endcomment %}
+            <a href="{% url 'testsession:sessions' %}" class="unvisited">
                 <div class="card card-short bg-dark text-white">
                     <div class="card-body">
                         <div class="h1 text-muted text-right mb-4">
@@ -92,11 +74,11 @@
                         <small class="text-muted text-uppercase font-weight-bold">{% trans "Hosted Consumer session" %}</small>
                     </div>
                 </div>
-            {% comment %} </a> {% endcomment %}
+            </a>
         </div>
         <div class="col-sm-6 col-md-2">
             <div class="card card-short text-white bg-warning">
-                {% comment %} <a href="{% url 'testsession:session_create' %}" class="unvisited"> {% endcomment %}
+                <a href="{% url 'testsession:session_create' %}" class="unvisited">
                     <div class="card-body">
                         <div class="h1 text-muted text-right mb-4">
                             <i class="icon-list"></i>
@@ -109,7 +91,7 @@
         </div>
         <div class="col-sm-6 col-md-2">
             <div class="card card-short text-white bg-danger">
-                {% comment %} <a href="{% url 'server_run:server-run_create_item' %}" class="unvisited"> {% endcomment %}
+                <a href="{% url 'server_run:server-run_create_item' %}" class="unvisited">
                     <div class="card-body">
                         <div class="h1 text-muted text-right mb-4">
                             <i class="icon-list"></i>

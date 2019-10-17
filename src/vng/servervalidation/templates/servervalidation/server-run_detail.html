@@ -6,8 +6,14 @@
 {% block title %}{% trans "Server-run detail" %}{% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api_id %}
-{% breadcrumb "Provider tests" 'server_run:server-run_list' object.test_scenario.uuid object.environment.uuid %}
+{% if object.scheduled_scenario %}
+    {% breadcrumb "Scheduled test scenarios" 'server_run:scheduled-test-scenario_list' %}
+    {% breadcrumb "Scheduled rovider tests" 'server_run:server-run_list_scheduled' object.scheduled_scenario.uuid %}
+{% else %}
+    {% breadcrumb "Test scenarios" 'server_run:test-scenario_list' %}
+    {% breadcrumb "Provider tests" 'server_run:server-run_list' object.test_scenario.uuid object.environment.uuid %}
+{% endif %}
+
 {% breadcrumb 'Detail' 'server_run:server-run_detail' object.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
@@ -34,53 +40,46 @@
         <div class="col-sm-6">
             <div class="card">
                 <div class="card-header">
-                    Test scenario badge
-                    {% comment %} <button id="testScenarioBadge" class="btn btn-primary mr-3" onclick="setBadgeInfo(this.id)">{% trans "Test scenario badge" %}</button> {% endcomment %}
-                    {% comment %} <button id="providerRunBadge" class="btn btn-primary" onclick="setBadgeInfo(this.id)">{% trans "Provider run badge" %}</button> {% endcomment %}
+                    <button id="testScenarioBadge" class="btn btn-primary mr-3" onclick="setBadgeInfo(this.id)">{% trans "Test scenario badge" %}</button>
+                    <button id="providerRunBadge" class="btn btn-primary" onclick="setBadgeInfo(this.id)">{% trans "Provider run badge" %}</button>
                 </div>
-                {% if object.environment.last_run %}
-                    <div class="card-body">
-                        <p id="badge-description"></p>
-                        <p>
-                            {% comment %} {% url 'apiv1server:latest-badge' object.uuid as addr %} {% endcomment %}
-                            {% blocktrans %}
-                                Note: Shields.io caches the badge result for 5 minutes. Check the <a
-                                    href="{{url}}">API</a> for
-                                direct access.
-                            {% endblocktrans %}
-                        </p>
-                        <span display="block" style='width: 250px;' class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
-                            <a href="{% url 'server_run:server-run_latest' object.test_scenario.uuid object.environment.uuid %}">
+                <div class="card-body">
+                    <p id="badge-description"></p>
+                    <p>
+                        {% comment %} {% url 'apiv1server:latest-badge' object.uuid as addr %} {% endcomment %}
+                        {% blocktrans %}
+                            Note: Shields.io caches the badge result for 5 minutes. Check the <a
+                                href="{{url}}">API</a> for
+                            direct access.
+                        {% endblocktrans %}
+                    </p>
+                    <span display="block" style='width: 250px;' class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                        <a href="{% url 'server_run:server-run_detail' object.uuid %}">
 
-                                <img id="badge" style='width:250px' alt="" src="">
-                            </a>
-                        </span>
-                    </div>
-                    <div class="card-body">
-                        {% blocktrans %}
-                            <h5 class="card-title">Markdown snippet</h5>
-                            <p>Paste the following in your README.md to show your badge on Github.</p>
-                        {% endblocktrans %}
-                            <pre class="prettyprint" id='gitSnippet'>
-                        <xmp>
-                        </xmp>
-                        </pre>
-                    </div>
-                    <div class="card-body">
-                        {% blocktrans %}
-                            <h5 class="card-title">HTML snippet</h5>
-                            <p>Paste the following in your HTML page to show your badge.</p>
-                        {% endblocktrans %}
-                            <pre class="prettyprint" id='htmlSnippet'>
-                        <xmp>
-                        </xmp>
-                        </pre>
-                    </div>
-                {% else %}
-                    <div class="card-body">
-                        {% trans "There are no results yet for this environment." %}
-                    </div>
-                {% endif %}
+                            <img id="badge" style='width:250px' alt="" src="">
+                        </a>
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% blocktrans %}
+                        <h5 class="card-title">Markdown snippet</h5>
+                        <p>Paste the following in your README.md to show your badge on Github.</p>
+                    {% endblocktrans %}
+                        <pre class="prettyprint" id='gitSnippet'>
+                    <xmp>
+                    </xmp>
+                    </pre>
+                </div>
+                <div class="card-body">
+                    {% blocktrans %}
+                        <h5 class="card-title">HTML snippet</h5>
+                        <p>Paste the following in your HTML page to show your badge.</p>
+                    {% endblocktrans %}
+                        <pre class="prettyprint" id='htmlSnippet'>
+                    <xmp>
+                    </xmp>
+                    </pre>
+                </div>
             </div>
             </div>
         </div>
@@ -224,22 +223,26 @@
                                     <b>{{calls.item.name}}</b>
                                 </td>
                                 <td>
+                                    {{calls.request.method}}
                                 </td>
                                 <td class="w-25">
+                                    <p class='icon icon--checkmark'></p>
                                 </td>
                                 {% else %}
                                 <td>
                                     <b>{{calls.item.name}}</b>
                                 </td>
                                 <td>
+                                    {{calls.request.method}}
                                 </td>
                                 <td class="w-25">
+                                    <p class='icon icon--cross'></p>
                                 </td>
                                 {% endif %}
                             </tr>
                             <tr>
                                 <td>
-                                    {{calls.request.method}} {{calls.request.url.url}}
+                                    {{calls.request.url.url}}
                                 </td>
                                 <td>
                                     {{ calls.response.code }} {{ calls.response.status }}
@@ -380,14 +383,23 @@
         return s;
     }
 
-    function setBadgeInfo() {
-        document.getElementById("badge-description").innerHTML = "Shown below is the badge of the most recent provider run with the environment {{ server_run.environment }} that was started by the user <b>{{ object.user }}</b>.";
-        document.getElementById("badge").src = "https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}";
-        var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}})]({{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_latest' object.test_scenario.uuid object.environment.uuid %})'
+    function setBadgeInfo(id) {
+        if(id == "testScenarioBadge") {
+            document.getElementById("badge-description").innerHTML = "Shown below is the badge of the most recent provider run that was started by the user <b>{{ object.user }}</b>.";
+            document.getElementById("badge").src = "https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}";
+            var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}})]({{changing_badge_url}})'
 
-        var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
-            + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_latest' object.test_scenario.uuid object.environment.uuid %}">\n'
-            + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}"></span></a>'
+            var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
+                + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail' object.uuid %}">\n'
+                + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}"></span></a>'
+        } else if(id == "providerRunBadge") {
+            document.getElementById("badge-description").innerHTML = "Shown below is the persistent badge for this specific provider run.";
+            document.getElementById("badge").src = "https://img.shields.io/endpoint.svg?style=for-the-badge&url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:api_server-run-shield' object.uuid %}"
+            var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url={{request.scheme}}://{{request.get_host}}{% url "apiv1server:api_server-run-shield" object.uuid %})]({{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail' object.uuid %})'
+            var htmlSnippet= '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
+                + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_detail' object.uuid %}">\n'
+                + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&url={{request.scheme}}://{{request.get_host}}{% url "apiv1server:api_server-run-shield" object.uuid %}"></span></a>'
+        }
 
         // this page's own source code
         gitSnippet = htmlEscape(gitSnippet);
@@ -402,6 +414,6 @@
         document.getElementById("htmlSnippet").innerHTML = PR.prettyPrintOne(htmlSnippet);
     }
 
-    document.onload = setBadgeInfo();
+    document.onload = setBadgeInfo("testScenarioBadge");
 </script>
 {% endblock %}

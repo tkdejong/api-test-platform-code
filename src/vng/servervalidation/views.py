@@ -30,28 +30,19 @@ class TestScenarioList(LoginRequiredMixin, ListView):
     context_object_name = 'test-scenario_list'
     paginate_by = 10
 
-    def get_context_data(self, *args, **kwargs):
-        data = super().get_context_data(*args, **kwargs)
-        data['api_id'] = self.kwargs['api_id']
-        return data
-
     def get_queryset(self):
         res = []
-        runs_for_user = ServerRun.objects.filter(
-            test_scenario__api=self.kwargs['api_id'],
-            user=self.request.user,
-        )
+        runs_for_user = ServerRun.objects.filter(user=self.request.user, stopped__isnull=False)
         distinct_combinations = runs_for_user.select_related(
             'test_scenario', 'environment'
-        ).order_by('test_scenario__id', 'environment__id').values_list(
+        ).order_by('test_scenario__id', 'environment__id', '-stopped').values_list(
             'test_scenario',
-            'environment'
+            'environment',
+            'stopped'
         ).distinct('test_scenario', 'environment')
-        for test_scenario_id, environment_id in distinct_combinations:
+        for test_scenario_id, environment_id, last_run in distinct_combinations:
             test_scenario = TestScenario.objects.get(id=test_scenario_id)
             environment = Environment.objects.get(id=environment_id)
-
-            last_run = environment.last_run
             res.append((test_scenario, environment, last_run))
         return res
 
@@ -68,15 +59,13 @@ class ServerRunList(LoginRequiredMixin, ListView):
             user=self.request.user,
             test_scenario__uuid=self.kwargs['scenario_uuid'],
             environment__uuid=self.kwargs['env_uuid'],
-        ).order_by('-started')
+        ).filter(scheduled_scenario=None).order_by('-started')
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
 
         data['test_scenario'] = get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
         data['environment'] = get_object_or_404(Environment, uuid=self.kwargs['env_uuid'])
-
-        data['api_id'] = data['test_scenario'].api.id
 
         data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
         data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
@@ -104,14 +93,8 @@ class ServerRunForm(CreateView):
         self.request.session['software_product'] = form.instance.software_product
         self.request.session['product_role'] = form.instance.product_role
         return redirect(reverse('server_run:server-run_select_environment', kwargs={
-            "api_id": self.kwargs['api_id'],
             "test_id": ts_id
         }))
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'api_id': self.kwargs['api_id']})
-        return kwargs
 
 
 class ServerRunListScheduled(LoginRequiredMixin, ListView):
@@ -186,7 +169,6 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
         test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
         envs = test_scenario.environment_set.filter(user=self.request.user)
         data['form'] = SelectEnvironmentForm(envs=envs)
-        data['api_id'] = self.kwargs['api_id']
         return data
 
     def post(self, request, *args, **kwargs):
@@ -325,14 +307,14 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
         for key, value in data.items():
             if key in tsu_names:
                 tsu = testscenariourls.get(name=key)
-                Endpoint.objects.create(url=value.strip(), environment=self.env, test_scenario_url=tsu)
+                Endpoint.objects.create(url=value, environment=self.env, test_scenario_url=tsu)
 
         if not self.request.session.get('server_run_scheduled'):
             if self.ts.jwt_enabled():
-                self.server.client_id = data['Client ID'].strip()
-                self.server.secret = data['Secret'].strip()
+                self.server.client_id = data['Client ID']
+                self.server.secret = data['Secret']
             elif self.ts.custom_header():
-                ServerHeader(environment=self.env, header_key='Authorization', header_value=data['Authorization header'].strip()).save()
+                ServerHeader(environment=self.env, header_key='Authorization', header_value=data['Authorization header']).save()
             self.server.save()
 
             if self.server.scheduled:
@@ -417,7 +399,7 @@ class ServerRunOutputUuid(DetailView):
             reverse('apiv1server:latest-badge', kwargs={'uuid': server_run.environment.uuid})
         )
         context['changing_badge_url'] = changing_badge_url
-        context['api_id'] = server_run.test_scenario.api.id
+
         ptr = PostmanTestResult.objects.filter(server_run=server_run)
         context["postman_result"] = ptr
         context["update_info"] = True
@@ -464,19 +446,15 @@ class TriggerServerRun(OwnerSingleObject, View):
 
 class ScheduleActivate(OwnerSingleObject, View):
 
-    model = Environment
+    model = ScheduledTestScenario
     pk_name = 'uuid'
     slug_pk_name = 'uuid'
 
     def get(self, request, *args, **kwargs):
-        environment = self.get_object()
-        scheduled = environment.scheduledtestscenario
+        scheduled = self.get_object()
         scheduled.active = not scheduled.active
         scheduled.save()
-        return redirect(reverse('server_run:server-run_list', kwargs={
-            'scenario_uuid': environment.test_scenario.uuid,
-            'env_uuid': environment.uuid
-        }))
+        return redirect(reverse('server_run:scheduled-test-scenario_list'))
 
 
 class StopServer(OwnerSingleObject, View):
@@ -569,34 +547,3 @@ class TestScenarioDetail(DetailView):
 
     model = TestScenario
     template_name = 'servervalidation/test_scenario-detail.html'
-
-
-class CreateSchedule(OwnerSingleObject, View):
-
-    model = Environment
-    pk_name = 'uuid'
-    slug_pk_name = 'uuid'
-
-    def get(self, request, *args, **kwargs):
-        environment = self.get_object()
-        ScheduledTestScenario.objects.create(
-            environment=environment
-        )
-        return redirect(reverse('server_run:server-run_list', kwargs={
-            'scenario_uuid': environment.test_scenario.uuid,
-            'env_uuid': environment.uuid
-        }))
-
-
-class LatestRunView(ServerRunOutputUuid):
-    model = ServerRun
-    template_name = 'servervalidation/server-run_detail.html'
-    slug_field = 'uuid'
-    slug_url_kwarg = 'uuid'
-
-    def get_object(self):
-        server_runs = ServerRun.objects.filter(
-            environment__uuid=self.kwargs['env_uuid'],
-            test_scenario__uuid=self.kwargs['scenario_uuid']
-        ).order_by('-stopped')
-        return server_runs.first()

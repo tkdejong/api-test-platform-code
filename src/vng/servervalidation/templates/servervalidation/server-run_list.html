@@ -7,7 +7,7 @@
 
 
 {% block breadcrumb %}
-{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api_id %}
+{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' %}
 {% breadcrumb "Provider tests" 'server_run:server-run_list' test_scenario.uuid environment.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
@@ -19,43 +19,26 @@
             <div class="card">
                 <div class="card-header">
                     {% trans "Provider tests" %}
-                    <a type="submit" class="btn btn-primary float-right ml-2" href="{% url 'server_run:server-run_trigger' environment.uuid %}">{% trans "Start run for this environment" %}</a>
-                    {% if environment.scheduledtestscenario %}
-                        {% if environment.scheduledtestscenario.active %}
-                            <a type="submit" class="btn btn-primary btn-danger float-right"  href="{% url 'server_run:schedule_activate' environment.uuid %}">{% trans "Deactivate schedule" %}</a>
-                        {% else %}
-                            <a type="submit" class="btn btn-primary btn-success float-right"  href="{% url 'server_run:schedule_activate' environment.uuid %}">{% trans "Reactivate schedule" %}</a>
-                        {% endif %}
-                    {% else %}
-                        <a type="submit" class="btn btn-secondary float-right" href="{% url 'server_run:server-run_create_schedule' environment.uuid %}">{% trans "Add schedule" %}</a>
-                    {% endif %}
+                    <a type="submit" class="btn btn-primary float-right" href="{% url 'server_run:server-run_trigger' environment.uuid %}">{% trans "Start run for this environment" %}</a>
                 </div>
                 <div class="card-body">
                     <div>
                         <table class="ml-auto mt-auto mr-auto mb-3">
                             <tr><td><h4><b>Test scenario:</b> {{ test_scenario }}</h4></td></tr>
                             <tr><td><h4><b>Environment:</b> {{ environment.name }}</h4></td></tr>
-                            {% if environment.scheduledtestscenario %}
-                                {% if environment.scheduledtestscenario.active %}
-                                    <tr><td><h4>{% trans "Scheduled to run every night at: " %} <b>00:00</b></h4></td></tr>
-                                {% else %}
-                                    <tr><td><h4>{% trans "Schedule is currently not active" %}</h4></td></tr>
-                                {% endif %}
-                            {% endif %}
                         </table>
-                        {% if environment.last_run %}
-                            <table class="ml-auto mt-auto mr-auto mb-3">
-                                <tr>
-                                    <td>
-                                        <span display="block" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
-                                            <a href="{% url 'server_run:server-run_latest' test_scenario.uuid environment.uuid %}">
-                                                <img style="height:30px"  alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
-                                            </a>
-                                        </span>
-                                    </td>
-                                </tr>
-                            </table>
-                        {% endif %}
+
+                        <table class="ml-auto mt-auto mr-auto mb-3">
+                            <tr>
+                                <td>
+                                    <span display="block" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                                        <a href="{% url 'server_run:server-run_list' test_scenario.uuid environment.uuid %}">
+                                            <img style="height:30px"  alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
+                                        </a>
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <table class="table">
                         {% include 'servervalidation/table/header-server-run.html' only %}

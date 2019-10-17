@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class CreateServerRunForm(forms.ModelForm):
 
-    # test_scenario = CustomModelChoiceField(TestScenario.objects.filter(active=True), widget=forms.RadioSelect, empty_label=None)
+    test_scenario = CustomModelChoiceField(TestScenario.objects.filter(active=True), widget=forms.RadioSelect, empty_label=None)
 
     class Meta:
         model = ServerRun
@@ -24,16 +24,6 @@ class CreateServerRunForm(forms.ModelForm):
             'test_scenario',
             'scheduled',
         ]
-
-    def __init__(self, *args, **kwargs):
-        api_id = kwargs.pop('api_id', None)
-        super().__init__(*args, **kwargs)
-        if api_id:
-            self.fields['test_scenario'] = CustomModelChoiceField(
-                TestScenario.objects.filter(active=True, api=api_id),
-                widget=forms.RadioSelect,
-                empty_label=None
-            )
 
     def clean(self):
         """

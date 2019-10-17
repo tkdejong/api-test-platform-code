@@ -6,8 +6,8 @@ from . import apps
 app_name = apps.AppConfig.__name__
 
 urlpatterns = [
-    path('<int:api_id>/', views.SessionListView.as_view(), name='sessions'),
-    path('<int:api_id>/create/', views.SessionFormView.as_view(), name='session_create'),
+    path('', views.SessionListView.as_view(), name='sessions'),
+    path('create/', views.SessionFormView.as_view(), name='session_create'),
     path('postman/<int:pk>/', views.PostmanDownloadView.as_view(), name='postman_download'),
     path('<uuid:uuid>/stop/', views.StopSession.as_view(), name='stop_session'),
     path('<uuid:uuid>/report-pdf/', views.SessionReportPdf.as_view(), name='session_report-pdf'),

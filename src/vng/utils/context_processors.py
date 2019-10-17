@@ -1,7 +1,7 @@
 from django.conf import settings as django_settings
 
 from ..testsession.models import Session
-from ..servervalidation.models import ServerRun, API
+from ..servervalidation.models import ServerRun
 from .choices import StatusChoices, StatusWithScheduledChoices
 
 
@@ -21,8 +21,3 @@ def settings(request):
         context['session_active'] = Session.objects.filter(user=request.user, status=StatusChoices.running).count()
         context['server_scheduled'] = ServerRun.objects.filter(user=request.user, scheduled=True, status=StatusWithScheduledChoices.scheduled).count()
     return context
-
-def api_list(request):
-    return {
-        'api_list': API.objects.all()
-    }

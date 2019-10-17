@@ -7,7 +7,6 @@ from django.views.generic.base import TemplateView
 from .decorators import anonymous_required
 from .base_url import *
 from . import views
-from django.contrib.flatpages.views import flatpage
 
 urlpatterns = base_urlpatterns + [
     # redirect the request to the testession
@@ -19,6 +18,5 @@ urlpatterns = base_urlpatterns + [
     url(r'^server/', include('vng.servervalidation.urls', namespace='server_run')),
     url(r'^consumer/', include('vng.testsession.urls', namespace='testsession')),
     url(r'^pages/', include('django.contrib.flatpages.urls')),
-    # path('', views.Dashboard.as_view(), name='dashboard'),
-    path('', flatpage, {'url': '/'}, name='dashboard'),
+    path('', views.Dashboard.as_view(), name='dashboard'),
 ]

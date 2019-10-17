@@ -30,13 +30,3 @@ class SessionForm(forms.ModelForm):
     class Meta:
         model = Session
         fields = ['session_type', 'sandbox']
-
-    def __init__(self, *args, **kwargs):
-        api_id = kwargs.pop('api_id', None)
-        super().__init__(*args, **kwargs)
-        if api_id:
-            self.fields['session_type'] = CustomModelChoiceField(
-                SessionType.objects.filter(active=True, api=api_id),
-                widget=forms.RadioSelect,
-                empty_label=None
-            )
