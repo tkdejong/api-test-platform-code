@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.views import View
 
 from vng.accounts.models import User
-from vng.servervalidation.models import ServerRun, TestScenario
+from vng.servervalidation.models import ServerRun, TestScenario, API
 
 from .models import (
     ScenarioCase, Session, SessionLog, ExposedUrl,
@@ -40,7 +40,7 @@ class SessionListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['api_id'] = self.kwargs['api_id']
+        context['api'] = API.objects.get(id=self.kwargs['api_id'])
         _choices = dict(choices.StatusChoices.choices)
         _choices['error_deploy'] = choices.StatusChoices.error_deploy
         context.update({

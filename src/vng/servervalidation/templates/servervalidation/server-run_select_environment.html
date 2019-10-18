@@ -13,7 +13,7 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
-                        {% trans "Create provider-testrun for scenario:" %} {{ ts }}
+                        {% trans "Create provider-testrun for scenario:" %} {{ test_scenario.name }}
                     </div>
                     <div class='card-body'>
                     {% load_widgets form='forms.html' %}
@@ -29,7 +29,7 @@
                                     <i class="fa fa-dot-circle-o"></i>{% trans "Start" %}</button>
                             </div>
                             <div class="col-auto">
-                                <button class="btn btn-sm btn-danger" type="reset" onclick="location.href = {% url 'server_run:test-scenario_list' api_id %};">
+                                <button class="btn btn-sm btn-danger" type="reset" onclick="location.href = {% url 'server_run:test-scenario_list' api.id %};">
                                     <i class="fa fa-ban"></i> {% trans "Cancel" %}</button>
                             </div>
                         </div>
