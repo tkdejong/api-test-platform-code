@@ -1,9 +1,11 @@
 from django.contrib import admin
+from django import forms
 import vng.servervalidation.models as model
 
 from ordered_model.admin import OrderedModelAdmin
 from django_admin_relation_links import AdminChangeLinksMixin
 
+from vng.testsession.models import SessionType
 
 def get_all_fields(mo):
     l = [field.name for field in mo._meta.fields]
@@ -27,10 +29,34 @@ class PostmanTestInline(admin.TabularInline):
     model = model.PostmanTest
 
 
+class APIForm(forms.ModelForm):
+    class Meta:
+        model = model.API
+        fields = '__all__'
+
+    test_scenarios = forms.ModelMultipleChoiceField(queryset=model.TestScenario.objects.all())
+    session_types = forms.ModelMultipleChoiceField(queryset=SessionType.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance:
+            self.fields['test_scenarios'].initial = self.instance.testscenario_set.all()
+            self.fields['session_types'].initial = self.instance.sessiontype_set.all()
+
+    def save(self, *args, **kwargs):
+        instance = super().save(commit=False)
+        self.fields['test_scenarios'].initial.update(api=None)
+        self.fields['session_types'].initial.update(api=None)
+        self.cleaned_data['test_scenarios'].update(api=instance)
+        self.cleaned_data['session_types'].update(api=instance)
+        return instance
+
+
 @admin.register(model.API)
 class APIAdmin(admin.ModelAdmin):
     list_display = ['name']
 
+    form = APIForm
 
 @admin.register(model.PostmanTest)
 class PostmanTestAdmin(AdminChangeLinksMixin, OrderedModelAdmin):
