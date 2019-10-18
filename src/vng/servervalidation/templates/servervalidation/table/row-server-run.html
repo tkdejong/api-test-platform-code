@@ -45,24 +45,26 @@
         {% else %}
             <td>
         {% endif %}
-        {% if not server_run.is_stopped and not server_run.is_running and not server_run.is_error %}
-        <form method="POST" action="{% url 'server_run:server-run_stop' server_run.id %}">
-            {% csrf_token %}
-            <input type="submit" class="btn btn-primary" value="Stop">
-        </form>
-        {% endif %}
         {% if not server_run.is_stopped and not server_run.scheduled and not server_run.is_error %}
             {% if server_run.percentage_exec and server_run.status_exec %}
-            <div class="progress-group">
-                <div class="progress-group-header">
-                    <i class="cui-cloud progress-group-icon"></i>
-                    <div class="statuslabel"></div>
-                    <div class="ml-auto font-weight-bold progressbar-indicator"></div>
-                </div>
-                <div class="progress-group-bars">
-                    <div class="progress progress-xs">
-                    <div class="progress-bar bg-success progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="row">
+                <div class="col progress-group">
+                    <div class="progress-group-header">
+                        <i class="cui-cloud progress-group-icon"></i>
+                        <div class="statuslabel"></div>
+                        <div class="ml-auto font-weight-bold progressbar-indicator"></div>
                     </div>
+                    <div class="progress-group-bars">
+                        <div class="progress progress-xs">
+                        <div class="progress-bar bg-success progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-4">
+                    <form method="POST" action="{% url 'server_run:server-run_stop' server_run.id %}">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary" value="Stop">
+                    </form>
                 </div>
             </div>
             {% endif %}

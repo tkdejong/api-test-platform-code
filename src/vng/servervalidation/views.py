@@ -400,7 +400,7 @@ class StopServer(OwnerSingleObject, View):
         server.status = choices.StatusWithScheduledChoices.stopped
         server.save()
         return redirect(reverse('server_run:server-run_list', kwargs={
-            'uuid': server.test_scenario.uuid,
+            'scenario_uuid': server.test_scenario.uuid,
             'env_uuid': server.environment.uuid
         }))
 
