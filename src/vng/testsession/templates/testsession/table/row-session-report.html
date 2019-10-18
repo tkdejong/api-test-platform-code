@@ -9,7 +9,7 @@
     <tr>
 {% endif %}
         <td>{{ report.scenario_case.http_method }}</td>
-        <td>{{ report.scenario_case.description }}</td>
+        <td>{% if report.scenario_case.description %} {{ report.scenario_case.description }} {% endif %}</td>
         <td>{{ report.scenario_case.url }}</td>
         <td>
             {% for qps in report.scenario_case.queryparamsscenario_set.all %}
