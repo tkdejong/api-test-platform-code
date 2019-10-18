@@ -11,8 +11,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                  {% trans "Test scenarios" %}
-		  <a href="{% url 'server_run:server-run_create_item' api_id %}" class="btn btn-success float-right"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
+                  {% trans "Test scenarios for " %} <b>{{api.name}}</b>
+		  <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
                 </div>
                 <div class="card-body">
                     <table class="table">

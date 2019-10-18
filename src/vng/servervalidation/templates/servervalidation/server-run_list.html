@@ -7,7 +7,7 @@
 
 
 {% block breadcrumb %}
-{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api_id %}
+{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api.id %}
 {% breadcrumb "Provider tests" 'server_run:server-run_list' test_scenario.uuid environment.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
@@ -33,6 +33,7 @@
                 <div class="card-body">
                     <div>
                         <table class="ml-auto mt-auto mr-auto mb-3">
+                            <tr><td><h4><b>API:</b> {{ api.name }}</h4></td></tr>
                             <tr><td><h4><b>Test scenario:</b> {{ test_scenario }}</h4></td></tr>
                             <tr><td><h4><b>Environment:</b> {{ environment.name }}</h4></td></tr>
                             {% if environment.scheduledtestscenario %}

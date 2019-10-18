@@ -19,7 +19,8 @@ from ..utils import choices
 from ..utils.views import OwnerSingleObject, PDFGenerator
 from .forms import CreateServerRunForm, CreateEndpointForm, SelectEnvironmentForm
 from .models import (
-    ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest, PostmanTestResult, ServerHeader, ScheduledTestScenario, Environment
+    API, ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest,
+    PostmanTestResult, ServerHeader, ScheduledTestScenario, Environment
 )
 from .task import execute_test
 
@@ -32,7 +33,7 @@ class TestScenarioList(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
-        data['api_id'] = self.kwargs['api_id']
+        data['api'] = API.objects.get(id=self.kwargs['api_id'])
         return data
 
     def get_queryset(self):
@@ -76,7 +77,7 @@ class ServerRunList(LoginRequiredMixin, ListView):
         data['test_scenario'] = get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
         data['environment'] = get_object_or_404(Environment, uuid=self.kwargs['env_uuid'])
 
-        data['api_id'] = data['test_scenario'].api.id
+        data['api'] = data['test_scenario'].api
 
         data['choices'] = dict(choices.StatusWithScheduledChoices.choices)
         data['choices']['error_deploy'] = choices.StatusChoices.error_deploy
@@ -93,6 +94,11 @@ class ServerRunForm(CreateView):
 
     template_name = 'servervalidation/server-run-form.html'
     form_class = CreateServerRunForm
+
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['api'] = API.objects.get(id=self.kwargs['api_id'])
+        return data
 
     def form_valid(self, form):
         ts_id = form.instance.test_scenario.id
@@ -120,7 +126,8 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
         test_scenario = TestScenario.objects.get(id=self.kwargs['test_id'])
         envs = test_scenario.environment_set.filter(user=self.request.user)
         data['form'] = SelectEnvironmentForm(envs=envs)
-        data['api_id'] = self.kwargs['api_id']
+        data['api'] = test_scenario.api
+        data['test_scenario'] = test_scenario
         return data
 
     def post(self, request, *args, **kwargs):
