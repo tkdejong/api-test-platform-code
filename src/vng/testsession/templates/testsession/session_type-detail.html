@@ -53,7 +53,7 @@
                                 {% for sc in cases %}
                                     <tr>
                                         <td>{{sc.http_method}}</td>
-                                        <td>{{ sc.description }}</td>
+                                        <td>{% if sc.description %}{{ sc.description }}{% endif %}</td>
                                         <td>{{sc.url}}</td>
                                         <td>
                                         {% for qp in sc.queryparamsscenario_set.all %}
