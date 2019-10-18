@@ -147,6 +147,11 @@ class Environment(models.Model):
         latest = self.serverrun_set.exclude(stopped=None).order_by('-stopped').first()
         return getattr(latest, 'stopped', None)
 
+    @property
+    def last_started_at(self):
+        last_started = self.serverrun_set.order_by('-started').first()
+        return getattr(last_started, 'started', None)
+
 
 class ScheduledTestScenario(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(

@@ -10,6 +10,8 @@
     <td>
         {% if last_run %}
             {{ last_run }}
+        {% else %}
+            {% trans "No stopped runs yet" %}
         {% endif %}
     </td>
     <td>
