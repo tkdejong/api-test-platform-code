@@ -42,7 +42,7 @@ from ..utils.auth import get_jwt
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
 logger = logging.getLogger(__name__)
-logger2 = logging.getLogger('test')
+logger2 = logging.getLogger('vng')
 
 
 class SessionViewStatusSet(
@@ -485,6 +485,7 @@ class RunTest(CSRFExemptMixin, View):
 
     def build_method_handler(self, request_method_name, request, body=False):
         try:
+            logger2.info(request.__dict__)
             return self.build_method(request_method_name, request, body)
         except Http404:
             return JsonResponse({
