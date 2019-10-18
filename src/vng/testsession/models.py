@@ -242,7 +242,7 @@ def create_cases_from_oas(sender, instance, **kwargs):
                 collection=instance,
                 url=path,
                 http_method=method.upper(),
-                description=details.get('summary', None),
+                description=details.get('summary', ''),
             )
 
             for parameter in details.get('parameters') or []:
@@ -349,7 +349,7 @@ class ScenarioCase(OrderedModel):
         "The HTTP method that must be tested for this scenario case"
     ))
     order_with_respect_to = 'collection'
-    description = models.TextField(default=None, null=True, blank=True)
+    description = models.TextField(default='', null=True, blank=True)
 
     class Meta(OrderedModel.Meta):
         pass
