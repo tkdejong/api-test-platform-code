@@ -38,7 +38,7 @@
                             <tr><td><h4><b>Environment:</b> {{ environment.name }}</h4></td></tr>
                             {% if environment.scheduledtestscenario %}
                                 {% if environment.scheduledtestscenario.active %}
-                                    <tr><td><h4>{% trans "Scheduled to run every night at: " %} <b>00:00</b></h4></td></tr>
+                                    <tr><td><h4>{% trans "Scheduled to run every night at: " %} <b>{{schedule_time|time:"H:i"}}</b></h4></td></tr>
                                 {% else %}
                                     <tr><td><h4>{% trans "Schedule is currently not active" %}</h4></td></tr>
                                 {% endif %}

@@ -22,7 +22,7 @@
             {% endif %}
         </td>
         <td>
-            {{ session.started|date }}<br />{{ session.started|time }}
+            {{session.started|date:"N j, Y, H:i" }}
         </td>
         <td>{{ session.session_type.name }}</td>
 
