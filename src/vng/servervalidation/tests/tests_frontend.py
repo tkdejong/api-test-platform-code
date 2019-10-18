@@ -833,3 +833,112 @@ class LatestServerRunTests(WebTest):
         }), user=self.user)
 
         self.assertIn(str(server_run2.id), response.text)
+
+
+class ProviderOrderingTests(WebTest):
+
+    def setUp(self):
+        self.api = APIFactory.create()
+        self.user = UserFactory.create()
+        self.test_scenario1 = TestScenarioFactory.create(name='ts1', api=self.api)
+        self.test_scenario2 = TestScenarioFactory.create(name='ts2', api=self.api)
+        self.env1 = EnvironmentFactory.create(
+            name='env1',
+            user=self.user,
+            test_scenario=self.test_scenario1
+        )
+        self.env2 = EnvironmentFactory.create(
+            name='env2',
+            user=self.user,
+            test_scenario=self.test_scenario1
+        )
+        self.env3 = EnvironmentFactory.create(
+            name='env3',
+            user=self.user,
+            test_scenario=self.test_scenario2
+        )
+        self.env4 = EnvironmentFactory.create(
+            name='env4',
+            user=self.user,
+            test_scenario=self.test_scenario1
+        )
+
+        self.server1 = ServerRunFactory.create(
+            stopped="2019-01-01T12:00:00Z",
+            test_scenario=self.test_scenario1,
+            environment=self.env1,
+            user=self.user
+        )
+        ServerRunFactory.create(
+            stopped="2019-01-01T11:00:00Z",
+            test_scenario=self.test_scenario1,
+            environment=self.env2,
+            user=self.user
+        )
+        ServerRunFactory.create(
+            started="2019-01-01T15:00:00Z",
+            stopped=None,
+            test_scenario=self.test_scenario1,
+            environment=self.env3,
+            user=self.user
+        )
+        ServerRunFactory.create(
+            started="2019-01-01T13:00:00Z",
+            stopped=None,
+            test_scenario=self.test_scenario1,
+            environment=self.env4,
+            user=self.user
+        )
+
+    def test_ordering_test_scenario_list(self):
+        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
+
+        # Find the table containing the rows with environments and badges
+        table = response.html.find('th', {'scope': 'col'}, text='ID').parent.parent
+
+        # Skip the headers
+        rows = table.findChildren('tr')[1:]
+
+        self.assertIn('env3', rows[0].text)
+        self.assertIn('env4', rows[1].text)
+        self.assertIn('env1', rows[2].text)
+        self.assertIn('env2', rows[3].text)
+
+    def test_ordering_server_run_list(self):
+        self.server2 = ServerRunFactory.create(
+            stopped="2019-01-01T11:00:00Z",
+            test_scenario=self.test_scenario1,
+            environment=self.env1,
+            user=self.user
+        )
+        self.server3 = ServerRunFactory.create(
+            started="2019-01-01T15:00:00Z",
+            stopped=None,
+            test_scenario=self.test_scenario1,
+            environment=self.env1,
+            user=self.user
+        )
+        self.server4 = ServerRunFactory.create(
+            started="2019-01-01T14:00:00Z",
+            stopped=None,
+            test_scenario=self.test_scenario1,
+            environment=self.env1,
+            user=self.user
+        )
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario1.uuid,
+            'env_uuid': self.env1.uuid
+        }), user=self.user)
+
+        # Find the table containing the rows with environments and badges
+        table = response.html.find('th', {'scope': 'col'}, text='Sessie ID').parent.parent
+
+        # Skip the headers
+        rows = table.findChildren('tr')[1:]
+
+        self.assertIn(str(self.server3.id), rows[0].findChild('a').text)
+        self.assertIn(str(self.server4.id), rows[1].findChild('a').text)
+        self.assertIn(str(self.server1.id), rows[2].findChild('a').text)
+        self.assertIn(str(self.server2.id), rows[3].findChild('a').text)

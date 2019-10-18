@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+import pytz
 
 from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,6 +10,7 @@ from django.urls import reverse
 from django.urls import reverse_lazy
 from django.db.utils import IntegrityError
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django.views import View
 from django.views.generic import DetailView, CreateView, UpdateView
 from django.views.generic.list import ListView
@@ -36,6 +39,7 @@ class TestScenarioList(LoginRequiredMixin, ListView):
         return data
 
     def get_queryset(self):
+        res_no_last_run = []
         res = []
         runs_for_user = ServerRun.objects.filter(
             test_scenario__api=self.kwargs['api_id'],
@@ -52,8 +56,19 @@ class TestScenarioList(LoginRequiredMixin, ListView):
             environment = Environment.objects.get(id=environment_id)
 
             last_run = environment.last_run
-            res.append((test_scenario, environment, last_run))
-        return res
+            if last_run:
+                res.append((test_scenario, environment, last_run))
+            else:
+                last_started_at = environment.last_started_at
+                res_no_last_run.append((test_scenario, environment, last_started_at))
+
+        # For all the environment that haven't had a stopped run yet, order
+        # them by the last started run and display them before the environments
+        # with stopped runs
+        res_no_last_run.sort(key=lambda x: x[2], reverse=True)
+        res_no_last_run = [(scenario, env, None) for scenario, env, _ in res_no_last_run]
+        res.sort(key=lambda x: x[2], reverse=True)
+        return res_no_last_run + res
 
 
 class ServerRunList(LoginRequiredMixin, ListView):
@@ -68,7 +83,7 @@ class ServerRunList(LoginRequiredMixin, ListView):
             user=self.request.user,
             test_scenario__uuid=self.kwargs['scenario_uuid'],
             environment__uuid=self.kwargs['env_uuid'],
-        ).order_by('-started')
+        ).order_by('-stopped', '-started')
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
@@ -385,7 +400,7 @@ class StopServer(OwnerSingleObject, View):
         server.status = choices.StatusWithScheduledChoices.stopped
         server.save()
         return redirect(reverse('server_run:server-run_list', kwargs={
-            'uuid': server.test_scenario.uuid,
+            'scenario_uuid': server.test_scenario.uuid,
             'env_uuid': server.environment.uuid
         }))
 
