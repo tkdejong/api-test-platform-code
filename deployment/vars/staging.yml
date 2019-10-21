@@ -15,7 +15,7 @@ pub_key_users:
   - steven
 
 project_repo: git@github.com:VNG-Realisatie/api-test-platform-code.git
-branch: develop
+branch: staging
 
 nginx_server_name: "{{ target }}.api-test.nl"
 nginx_second_name: "{{ project_name }}-{{ target }}.maykin.nl"
