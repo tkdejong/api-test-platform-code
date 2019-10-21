@@ -34,8 +34,8 @@ class APIForm(forms.ModelForm):
         model = model.API
         fields = '__all__'
 
-    test_scenarios = forms.ModelMultipleChoiceField(queryset=model.TestScenario.objects.all())
-    session_types = forms.ModelMultipleChoiceField(queryset=SessionType.objects.all())
+    test_scenarios = forms.ModelMultipleChoiceField(queryset=model.TestScenario.objects.all(), required=False)
+    session_types = forms.ModelMultipleChoiceField(queryset=SessionType.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,6 +47,8 @@ class APIForm(forms.ModelForm):
         instance = super().save(commit=False)
         self.fields['test_scenarios'].initial.update(api=None)
         self.fields['session_types'].initial.update(api=None)
+
+        instance.save()
         self.cleaned_data['test_scenarios'].update(api=instance)
         self.cleaned_data['session_types'].update(api=instance)
         return instance
