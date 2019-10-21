@@ -9,7 +9,7 @@
     <td>{{ environment.name }}</td>
     <td>
         {% if last_run %}
-            {{ last_run }}
+            {{ last_run|date:"N j, Y, H:i" }}
         {% else %}
             {% trans "No stopped runs yet" %}
         {% endif %}

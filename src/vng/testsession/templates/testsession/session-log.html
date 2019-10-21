@@ -46,7 +46,7 @@
                         {% trans "Log" %}
                     </div>
                     <div class="card-body">
-                        <h4 class="card-title">{% trans "Started at" %}: {{ session.started|date }}</h4>
+                        <h4 class="card-title">{% trans "Started at" %}: {{ session.started|date:"N j, Y, H:i" }}</h4>
 
                         {% if session.is_stopped %}
                         {% for postman in session.exposedurl_set.all %}

@@ -44,12 +44,12 @@
 
 <tr>
     <td>{% trans "Started" %}</td>
-    <td>{{ server_run.started }}</td>
+    <td>{{ server_run.started|date:"N j, Y, H:i" }}</td>
 </tr>
 {% if server_run.stopped %}
     <tr>
         <td>Stopped</td>
-        <td>{{ server_run.stopped }}</td>
+        <td>{{ server_run.stopped|date:"N j, Y, H:i" }}</td>
     </tr>
 {% endif %}
 

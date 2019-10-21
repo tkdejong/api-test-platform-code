@@ -1,6 +1,6 @@
 import json
-from datetime import datetime
 import pytz
+from datetime import time
 
 from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -91,6 +91,7 @@ class ServerRunList(LoginRequiredMixin, ListView):
 
         data['test_scenario'] = get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
         data['environment'] = get_object_or_404(Environment, uuid=self.kwargs['env_uuid'])
+        data['schedule_time'] = time(hour=0, minute=0)
 
         data['api'] = data['test_scenario'].api
 

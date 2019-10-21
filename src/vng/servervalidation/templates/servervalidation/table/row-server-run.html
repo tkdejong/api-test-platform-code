@@ -19,7 +19,7 @@
             {% endif %}
         </td>
         {% if server_run.stopped %}
-            <td>{{ server_run.stopped }}</td>
+            <td>{{ server_run.stopped|date:"N j, Y, H:i" }}</td>
         {% else %}
             <td></td>
         {% endif %}
