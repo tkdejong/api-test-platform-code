@@ -65,6 +65,7 @@
                         <xmp>
                         </xmp>
                         </pre>
+                        <button class="btn btn-secondary" onclick="copySnippet('gitSnippet')">Copy markdown snippet</button>
                     </div>
                     <div class="card-body">
                         {% blocktrans %}
@@ -75,6 +76,7 @@
                         <xmp>
                         </xmp>
                         </pre>
+                        <button class="btn btn-secondary" onclick="copySnippet('htmlSnippet')">Copy HTML snippet</button>
                     </div>
                 {% else %}
                     <div class="card-body">
@@ -366,6 +368,21 @@
 
 {% block script %}
 <script>
+    function copySnippet(snippetType) {
+        snippet = document.getElementById(snippetType);
+
+        var range = document.createRange();
+        range.selectNodeContents(snippet);
+
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        document.execCommand("copy");
+
+        sel.removeRange(range);
+    }
+
     function htmlEscape(s) {
         s = s.replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
