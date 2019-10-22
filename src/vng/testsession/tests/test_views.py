@@ -7,6 +7,7 @@ import copy
 import mock
 import factory
 
+from django.utils.http import urlencode
 from django.conf import settings
 from django.test import override_settings, tag
 from django.urls import reverse
@@ -387,6 +388,22 @@ class TestUrlParam(WebTest):
             self.session
         )
         self.assertEqual(res, False)
+
+    def test_query_params_post_request_match(self):
+        qp = QueryParamsScenarioFactory(name='someparam')
+        scenario_case = qp.scenario_case
+        scenario_case.collection = self.collection
+        scenario_case.http_method = 'POST'
+        scenario_case.save()
+
+        url = reverse_sub('run_test', self.exposed_url.subdomain, kwargs={
+            'relative_url': scenario_case.url
+        })
+        url = url + '?' + urlencode({qp.name: 'bla'})
+        call = self.app.post(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(self.exposed_url.subdomain)},
+                            user=self.session.user, status=[404])
+
+        self.assertEqual(len(Report.objects.filter(scenario_case=scenario_case)), 1)
 
     def test_query_params_no_match(self):
         report = len(Report.objects.filter(scenario_case=self.scenario_case))

@@ -249,10 +249,7 @@ class RunTest(CSRFExemptMixin, View):
         logger.info("Parsed: %s", parsed_url)
         logger.info("URL: %s", check_url)
         if re.search(parsed_url, check_url) is not None:
-            if self.request.method == 'POST':
-                params = self.request.POST
-            else:
-                params = self.request.GET
+            params = self.request.GET
             for qp in query_params:
                 par = params.get(qp.name)
                 if par is None or (qp.expected_value != '*' and qp.expected_value != par):
