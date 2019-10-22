@@ -42,7 +42,6 @@ from ..utils.auth import get_jwt
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
 logger = logging.getLogger(__name__)
-logger2 = logging.getLogger('vng')
 
 
 class SessionViewStatusSet(
@@ -231,7 +230,6 @@ class RunTest(CSRFExemptMixin, View):
     error_codes = [(400, 599)]  # boundaries considered as errors
 
     def get_queryset(self):
-        logger2.info(self.request.subdomain)
         return get_object_or_404(ExposedUrl, subdomain=self.request.subdomain).session
 
     def match_url(self, url, compare, query_params):
@@ -442,7 +440,6 @@ class RunTest(CSRFExemptMixin, View):
         eu = get_object_or_404(ExposedUrl, session=self.session, subdomain=request.subdomain)
         request_header = self.get_http_header(request, eu.vng_endpoint, self.session)
         session_log, session = self.build_session_log(request, request_header)
-        logger2.info(eu, session)
         if session.is_stopped():
             raise Http404()
         endpoints = ExposedUrl.objects.filter(session=session)
@@ -458,7 +455,6 @@ class RunTest(CSRFExemptMixin, View):
                 logger.info("Request body after rewrite: %s", rewritten_body)
                 response = method(request_url, data=rewritten_body, headers=request_header, allow_redirects=False)
             else:
-                logger2.info('{} {}'.format(request_url, request_header))
                 response = method(request_url, headers=request_header, allow_redirects=False)
             return response
         try:
@@ -485,7 +481,6 @@ class RunTest(CSRFExemptMixin, View):
 
     def build_method_handler(self, request_method_name, request, body=False):
         try:
-            logger2.info(request.__dict__)
             return self.build_method(request_method_name, request, body)
         except Http404:
             return JsonResponse({
