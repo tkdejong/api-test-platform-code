@@ -7,7 +7,9 @@
 
 
 {% block breadcrumb %}
-{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api.id %}
+{% if request.user == environment.user %}
+    {% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api.id %}
+{% endif %}
 {% breadcrumb "Provider tests" 'server_run:server-run_list' test_scenario.uuid environment.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
