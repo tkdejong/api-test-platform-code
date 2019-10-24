@@ -81,7 +81,6 @@ class ServerRunList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return self.model.objects.filter(
-            user=self.request.user,
             test_scenario__uuid=self.kwargs['scenario_uuid'],
             environment__uuid=self.kwargs['env_uuid'],
         ).order_by('-stopped', '-started')
