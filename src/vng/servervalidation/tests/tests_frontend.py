@@ -66,7 +66,8 @@ class TestCreation(WebTest):
         ServerRunFactory.create(
             test_scenario=self.test_scenario,
             user=self.user,
-            environment=self.environment
+            environment=self.environment,
+            status='error'
         )
 
         call = self.app.get(reverse('server_run:server-run_list', kwargs={
