@@ -66,7 +66,8 @@ class TestCreation(WebTest):
         ServerRunFactory.create(
             test_scenario=self.test_scenario,
             user=self.user,
-            environment=self.environment
+            environment=self.environment,
+            status='error'
         )
 
         call = self.app.get(reverse('server_run:server-run_list', kwargs={
@@ -638,6 +639,16 @@ class TestServerRunList(WebTest):
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), auto_follow=True, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('testenv', response.text)
+
+    def test_server_run_list_different_user(self):
+        different_user = UserFactory.create()
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), auto_follow=True, user=different_user)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('testenv', response.text)
