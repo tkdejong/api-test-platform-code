@@ -1,6 +1,6 @@
 
 psycopg2
-Pillow
+Pillow>=6.2.0
 pytz
 raven
 
