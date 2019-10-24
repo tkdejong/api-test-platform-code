@@ -642,6 +642,8 @@ class TestServerRunList(WebTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('testenv', response.text)
+        self.assertIn('Start run for this environment', response.text)
+        self.assertIn('Add schedule', response.text)
 
     def test_server_run_list_different_user(self):
         different_user = UserFactory.create()
@@ -652,6 +654,19 @@ class TestServerRunList(WebTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('testenv', response.text)
+        self.assertNotIn('Start run for this environment', response.text)
+        self.assertNotIn('Add schedule', response.text)
+
+    def test_server_run_list_no_user(self):
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), auto_follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('testenv', response.text)
+        self.assertNotIn('Start run for this environment', response.text)
+        self.assertNotIn('Add schedule', response.text)
 
     def test_server_run_list_without_json_file(self):
         self.postman_result.log_json = None
