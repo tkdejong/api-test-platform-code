@@ -642,6 +642,16 @@ class TestServerRunList(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertIn('testenv', response.text)
 
+    def test_server_run_list_different_user(self):
+        different_user = UserFactory.create()
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), auto_follow=True, user=different_user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('testenv', response.text)
+
     def test_server_run_list_without_json_file(self):
         self.postman_result.log_json = None
         self.postman_result.save()
