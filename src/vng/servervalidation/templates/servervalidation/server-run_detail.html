@@ -6,7 +6,9 @@
 {% block title %}{% trans "Server-run detail" %}{% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api_id %}
+{% if request.user == environment.user %}
+    {% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api_id %}
+{% endif %}
 {% breadcrumb "Provider tests" 'server_run:server-run_list' object.test_scenario.uuid object.environment.uuid %}
 {% breadcrumb 'Detail' 'server_run:server-run_detail' object.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
