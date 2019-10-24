@@ -72,7 +72,7 @@ class TestScenarioList(LoginRequiredMixin, ListView):
         return res_no_last_run + res
 
 
-class ServerRunList(LoginRequiredMixin, ListView):
+class ServerRunList(ListView):
 
     template_name = 'servervalidation/server-run_list.html'
     context_object_name = 'server_run_list'
@@ -81,7 +81,6 @@ class ServerRunList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return self.model.objects.filter(
-            user=self.request.user,
             test_scenario__uuid=self.kwargs['scenario_uuid'],
             environment__uuid=self.kwargs['env_uuid'],
         ).order_by('-stopped', '-started')
