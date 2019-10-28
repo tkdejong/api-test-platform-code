@@ -157,6 +157,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
             if new_env_name:
                 env = Environment.objects.create(test_scenario=test_scenario, name=new_env_name, user=self.request.user)
                 return redirect(reverse('server_run:endpoints_create', kwargs={
+                    "api_id": env.test_scenario.api.id,
                     "test_id": env.test_scenario.id,
                     "env_id": env.id
                 }))
@@ -166,6 +167,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
                 self.fetch_server()
                 self.create_server_run(env)
                 return redirect(reverse('server_run:server-run_list', kwargs={
+                    'api_id': test_scenario.api.id,
                     'scenario_uuid': test_scenario.uuid,
                     'env_uuid': env.uuid
                 }))
@@ -202,6 +204,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('server_run:server-run_list', kwargs={
+            'api_id': self.ts.api.id,
             'scenario_uuid': self.ts.uuid,
             'env_uuid': self.env.uuid
         })
@@ -310,7 +313,7 @@ class ServerRunOutputUpdate(UpdateView):
     def get_success_url(self):
         return reverse_lazy(
             'server_run:server-run_detail',
-            kwargs={'uuid': self.object.uuid}
+            kwargs={'api_id': self.kwargs['api_id'], 'uuid': self.object.uuid}
         )
 
     def get_context_data(self, *args, **kwargs):
@@ -374,6 +377,7 @@ class TriggerServerRun(OwnerSingleObject, View):
         )
         execute_test.delay(server.pk, email=False)
         return redirect(reverse('server_run:server-run_list', kwargs={
+            'api_id': environment.test_scenario.api.id,
             'scenario_uuid': environment.test_scenario.uuid,
             'env_uuid': environment.uuid
         }))
@@ -391,6 +395,7 @@ class ScheduleActivate(OwnerSingleObject, View):
         scheduled.active = not scheduled.active
         scheduled.save()
         return redirect(reverse('server_run:server-run_list', kwargs={
+            'api_id': environment.test_scenario.api.id,
             'scenario_uuid': environment.test_scenario.uuid,
             'env_uuid': environment.uuid
         }))
@@ -407,6 +412,7 @@ class StopServer(OwnerSingleObject, View):
         server.status = choices.StatusWithScheduledChoices.stopped
         server.save()
         return redirect(reverse('server_run:server-run_list', kwargs={
+            'api_id': server.test_scenario.api.id,
             'scenario_uuid': server.test_scenario.uuid,
             'env_uuid': server.environment.uuid
         }))
@@ -495,6 +501,7 @@ class CreateSchedule(OwnerSingleObject, View):
             environment=environment
         )
         return redirect(reverse('server_run:server-run_list', kwargs={
+            'api_id': environment.test_scenario.api.id,
             'scenario_uuid': environment.test_scenario.uuid,
             'env_uuid': environment.uuid
         }))

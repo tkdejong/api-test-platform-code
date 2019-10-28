@@ -77,6 +77,11 @@ class SessionFormView(FormView):
         bootstrap_session.delay(session.uuid)
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['api'] = API.objects.get(id=self.kwargs['api_id'])
+        return data
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({'api_id': self.kwargs['api_id']})
@@ -152,7 +157,7 @@ class SessionLogUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy(
             'testsession:session_log',
-            kwargs={'uuid': self.object.uuid}
+            kwargs={'api_id': self.kwargs['api_id'], 'uuid': self.object.uuid}
         )
 
     def get_object(self, queryset=None):

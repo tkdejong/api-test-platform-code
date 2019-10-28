@@ -14,7 +14,7 @@
                         {% trans "Test consumer" %}
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">{% trans "Start a new consumer test session" %}</h5>
+                        <h5 class="card-title">{% trans "Start a new consumer test session for: " %} {{ api.name }}</h5>
                         {% load_widgets form='forms.html' %}
 
                         {% for field in form %}
@@ -23,7 +23,7 @@
                                     {% for radio in field %}
                                         <div class='row'>
                                             {{radio.tag}}&nbsp;{{ radio.choice_label.name }} [
-                                            <a href="{% url 'testsession:session_type-detail' radio.choice_label.pk  %}">info</a>]
+                                            <a href="{% url 'testsession:session_type-detail' api.id radio.choice_label.pk  %}">info</a>]
                                         </div>
                                     {% endfor %}
                                 </div>

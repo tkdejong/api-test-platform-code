@@ -5,9 +5,9 @@
 {% block title %}{% trans "Test consumer - Detail session view" %}{% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Home" 'testsession:sessions' %}
-{% breadcrumb "Log" "testsession:session_log" object.session.uuid %}
-{% breadcrumb 'Detail call' 'testsession:sessions' %}
+{% breadcrumb "Home" 'testsession:sessions' object.session.session_type.api.id %}
+{% breadcrumb "Log" "testsession:session_log" object.session.session_type.api.id object.session.uuid %}
+{% breadcrumb 'Detail call' 'testsession:sessions' object.session.session_type.api.id %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
 
