@@ -214,11 +214,11 @@ class PostmanTestAPITests(TransactionWebTest):
 
         self.assertEqual(response.json[0]['name'], 'postman_tests')
         self.assertEqual(response.json[0]['version'], '1.0.0')
-        self.assertIn(self.postman_tests1.validation_file.file.name, response.json[0]['validation_file'])
+        self.assertIn(self.postman_tests1.validation_file.name, response.json[0]['validation_file'])
 
         self.assertEqual(response.json[1]['name'], 'postman_tests')
         self.assertEqual(response.json[1]['version'], '1.0.1')
-        self.assertIn(self.postman_tests2.validation_file.file.name, response.json[1]['validation_file'])
+        self.assertIn(self.postman_tests2.validation_file.name, response.json[1]['validation_file'])
 
     def test_get_all_versions_empty(self):
         get_versions_url = reverse('apiv1server:provider:api_postman-test-get-all-versions', kwargs={
