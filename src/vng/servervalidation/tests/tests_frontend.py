@@ -71,6 +71,7 @@ class TestCreation(WebTest):
         )
 
         call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), user='test')
@@ -83,6 +84,7 @@ class TestCreation(WebTest):
         form['test_scenario'].force_value('9')
         form.submit()
         call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.tsf.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), user='test')
@@ -115,12 +117,14 @@ class TestCreation(WebTest):
         server = ServerRun.objects.filter(status=choices.StatusChoices.stopped)[0]
 
         url = reverse('server_run:server-run_detail', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': server.uuid
         })
         call = self.app.get(url, user=self.user)
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_log', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': ptr.server_run.uuid,
             'test_result_pk': ptr.pk
         })
@@ -128,6 +132,7 @@ class TestCreation(WebTest):
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_log_json', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': ptr.server_run.uuid,
             'test_result_pk': ptr.pk
         })
@@ -135,6 +140,7 @@ class TestCreation(WebTest):
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_pdf', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': server.uuid,
             'test_result_pk': ptr.pk
         })
@@ -188,12 +194,14 @@ class TestCreation(WebTest):
         server = ServerRun.objects.filter(status=choices.StatusChoices.stopped)[0]
 
         url = reverse('server_run:server-run_detail', kwargs={
+            'api_id': self.tsf.test_scenario.api.id,
             'uuid': server.uuid
         })
         call = self.app.get(url, user=self.user)
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_log', kwargs={
+            'api_id': self.tsf.test_scenario.api.id,
             'uuid': ptr.server_run.uuid,
             'test_result_pk': ptr.pk
         })
@@ -201,6 +209,7 @@ class TestCreation(WebTest):
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_log_json', kwargs={
+            'api_id': self.tsf.test_scenario.api.id,
             'uuid': ptr.server_run.uuid,
             'test_result_pk': ptr.pk
         })
@@ -208,6 +217,7 @@ class TestCreation(WebTest):
 
         ptr = PostmanTestResult.objects.get(postman_test__test_scenario=server.test_scenario)
         url = reverse('server_run:server-run_detail_pdf', kwargs={
+            'api_id': self.tsf.test_scenario.api.id,
             'uuid': server.uuid,
             'test_result_pk': ptr.pk
         })
@@ -221,6 +231,7 @@ class TestCreation(WebTest):
         )
         server = ServerRun.objects.filter(user=self.user).order_by('-started')[0]
         url = reverse('server_run:server-run_detail', kwargs={
+            'api_id': server.test_scenario.api.id,
             'uuid': server.uuid
         })
         call = self.app.get(url, user=self.user)
@@ -310,6 +321,7 @@ class IntegrationTest(WebTest):
             user=self.user
         )
         call = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': server.uuid
         }))
         self.assertIn(str(server.id), call.text)
@@ -318,6 +330,7 @@ class IntegrationTest(WebTest):
         prev = len(PostmanTestResult.objects.all())
         self.app.get(
             reverse('server_run:server-run_trigger', kwargs={
+                'api_id': self.test_scenario.api.id,
                 'uuid': self.environment.uuid
             }), user=self.user
         )
@@ -343,10 +356,12 @@ class IntegrationTest(WebTest):
         new_server = ServerRun.objects.latest('id')
 
         call = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'api_id': new_server.test_scenario.api.id,
             'uuid': new_server.uuid
         }))
         self.assertIn(str(new_server.uuid), call.text)
         call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': new_server.test_scenario.api.id,
             'scenario_uuid': new_server.test_scenario.uuid,
             'env_uuid': new_server.environment.uuid
         }), user=self.user)
@@ -362,6 +377,7 @@ class IntegrationTest(WebTest):
 
         # simply check that with no user it raises no errors
         call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': server.test_scenario.api.id,
             'scenario_uuid': server.test_scenario.uuid,
             'env_uuid': server.environment.uuid
         }), status=[200, 302])
@@ -373,6 +389,7 @@ class IntegrationTest(WebTest):
             user=self.user
         )
         call = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': server.test_scenario.api.id,
             'scenario_uuid': server.test_scenario.uuid,
             'env_uuid': server.environment.uuid
         }), user=self.user)
@@ -384,7 +401,7 @@ class IntegrationTest(WebTest):
         call = self.app.get(
             reverse(
                 'server_run:server-run_info-update',
-                kwargs={'uuid': new_server.uuid}),
+                kwargs={'api_id': new_server.test_scenario.api.id, 'uuid': new_server.uuid}),
             user=self.user
         )
         form = call.forms[1]
@@ -398,13 +415,14 @@ class IntegrationTest(WebTest):
         call = self.app.get(
             reverse(
                 'server_run:server-run_info-update',
-                kwargs={'uuid': new_server.uuid}),
+                kwargs={'api_id': new_server.test_scenario.api.id, 'uuid': new_server.uuid}),
             user='random',
             status=[403]
         )
 
     def test_add_schedule_to_env(self):
         response = self.app.get(reverse('server_run:server-run_create_schedule', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': self.environment.uuid
         }), user=self.user, auto_follow=True)
 
@@ -417,10 +435,12 @@ class IntegrationTest(WebTest):
 
     def test_deactivate_schedule(self):
         self.app.get(reverse('server_run:server-run_create_schedule', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': self.environment.uuid
         }), user=self.user)
 
         response = self.app.get(reverse('server_run:schedule_activate', kwargs={
+            'api_id': self.test_scenario.api.id,
             'uuid': self.environment.uuid
         }), user=self.user, auto_follow=True)
 
@@ -433,14 +453,17 @@ class IntegrationTest(WebTest):
 
     def test_reactivate_schedule(self):
         self.app.get(reverse('server_run:server-run_create_schedule', kwargs={
+            'api_id': self.environment.test_scenario.api.id,
             'uuid': self.environment.uuid
         }), user=self.user)
 
         self.app.get(reverse('server_run:schedule_activate', kwargs={
+            'api_id': self.environment.test_scenario.api.id,
             'uuid': self.environment.uuid
         }), user=self.user, auto_follow=True)
 
         response = self.app.get(reverse('server_run:schedule_activate', kwargs={
+            'api_id': self.environment.test_scenario.api.id,
             'uuid': self.environment.uuid
         }), user=self.user, auto_follow=True)
 
@@ -459,6 +482,7 @@ class TestScenarioDetail(WebTest):
 
     def test_scenario_detail(self):
         call = self.app.get(reverse('server_run:testscenario-detail', kwargs={
+            'api_id': self.pts.test_scenario.api.id,
             'pk': self.pts.test_scenario.id
         }))
         self.assertIn('test subsub', call.text)
@@ -478,7 +502,10 @@ class ServerRunHiddenVarsTests(WebTest):
         _ = EndpointFactory(test_scenario_url=tsu1, server_run=self.server_run, url='https://url1.com/', environment=self.environment)
         _ = EndpointFactory(test_scenario_url=tsu2, server_run=self.server_run, url='https://url2.com/', environment=self.environment)
 
-        self.detail_url = reverse('server_run:server-run_detail', kwargs={'uuid': self.server_run.uuid})
+        self.detail_url = reverse('server_run:server-run_detail', kwargs={
+            'api_id': self.server_run.test_scenario.api.id,
+            'uuid': self.server_run.uuid
+        })
 
 
     def test_detail_page_replace_hidden_vars_with_placeholders_for_other_user(self):
@@ -511,12 +538,16 @@ class ServerRunPublicLogsTests(WebTest):
             server_run__user=self.user1,
         )
         server_run = test_result_public.server_run
-        self.detail_url_public = reverse('server_run:server-run_detail', kwargs={'uuid': server_run.uuid})
+        self.detail_url_public = reverse('server_run:server-run_detail', kwargs={
+            'api_id': server_run.test_scenario.api.id, 'uuid': server_run.uuid
+        })
         self.log_json_url_public = reverse('server_run:server-run_detail_log_json', kwargs={
+            'api_id': server_run.test_scenario.api.id,
             'uuid': server_run.uuid,
             'test_result_pk': test_result_public.pk,
         })
         self.log_html_url_public = reverse('server_run:server-run_detail_log', kwargs={
+            'api_id': server_run.test_scenario.api.id,
             'uuid': server_run.uuid,
             'test_result_pk': test_result_public.pk,
         })
@@ -526,12 +557,16 @@ class ServerRunPublicLogsTests(WebTest):
             server_run__user=self.user1,
         )
         server_run = test_result_private.server_run
-        self.detail_url_private = reverse('server_run:server-run_detail', kwargs={'uuid': server_run.uuid})
+        self.detail_url_private = reverse('server_run:server-run_detail', kwargs={
+            'api_id': server_run.test_scenario.api.id, 'uuid': server_run.uuid
+        })
         self.log_json_url_private = reverse('server_run:server-run_detail_log_json', kwargs={
+            'api_id': server_run.test_scenario.api.id,
             'uuid': server_run.uuid,
             'test_result_pk': test_result_private.pk,
         })
         self.log_html_url_private = reverse('server_run:server-run_detail_log', kwargs={
+            'api_id': server_run.test_scenario.api.id,
             'uuid': server_run.uuid,
             'test_result_pk': test_result_private.pk,
         })
@@ -636,6 +671,7 @@ class TestServerRunList(WebTest):
 
     def test_server_run_list(self):
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), auto_follow=True, user=self.user)
@@ -648,6 +684,7 @@ class TestServerRunList(WebTest):
     def test_server_run_list_different_user(self):
         different_user = UserFactory.create()
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), auto_follow=True, user=different_user)
@@ -659,6 +696,7 @@ class TestServerRunList(WebTest):
 
     def test_server_run_list_no_user(self):
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), auto_follow=True)
@@ -672,6 +710,7 @@ class TestServerRunList(WebTest):
         self.postman_result.log_json = None
         self.postman_result.save()
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), auto_follow=True, user=self.user)
@@ -683,6 +722,7 @@ class TestServerRunList(WebTest):
         self.postman_result.log = None
         self.postman_result.save()
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), auto_follow=True, user=self.user)
@@ -730,6 +770,7 @@ class BadgesWithoutResultsTests(WebTest):
             user=self.user
         )
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': server_run.environment.uuid
         }), user=self.user)
@@ -743,6 +784,7 @@ class BadgesWithoutResultsTests(WebTest):
             user=self.user
         )
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': server_run.environment.uuid
         }), user=self.user)
@@ -767,6 +809,7 @@ class BadgesWithoutResultsTests(WebTest):
         )
 
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': server_run_with_results.environment.uuid
         }), user=self.user)
@@ -780,6 +823,7 @@ class BadgesWithoutResultsTests(WebTest):
             user=self.user
         )
         response = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'api_id': server_run.test_scenario.api.id,
             'uuid': server_run.uuid
         }), user=self.user)
 
@@ -793,6 +837,7 @@ class BadgesWithoutResultsTests(WebTest):
             user=self.user
         )
         response = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'api_id': server_run.test_scenario.api.id,
             'uuid': server_run.uuid
         }), user=self.user)
 
@@ -822,6 +867,7 @@ class BadgesWithoutResultsTests(WebTest):
         )
 
         response = self.app.get(reverse('server_run:server-run_detail', kwargs={
+            'api_id': server_run_without_results.test_scenario.api.id,
             'uuid': server_run_without_results.uuid
         }), user=self.user)
 
@@ -854,6 +900,7 @@ class LatestServerRunTests(WebTest):
         )
 
         response = self.app.get(reverse('server_run:server-run_latest', kwargs={
+            'api_id': self.test_scenario.api.id,
             'scenario_uuid': self.test_scenario.uuid,
             'env_uuid': self.environment.uuid
         }), user=self.user)
@@ -954,6 +1001,7 @@ class ProviderOrderingTests(WebTest):
             user=self.user
         )
         response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario1.api.id,
             'scenario_uuid': self.test_scenario1.uuid,
             'env_uuid': self.env1.uuid
         }), user=self.user)
