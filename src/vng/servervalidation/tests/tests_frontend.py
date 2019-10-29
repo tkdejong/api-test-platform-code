@@ -4,12 +4,13 @@ import re
 
 from django_webtest import WebTest
 from django.urls import reverse
+from django.core.files.base import File
 
 from vng.postman.choices import ResultChoices
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import (
     ServerRun, PostmanTest, PostmanTestResult,
-    User, ScheduledTestScenario, Endpoint
+    User, ScheduledTestScenario, Endpoint, TestScenario, TestScenarioUrl
 )
 
 from .factories import (
@@ -1016,3 +1017,113 @@ class ProviderOrderingTests(WebTest):
         self.assertIn(str(self.server4.id), rows[1].findChild('a').text)
         self.assertIn(str(self.server1.id), rows[2].findChild('a').text)
         self.assertIn(str(self.server2.id), rows[3].findChild('a').text)
+
+
+class TestScenarioCreateTests(WebTest):
+
+    def setUp(self):
+        self.api = APIFactory.create(name="ZGW")
+        self.user = UserFactory.create()
+
+    def test_create_without_variables(self):
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['name'] = 'some scenario name'
+        form['description'] = 'test description'
+        form['public_logs'] = False
+
+        response = form.submit().follow()
+
+        scenario = TestScenario.objects.first()
+        self.assertEqual(scenario.name, 'some scenario name')
+        self.assertEqual(scenario.description, 'test description')
+        self.assertEqual(scenario.public_logs, False)
+
+        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={'pk': scenario.pk})
+        self.assertEqual(scenario_detail_path, response.request.path)
+
+    def test_create_scenario_name_already_exists(self):
+        TestScenarioFactory.create(name='exists')
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['name'] = 'exists'
+        form['description'] = 'test description'
+        form['public_logs'] = False
+
+        response = form.submit()
+
+        scenario_detail_path = reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        })
+        self.assertEqual(scenario_detail_path, response.request.path)
+
+    def test_create_with_variable(self):
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['name'] = 'some scenario name'
+        form['description'] = 'test description'
+        form['public_logs'] = False
+
+        form['testscenariourl_set-0-name'] = 'token'
+        form['testscenariourl_set-0-url'] = False
+        form['testscenariourl_set-0-hidden'] = True
+        form['testscenariourl_set-0-placeholder'] = 'bearer token'
+
+        response = form.submit().follow()
+
+        scenario = TestScenario.objects.first()
+        self.assertEqual(scenario.name, 'some scenario name')
+        self.assertEqual(scenario.description, 'test description')
+        self.assertEqual(scenario.public_logs, False)
+
+        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={'pk': scenario.pk})
+        self.assertEqual(scenario_detail_path, response.request.path)
+
+        variable = TestScenarioUrl.objects.first()
+        self.assertEqual(variable.name, 'token')
+        self.assertEqual(variable.url, False)
+        self.assertEqual(variable.hidden, True)
+        self.assertEqual(variable.placeholder, 'bearer token')
+
+    def test_create_with_postman_test(self):
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['name'] = 'some scenario name'
+        form['description'] = 'test description'
+        form['public_logs'] = False
+
+        form['postmantest_set-0-name'] = 'sometestscript'
+        form['postmantest_set-0-version'] = '1.0.2'
+
+        upload_file = open('.gitignore', 'rb')
+        form['postmantest_set-0-validation_file'] = [upload_file.name, b'{}']
+
+        form['postmantest_set-0-published_url'] = 'https://example.com'
+
+        response = form.submit().follow()
+
+        scenario = TestScenario.objects.first()
+        self.assertEqual(scenario.name, 'some scenario name')
+        self.assertEqual(scenario.description, 'test description')
+        self.assertEqual(scenario.public_logs, False)
+
+        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={'pk': scenario.pk})
+        self.assertEqual(scenario_detail_path, response.request.path)
+
+        postman_test = PostmanTest.objects.first()
+        self.assertEqual(postman_test.name, 'sometestscript')
+        self.assertEqual(postman_test.version, '1.0.2')
+        self.assertTrue(postman_test.validation_file)
+        self.assertEqual(postman_test.published_url, 'https://example.com')
