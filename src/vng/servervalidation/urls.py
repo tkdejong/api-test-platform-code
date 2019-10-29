@@ -25,4 +25,5 @@ urlpatterns = [
     path('<int:api_id>/<uuid:scenario_uuid>/<uuid:env_uuid>/', views.ServerRunList.as_view(), name='server-run_list'),
     path('<int:api_id>/<uuid:scenario_uuid>/<uuid:env_uuid>/latest/', views.LatestRunView.as_view(), name='server-run_latest'),
     # path('', views.ServerRunList.as_view(), name='server-run_list'),
+    path('<int:api_id>/scenario/create/', views.CreateTestScenarioView.as_view(), name='test-scenario_create_item'),
 ]

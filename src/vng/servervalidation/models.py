@@ -101,7 +101,10 @@ class PostmanTest(OrderedModel):
     test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
         "The name of the test scenario to which this Postman test is linked"
     ))
-    validation_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL, help_text=_(
+    # validation_file = FilerFileField(null=True, blank=True, default=None, on_delete=models.SET_NULL, help_text=_(
+    #     "The actual file containing the Postman collection"
+    # ))
+    validation_file = models.FileField(null=True, blank=True, default=None, help_text=_(
         "The actual file containing the Postman collection"
     ))
     published_url = models.URLField(null=True, blank=True, help_text=_(
