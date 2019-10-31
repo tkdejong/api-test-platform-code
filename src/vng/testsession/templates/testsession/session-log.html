@@ -46,7 +46,7 @@
                         {% trans "Log" %}
                     </div>
                     <div class="card-body">
-                        <h4 class="card-title">{% trans "Started at" %}: {{ session.started|date }}</h4>
+                        <h4 class="card-title">{% trans "Started at" %}: {{ session.started|date:"N j, Y, H:i" }}</h4>
 
                         {% if session.is_stopped %}
                         {% for postman in session.exposedurl_set.all %}
@@ -371,6 +371,7 @@
 
                     </xmp>
                     </pre>
+                    <button class="btn btn-secondary" onclick="copySnippet('gitSnippet')">Copy markdown snippet</button>
                 </div>
                 </div>
                 <div class="card">
@@ -382,6 +383,7 @@
                         <xmp>
                         </xmp>
                     </pre>
+                    <button class="btn btn-secondary" onclick="copySnippet('htmlSnippet')">Copy HTML snippet</button>
                     </div>
                 </div>
             </div>
@@ -392,6 +394,21 @@
 
 {% block script %}
 <script>
+    function copySnippet(snippetType) {
+        snippet = document.getElementById(snippetType);
+
+        var range = document.createRange();
+        range.selectNodeContents(snippet);
+
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        document.execCommand("copy");
+
+        sel.removeRange(range);
+    }
+
     var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %})]({{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %})'
 
     var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'

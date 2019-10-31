@@ -17,7 +17,7 @@ class VNGEndpointInline(OrderedTabularInline):
 
 class ScenarioCaseInline(OrderedTabularInline):
     model = model.ScenarioCase
-    fields = ('url', 'move_up_down_links', 'http_method',)
+    fields = ('url', 'description', 'move_up_down_links', 'http_method',)
     readonly_fields = ('move_up_down_links',)
     extra = 1
     ordering = ('order',)

@@ -13,51 +13,21 @@
         <li class="nav-title">{% trans "APIs" %}</li>
 
         {% for api in api_list %}
-            <li class="nav-item ">
-                {% comment %} <a class="nav-link" href="/pages{{ api.url }}">
-                    <i class="nav-icon icon-list"></i>{{ api.name }}</a> {% endcomment %}
-                <div class="dropdown">
-                    {% comment %} <button class="btn btn-secondary dropdown-toggle ml-3" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ api.name }}
-                    </button> {% endcomment %}
-                    <a class="dropdown-toggle nav-link" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="nav-icon icon-list"></i>{{ api.name }}
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="{% url 'server_run:test-scenario_list' api.id %}">Provider</a>
-                        <a class="dropdown-item" href="{% url 'testsession:sessions' api.id %}">Consumer</a>
-                    </div>
-                </div>
+            <li class="nav-item nav-dropdown ">
+                <a class="nav-link nav-dropdown-toggle" href="#">
+                    <i class="nav-icon icon-list"></i>{{ api.name }}
+                </a>
+                <ul class="nav-dropdown-items">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'server_run:test-scenario_list' api.id %}">Provider</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'testsession:sessions' api.id %}">Consumer</a>
+                    </li>
+                </ul>
             </li>
         {% endfor %}
 
-        {% comment %} <li class="nav-title">{% trans "Test Consumer" %}</li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'testsession:sessions' %}">
-              <i class="nav-icon icon-list"></i>{% trans "Consumer session" %}
-              <span class="badge badge-light">{{ session_active }}</span>
-            </a>
-	</li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'testsession:session_create' %}">
-              <i class="nav-icon icon-note"></i>{% trans "Start session" %}</a>
-	</li>
-	<li class="nav-title">{% trans "Test Provider" %}</li>
-	<li class="nav-item">
-	  <a class="nav-link" href="{% url 'server_run:test-scenario_list' %}">
-	    <i class="nav-icon icon-list"></i>
-	    Provider tests</a>
-	</li>
-	<li class="nav-item">
-	  <a class="nav-link" href="{% url 'server_run:scheduled-test-scenario_list' %}">
-	    <i class="nav-icon icon-clock"></i>
-	    Scheduled tests<span class="badge badge-light">{{ server_scheduled }}</span></a>
-	  </li>
-	<li class="nav-item">
-	  <a class="nav-link" href="{% url 'server_run:server-run_create_item' %}">
-	    <i class="nav-icon icon-note"></i>
-	    Start testrun</a>
-	</li> {% endcomment %}
     <li class="nav-title">{% trans "API Token manager" %}</li>
         <li class="nav-item ">
             <a class="nav-link" href="{% url 'apiv1_auth:token-manager' %}">

@@ -42,7 +42,6 @@ from ..utils.auth import get_jwt
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
 logger = logging.getLogger(__name__)
-logger2 = logging.getLogger('test')
 
 
 class SessionViewStatusSet(
@@ -231,7 +230,6 @@ class RunTest(CSRFExemptMixin, View):
     error_codes = [(400, 599)]  # boundaries considered as errors
 
     def get_queryset(self):
-        logger2.info(self.request.subdomain)
         return get_object_or_404(ExposedUrl, subdomain=self.request.subdomain).session
 
     def match_url(self, url, compare, query_params):
@@ -251,10 +249,7 @@ class RunTest(CSRFExemptMixin, View):
         logger.info("Parsed: %s", parsed_url)
         logger.info("URL: %s", check_url)
         if re.search(parsed_url, check_url) is not None:
-            if self.request.method == 'POST':
-                params = self.request.POST
-            else:
-                params = self.request.GET
+            params = self.request.GET
             for qp in query_params:
                 par = params.get(qp.name)
                 if par is None or (qp.expected_value != '*' and qp.expected_value != par):
@@ -442,7 +437,6 @@ class RunTest(CSRFExemptMixin, View):
         eu = get_object_or_404(ExposedUrl, session=self.session, subdomain=request.subdomain)
         request_header = self.get_http_header(request, eu.vng_endpoint, self.session)
         session_log, session = self.build_session_log(request, request_header)
-        logger2.info(eu, session)
         if session.is_stopped():
             raise Http404()
         endpoints = ExposedUrl.objects.filter(session=session)
@@ -458,7 +452,6 @@ class RunTest(CSRFExemptMixin, View):
                 logger.info("Request body after rewrite: %s", rewritten_body)
                 response = method(request_url, data=rewritten_body, headers=request_header, allow_redirects=False)
             else:
-                logger2.info('{} {}'.format(request_url, request_header))
                 response = method(request_url, headers=request_header, allow_redirects=False)
             return response
         try:
