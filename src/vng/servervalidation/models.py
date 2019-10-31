@@ -23,6 +23,13 @@ from vng.postman.choices import ResultChoices
 from ..utils import choices
 
 
+class API(models.Model):
+    name = models.CharField(max_length=80, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class TestScenario(models.Model):
 
     name = models.CharField(_('name'), max_length=200, unique=True, help_text=_(
@@ -38,6 +45,9 @@ class TestScenario(models.Model):
     ))
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
         "The universally unique identifier of this test scenario"
+    ))
+    api = models.ForeignKey(API, on_delete=models.PROTECT, null=True, blank=True, help_text=_(
+        "The API to which this test scenario belongs"
     ))
 
     def __str__(self):
@@ -132,29 +142,25 @@ class Environment(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.test_scenario.name, self.name)
 
+    @property
+    def last_run(self):
+        latest = self.serverrun_set.exclude(stopped=None).order_by('-stopped').first()
+        return getattr(latest, 'stopped', None)
+
 
 class ScheduledTestScenario(models.Model):
-    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
-        "The test scenario for which provider runs will be scheduled"
-    ))
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, help_text=_(
-        "The user that scheduled this test scenario"
-    ))
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
         "The universally unique identifier of this scheduled test scenario, needed to retrieve the badge"
     ))
-    environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.PROTECT, help_text=_(
+    environment = models.OneToOneField(Environment, null=True, blank=True, on_delete=models.PROTECT, help_text=_(
         "The environment that will be used for provider runs of this scheduled scenario"
     ))
     active = models.BooleanField(default=True, help_text=_(
         "Indicates whether this schedule is still active or not"
     ))
 
-    class Meta:
-        unique_together = ('test_scenario', 'user', 'environment',)
-
     def __str__(self):
-        return '{} - {}'.format(self.test_scenario, self.environment.name)
+        return '{} - {}'.format(self.environment.test_scenario, self.environment.name)
 
     @property
     def last_run(self):
@@ -183,9 +189,6 @@ class ServerRun(models.Model):
     ))
     stopped = models.DateTimeField(_('Stopped at'), null=True, default=None, blank=True, help_text=_(
         "The time at which the provider run was stopped"
-    ))
-    last_exec = models.DateTimeField(_('Last run'), null=True, default=None, blank=True, help_text=_(
-        "The time at which the last provider run for the test scenario was executed"
     ))
     status = models.CharField(
         max_length=20,

@@ -31,6 +31,7 @@ from .factories import (
     ScenarioCaseFactory, ExposedUrlFactory, SessionLogFactory, VNGEndpointFactory, QueryParamsScenarioFactory,
     HeaderInjectionFactory, FilerField, ScenarioCaseCollectionFactory
 )
+from ...servervalidation.tests.factories import APIFactory
 from ...utils import choices
 from ...utils.factories import UserFactory
 
@@ -68,6 +69,33 @@ class RetrieveSessionType(WebTest):
         call = self.app.get(reverse('apiv1session:session_types-list'), user='admin')
         t = json.loads(call.text)
         self.assertTrue(t[9]['id'] > 0)
+
+
+class SessionListTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.api1, self.api2 = APIFactory.create_batch(2)
+        self.sessiontype1 = SessionTypeFactory.create(api=self.api1, name='type1')
+        self.sessiontype2 = SessionTypeFactory.create(api=self.api2, name='type2')
+        SessionFactory.create(session_type=self.sessiontype1, user=self.user)
+        SessionFactory.create(session_type=self.sessiontype2, user=self.user)
+
+    def test_create_session_filters_by_api(self):
+        response = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.api1.id
+        }), user=self.user)
+
+        self.assertIn('type1', response.text)
+        self.assertNotIn('type2', response.text)
+
+    def test_list_filters_by_api(self):
+        response = self.app.get(reverse('testsession:sessions', kwargs={
+            'api_id': self.api1.id
+        }), user=self.user)
+
+        self.assertIn('type1', response.text)
+        self.assertNotIn('type2', response.text)
 
 
 @override_settings(SUBDOMAIN_SEPARATOR='-')
@@ -458,7 +486,9 @@ class TestSandboxMode(WebTest):
         self.session_type = self.endpoint.session_type
 
     def test_sandbox(self):
-        call = self.app.get(reverse('testsession:session_create'), user=self.user)
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.session_type.api.id
+        }), user=self.user)
         form = call.forms[1]
         form['session_type'].select(form['session_type'].options[-1][0])
         form['sandbox'] = True
@@ -482,7 +512,9 @@ class TestSandboxMode(WebTest):
         self.assertEqual(choices.HTTPCallChoices.success, report.result)
 
     def test_no_sandbox(self):
-        call = self.app.get(reverse('testsession:session_create'), user=self.user)
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.session_type.api.id
+        }), user=self.user)
         form = call.forms[1]
         form['session_type'].select(form['session_type'].options[-1][0])
         form['sandbox'] = False
@@ -556,12 +588,16 @@ class TestAllProcedure(WebTest):
         self.session_type = VNGEndpointFactory(name='demo-api').session_type
 
     def _test_create_session(self):
-        call = self.app.get(reverse('testsession:session_create'), user=self.user)
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.session_type.api.id
+        }), user=self.user)
         form = call.forms[1]
         form['session_type'].select(str(self.session_type.id))
         form.submit()
 
-        call = self.app.get(reverse('testsession:sessions'), user=self.user)
+        call = self.app.get(reverse('testsession:sessions', kwargs={
+            'api_id': self.session_type.api.id
+        }), user=self.user)
         self.assertIn(self.session_type.name, call.text)
 
     def _test_stop_session(self):
@@ -865,11 +901,14 @@ class TestPostmanRun(WebTest):
 class TestActiveSessionType(WebTest):
 
     def setUp(self):
-        self.stypes = [SessionTypeFactory(active = i%2==0) for i in range(10)]
+        self.api = APIFactory.create()
+        self.stypes = [SessionTypeFactory(active = i%2==0, api=self.api) for i in range(10)]
         self.user = UserFactory()
 
     def test_active_stypes(self):
-        call = self.app.get(reverse('testsession:session_create'), user = self.user)
+        call = self.app.get(reverse('testsession:session_create', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
         for st in self.stypes:
             if st.active:
                 self.assertIn(st.name, call.text)

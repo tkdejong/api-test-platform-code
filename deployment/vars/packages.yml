@@ -26,7 +26,6 @@ system_packages:
   - libxslt1-dev
   - swig
   - libjpeg-dev
-  - python-certbot # for letsencrypt
   - libffi-dev # for pyopenssl / Scrapy
   - libc-bin # ldconfig / npm
 

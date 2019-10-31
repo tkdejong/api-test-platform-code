@@ -40,6 +40,7 @@ class SessionListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        context['api_id'] = self.kwargs['api_id']
         _choices = dict(choices.StatusChoices.choices)
         _choices['error_deploy'] = choices.StatusChoices.error_deploy
         context.update({
@@ -53,7 +54,9 @@ class SessionListView(LoginRequiredMixin, ListView):
         '''
         Group all the exposed url by the session in order to display later all related url together
         '''
-        return Session.objects.filter(user=self.request.user).order_by('-started')
+        return Session.objects.filter(
+            user=self.request.user, session_type__api__id=self.kwargs['api_id']
+        ).order_by('-started')
 
 
 class SessionFormView(FormView):
@@ -62,7 +65,7 @@ class SessionFormView(FormView):
     form_class = SessionForm
 
     def get_success_url(self):
-        return reverse('testsession:sessions')
+        return reverse('testsession:sessions', kwargs={'api_id': self.kwargs['api_id']})
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -73,6 +76,11 @@ class SessionFormView(FormView):
         session = form.save()
         bootstrap_session.delay(session.uuid)
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'api_id': self.kwargs['api_id']})
+        return kwargs
 
 
 class SessionLogDetailView(OwnerSingleObject):
@@ -97,6 +105,7 @@ class SessionLogView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         session = get_object_or_404(Session, uuid=self.kwargs['uuid'])
+        context['api_id'] = session.session_type.api.id
         stats = session.get_report_stats()
         _choices = dict(choices.StatusChoices.choices)
         _choices['error_deploy'] = choices.StatusChoices.error_deploy
@@ -165,13 +174,18 @@ class StopSession(OwnerSingleObject, View):
 
     def post(self, request, *args, **kwargs):
         session = self.get_object()
+        api_id = session.session_type.api_id
         if session.status == choices.StatusChoices.stopped or session.status == choices.StatusChoices.shutting_down:
-            return HttpResponseRedirect(reverse('testsession:sessions'))
+            return HttpResponseRedirect(reverse('testsession:sessions', kwargs={
+                'api_id': api_id
+            }))
 
         session.status = choices.StatusChoices.shutting_down
         session.save()
         stop_session.delay(session.uuid)
-        return HttpResponseRedirect(reverse('testsession:sessions'))
+        return HttpResponseRedirect(reverse('testsession:sessions', kwargs={
+            'api_id': api_id
+        }))
 
 
 class SessionReport(DetailView):

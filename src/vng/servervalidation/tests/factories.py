@@ -8,10 +8,21 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 
 from vng.accounts.models import User
-from vng.testsession.tests.factories import UserFactory
 
-from ..models import ServerRun, TestScenario, TestScenarioUrl, PostmanTest, PostmanTestResult, Endpoint, Environment, ScheduledTestScenario
+from ..models import (
+    API, ServerRun, TestScenario, TestScenarioUrl,
+    PostmanTest, PostmanTestResult, Endpoint,
+    Environment, ScheduledTestScenario
+)
 from ...utils.factories import UserFactory
+
+
+class APIFactory(Dmf):
+
+    class Meta:
+        model = API
+
+    name = factory.sequence(lambda n: 'API %d' % n)
 
 
 class TestScenarioFactory(Dmf):
@@ -20,6 +31,7 @@ class TestScenarioFactory(Dmf):
         model = TestScenario
 
     name = factory.sequence(lambda n: 'testype %d' % n)
+    api = factory.SubFactory(APIFactory)
 
 
 class EnvironmentFactory(Dmf):
@@ -131,6 +143,4 @@ class ScheduledTestScenarioFactory(Dmf):
     class Meta:
         model = ScheduledTestScenario
 
-    test_scenario = factory.SubFactory(TestScenarioFactory)
-    user = factory.SubFactory(UserFactory)
     environment = factory.SubFactory(EnvironmentFactory)

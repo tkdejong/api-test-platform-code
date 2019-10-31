@@ -6,7 +6,7 @@
 {% block title %}{% trans "Test consumer - Detail session view" %} {% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Home" "testsession:sessions" %}
+{% breadcrumb "Home" "testsession:sessions" api_id %}
 {% breadcrumb "test consumer" "" %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
@@ -258,10 +258,10 @@
                                 <input type="button" class="btn btn-primary" value="{% trans "Report" %}"
                                     onclick="location.href = '{% url 'testsession:session_report' session.uuid %}';">
                             </p>
-                            <p>
+                            {% comment %} <p>
                                 <input type="button" class="btn btn-primary" value="{% trans "Report (PDF)" %}"
                                     onclick="location.href = '{% url 'testsession:session_report-pdf' session.uuid %}';">
-                            </p>
+                            </p> {% endcomment %}
                         </div>
                     </div>
                 </div>

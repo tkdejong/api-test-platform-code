@@ -43,15 +43,17 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th class="table__heading">{% trans "Http method" %}</th>
-                                    <th class="table__heading">{% trans "Url" %}</th>
-                                    <th class="table__heading">{% trans "Query params" %}</th>
+                                    <th class="table__heading col-1">{% trans "Http method" %}</th>
+                                    <th class="table__heading col-2">{% trans "Description" %}</th>
+                                    <th class="table__heading col-2">{% trans "Url" %}</th>
+                                    <th class="table__heading col-3">{% trans "Query params" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for sc in cases %}
                                     <tr>
-                                        <td>{{sc.http_method}} {% if sc.description %}<span class="case-description" data-toggle="tooltip" title="{{sc.description}}">?</span>{% endif %}</td>
+                                        <td>{{sc.http_method}}</td>
+                                        <td>{{ sc.description }}</td>
                                         <td>{{sc.url}}</td>
                                         <td>
                                         {% for qp in sc.queryparamsscenario_set.all %}
