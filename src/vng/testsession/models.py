@@ -436,7 +436,7 @@ class Session(models.Model):
 
     def get_absolute_request_url(self, request):
         test_session_url = 'https://{}{}'.format(request.get_host(),
-                                                 reverse('testsession:session_log', args=[self.uuid]))
+                                                 reverse('testsession:session_log', args=[self.session_type.api.id, self.uuid]))
         return test_session_url
 
     def is_stopped(self):

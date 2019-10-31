@@ -6,7 +6,7 @@
 {% block title %}{% trans "Server-run detail" %}{% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Home" 'server_run:server-run_list' %}
+{% breadcrumb "Home" 'server_run:server-run_list' object.test_scenario.api.id %}
 {% breadcrumb 'Detail' 'testsession:sessions' %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}

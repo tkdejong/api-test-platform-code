@@ -24,7 +24,7 @@
                                     {% for radio in field %}
                                         <div class='row'>
                                             {{radio.tag}}&nbsp;{{ radio.choice_label.name }}
-                                            [<a href="{% url 'server_run:testscenario-detail' radio.choice_label.pk  %}">info</a>]
+                                            [<a href="{% url 'server_run:testscenario-detail' api.id radio.choice_label.pk  %}">info</a>]
                                         </div>
                                     {% endfor %}
                                 </div>
