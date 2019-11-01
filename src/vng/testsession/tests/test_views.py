@@ -167,10 +167,12 @@ class CreationAndDeletion(WebTest):
 
         session = Session.objects.all().order_by('-id').first()
         self.app.post(reverse('testsession:stop_session', kwargs={
+            'api_id': self.vng_endpoint.session_type.api.id,
             'uuid': session.uuid
         }), user=session.user)
 
         self.app.get(reverse('testsession:session_log', kwargs={
+            'api_id': self.vng_endpoint.session_type.api.id,
             'uuid': session.uuid
         }), user=session.user)
 
@@ -180,7 +182,10 @@ class CreationAndDeletion(WebTest):
         }, headers=self.head)
         session_uuid = response.json['uuid']
         if settings.ENVIRONMENT != 'jenkins':
-            self.app.post(reverse('testsession:stop_session', kwargs={'uuid': session_uuid}), headers=self.head)
+            self.app.post(reverse('testsession:stop_session', kwargs={
+                'api_id': self.session_type_docker.api.id,
+                'uuid': session_uuid
+            }), headers=self.head)
 
     def test_session_creation_permission(self):
         Session.objects.all().delete()
@@ -205,7 +210,10 @@ class CreationAndDeletion(WebTest):
 
     def test_stop_session_no_auth(self):
         session = SessionFactory()
-        call = self.app.post(reverse('testsession:stop_session', kwargs={'uuid': session.uuid}), status=302)
+        call = self.app.post(reverse('testsession:stop_session', kwargs={
+            'api_id': session.session_type.api.id,
+            'uuid': session.uuid
+        }), status=302)
 
 
 @override_settings(SUBDOMAIN_SEPARATOR='-')
@@ -246,7 +254,9 @@ class TestLog(WebTest):
         self.endpoint_echo_h.save()
 
     def test_retrieve_no_entries(self):
-        call = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
+        call = self.app.get(reverse('testsession:session_log', kwargs={
+            'api_id': self.session.session_type.api.id, 'uuid': self.session.uuid
+        }), user=self.session.user)
         self.assertTrue('No requests have yet been received.' in call.text)
 
     def test_retrieve_no_entry(self):
@@ -254,21 +264,28 @@ class TestLog(WebTest):
             'relative_url': ''
         })
         call = self.app.get(url, extra_environ={'HTTP_HOST': '{}-example.com'.format(self.exp_url.subdomain)}, user=self.session.user)
-        call2 = self.app.get(reverse('testsession:session_log', kwargs={'uuid': self.session.uuid}), user=self.session.user)
+        call2 = self.app.get(reverse('testsession:session_log', kwargs={
+            'api_id': self.session.session_type.api.id, 'uuid': self.session.uuid
+        }), user=self.session.user)
         self.assertTrue(url in call2.text)
 
     def test_log_report(self):
         self.test_retrieve_no_entry()
-        call = self.app.get(reverse('testsession:session_report', kwargs={'uuid': self.session.uuid}), user=self.session.user)
+        call = self.app.get(reverse('testsession:session_report', kwargs={
+            'api_id': self.session.session_type.api.id, 'uuid': self.session.uuid
+        }), user=self.session.user)
 
     def test_log_report_pdf(self):
         self.test_retrieve_no_entry()
-        call = self.app.get(reverse('testsession:session_report-pdf', kwargs={'uuid': self.session.uuid}), user=self.session.user)
+        call = self.app.get(reverse('testsession:session_report-pdf', kwargs={
+            'api_id': self.session.session_type.api.id, 'uuid': self.session.uuid
+        }), user=self.session.user)
 
     def test_log_detail_view(self):
         sl = self.session_log
         call = self.app.get(reverse('testsession:session_log-detail',
                                     kwargs={
+                                        'api_id': sl.session.session_type.api.id,
                                         'uuid': sl.session.uuid,
                                         'log_uuid': sl.uuid}),
                             user=sl.session.user)
@@ -277,18 +294,23 @@ class TestLog(WebTest):
         sl = self.session_log
         call = self.app.get(reverse('testsession:session_log-detail',
                                     kwargs={
+                                        'api_id': sl.session.session_type.api.id,
                                         'uuid': sl.session.uuid,
                                         'log_uuid': sl.uuid}),
                             status=[302, 401, 403, 404])
 
     def test_api_session(self):
+        session_type = SessionType.objects.first()
+        session_type.api = APIFactory.create()
+        session_type.save()
+
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
             ('username', get_username()),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
         call = self.app.post(reverse("apiv1session:test_session-list"), params=collections.OrderedDict([
-            ('session_type', SessionType.objects.first().name),
+            ('session_type', session_type.name),
         ]), headers=head)
         call = get_object(call.body)
         url = call['exposedurl_set'][0]['subdomain']
@@ -322,6 +344,7 @@ class TestLog(WebTest):
 
     def test_ordered_report(self):
         url = reverse('testsession:session_report', kwargs={
+            'api_id': self.session.session_type.api.id,
             'uuid': self.session.uuid
         })
         sc = ScenarioCase.objects.all().order_by('order')
@@ -620,6 +643,7 @@ class TestAllProcedure(WebTest):
     def _test_stop_session(self):
         self.session = Session.objects.filter(user=self.user).filter(status=choices.StatusChoices.running)[0]
         url = reverse('testsession:stop_session', kwargs={
+            'api_id': self.session.session_type.api.id,
             'uuid': self.session.uuid,
         })
         call = self.app.post(url, user=self.session.user).follow()
@@ -628,6 +652,7 @@ class TestAllProcedure(WebTest):
 
     def test_get_report_stats(self):
         call = self.app.get(reverse('testsession:session_log',kwargs={
+            'api_id': self.session.session_type.api.id,
             'uuid': self.session.uuid
         }))
         self.assertEqual(call.status, '200 OK')
@@ -637,11 +662,13 @@ class TestAllProcedure(WebTest):
         self._test_stop_session()
         session = Session.objects.get(pk=self.session.pk)
         url = reverse('testsession:session_report', kwargs={
+            'api_id': session.session_type.api.id,
             'uuid': self.session.uuid,
         })
         call = self.app.get(url, user=self.session.user)
 
         url = reverse('testsession:session_report-pdf', kwargs={
+            'api_id': self.session.session_type.api.id,
             'uuid': self.session.uuid,
         })
         call = self.app.get(url, user=self.session.user)
@@ -650,10 +677,12 @@ class TestAllProcedure(WebTest):
         self._test_create_session()
         self.session = Session.objects.filter(user=self.user).filter(status=choices.StatusChoices.running)[0]
         url = reverse('testsession:stop_session', kwargs={
+            'api_id': self.session.session_type.api.id,
             'uuid': self.session.uuid,
         })
         call = self.app.post(url, user=self.session.user).follow()
         call = self.app.get(reverse('testsession:session_log', kwargs={
+            'api_id': self.session.session_type.api.id,
             'uuid': self.session.uuid
         }))
         self.assertIn('200 OK', call.text)
@@ -661,6 +690,7 @@ class TestAllProcedure(WebTest):
     def test_url_slash(self):
         from uuid import uuid4
         url = reverse('testsession:session_log', kwargs={
+            'api_id': self.session.session_type.api.id,
             'uuid': uuid4()
         })
 
@@ -675,7 +705,7 @@ class TestAllProcedure(WebTest):
         call = self.app.get(
             reverse(
                 'testsession:session_update',
-                kwargs={'uuid': session.uuid}),
+                kwargs={'api_id': session.session_type.api.id, 'uuid': session.uuid}),
             user=self.user
         )
         form = call.forms[1]

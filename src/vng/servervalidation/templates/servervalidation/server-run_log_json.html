@@ -19,7 +19,7 @@
                    {% trans "Log view" %}
                 </div>
                 <div class="card-body">
-                <input type="button" class="btn btn-primary" value="Back to the details" onclick="location.href = '{% url 'server_run:server-run_detail' object.uuid %}';">
+                <input type="button" class="btn btn-primary" value="Back to the details" onclick="location.href = '{% url 'server_run:server-run_detail' object.test_scenario.api.id object.uuid %}';">
                     <p id="translate"></p>
                     <p id="json-content" hidden=>
                         {{postman_test_result.display_log_json}}

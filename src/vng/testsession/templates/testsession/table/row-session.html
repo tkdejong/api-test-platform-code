@@ -6,7 +6,7 @@
 {% with session_related.0 as session %}
     <tr>
         <td>
-            <a href="{% url 'testsession:session_log' session.uuid %}">#{{ session.id|unlocalize }}</a>
+            <a href="{% url 'testsession:session_log' session.session_type.api.id session.uuid %}">#{{ session.id|unlocalize }}</a>
         </td>
         <td>
             {% if session.status == choices.running %}
@@ -82,7 +82,7 @@
         {% endif %}
         <td>
             {% if session.is_running %}
-                <form method="POST" action="{% url 'testsession:stop_session' session.uuid %}">
+                <form method="POST" action="{% url 'testsession:stop_session' session.session_type.api.id session.uuid %}">
                     {% csrf_token %}
                     <input type="submit" type="button" class="btn btn-primary" value="Stop">
                 </form>
@@ -93,7 +93,7 @@
                     <tr>
                         <td>
                             {% if endpoint.test_session %}
-                            <input type="button" class="btn btn-primary" value="{{endpoint.vng_endpoint.name}} Data test report" onclick="location.href = '{% url 'testsession:session-test_report' endpoint.session.uuid endpoint.test_session.id %}';">
+                            <input type="button" class="btn btn-primary" value="{{endpoint.vng_endpoint.name}} Data test report" onclick="location.href = '{% url 'testsession:session-test_report' session.session_type.api.id endpoint.session.uuid endpoint.test_session.id %}';">
                             {% endif %}
                         <td>
                     </tr>
@@ -104,7 +104,7 @@
         </td>
         <td>
             <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
-                <a href="{% url 'testsession:session_log' session.uuid %}">
+                <a href="{% url 'testsession:session_log' session.session_type.api.id session.uuid %}">
                     <img style='height:30px ' alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1session:testsession-shield' session.uuid %}">
                 </a>
             </span>
