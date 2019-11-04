@@ -6,6 +6,7 @@ from django_webtest import WebTest
 from django.urls import reverse
 from django.core.files.base import File
 
+from guardian.shortcuts import assign_perm
 from vng.postman.choices import ResultChoices
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import (
@@ -1024,6 +1025,7 @@ class TestScenarioCreateTests(WebTest):
     def setUp(self):
         self.api = APIFactory.create(name="ZGW")
         self.user = UserFactory.create()
+        assign_perm("create_scenario_for_api", self.user, self.api)
 
     def test_create_without_variables(self):
         response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
@@ -1127,3 +1129,53 @@ class TestScenarioCreateTests(WebTest):
         self.assertEqual(postman_test.version, '1.0.2')
         self.assertTrue(postman_test.validation_file)
         self.assertEqual(postman_test.published_url, 'https://example.com')
+
+    def test_view_create_page_with_permission(self):
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_create_page_with_permission_for_different_api(self):
+        user = UserFactory.create()
+        api2 = APIFactory.create(name='ATP API')
+        assign_perm("create_scenario_for_api", user, api2)
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), user=user, status=[403])
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_view_create_page_without_permission(self):
+        user = UserFactory.create()
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), user=user, status=[403])
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_button_visible_for_user_with_permission(self):
+        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.api.id
+        }), user=self.user)
+
+        self.assertIn('Create new test scenario', response.text)
+
+    def test_create_button_invisible_for_user_with_permission_for_different_api(self):
+        user = UserFactory.create()
+        api2 = APIFactory.create(name='ATP API')
+        assign_perm("create_scenario_for_api", user, api2)
+        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.api.id
+        }), user=user)
+
+        self.assertNotIn('Create new test scenario', response.text)
+
+    def test_create_button_invisible_for_user_without_permission(self):
+        user = UserFactory.create()
+        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.api.id
+        }), user=user)
+
+        self.assertNotIn('Create new test scenario', response.text)
