@@ -541,6 +541,7 @@ class CreateTestScenarioView(PermissionRequiredMixin, LoginRequiredMixin, Create
     def get_success_url(self):
         if hasattr(self, 'test_scenario'):
             return reverse('server_run:testscenario-detail', kwargs={
+                'api_id': self.kwargs['api_id'],
                 'pk': self.test_scenario.pk
             })
         return reverse('server_run:test-scenario_create_item', kwargs={
