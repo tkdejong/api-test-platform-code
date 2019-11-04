@@ -103,20 +103,20 @@ class SessionListTests(WebTest):
 class AuthorizationTests(WebTest):
 
     def setUp(self):
-        UserFactory()
+        self.user = UserFactory()
 
     def test_check_unauthenticated_testsessions(self):
         self.app.get(reverse('apiv1session:session_types-list'), expect_errors = True)
 
     def test_right_login(self):
         call=self.app.post(reverse('apiv1_auth:rest_login'), params = collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         self.assertIsNotNone(call.json.get('key'))
 
     def test_wrong_login(self):
         call=self.app.post(reverse('apiv1_auth:rest_login'), {
-            'username': get_username(),
+            'username': self.user.username,
             'password': 'wrong'
         }, status = 400)
 
@@ -142,7 +142,7 @@ class CreationAndDeletion(WebTest):
         self.user = UserFactory()
         self.session_type_docker = VNGEndpointDockerFactory().session_type
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         self.head = {'Authorization': 'Token {}'.format(key)}
@@ -198,15 +198,14 @@ class CreationAndDeletion(WebTest):
         }
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
         call = self.app.post(reverse('apiv1session:test_session-list'), session, headers=head)
         response_parsed = get_object(call.body)
         session = Session.objects.filter(uuid=response_parsed['uuid'])[0]
-        user = User.objects.all().first()
-        self.assertEqual(session.user.pk, user.pk)
+        self.assertEqual(session.user.pk, self.user.pk)
 
     def test_stop_session_no_auth(self):
         session = SessionFactory()
@@ -220,6 +219,7 @@ class CreationAndDeletion(WebTest):
 class TestLog(WebTest):
 
     def setUp(self):
+        self.user = UserFactory.create()
         self.scenarioCase = ScenarioCaseFactory()
         self.exp_url = ExposedUrlFactory()
         self.session = self.exp_url.session
@@ -305,7 +305,7 @@ class TestLog(WebTest):
         session_type.save()
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
@@ -482,9 +482,9 @@ class TestUrlMatchingPatterns(WebTest):
         self.vng_endpoint = VNGEndpointFactory(
             scenario_collection=self.scenario_case.collection
         )
-
+        self.user = UserFactory.create()
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         self.head = {'Authorization': 'Token {}'.format(key)}
@@ -587,7 +587,7 @@ class TestSandboxMode(WebTest):
         }
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
@@ -608,7 +608,7 @@ class TestSandboxMode(WebTest):
         }
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
@@ -730,12 +730,13 @@ class TestAllProcedure(WebTest):
 class TestLogNewman(WebTest):
 
     def setUp(self):
+        self.user = UserFactory.create()
         self.scenario_case = ScenarioCaseFactory()
         self.scenario_case1 = ScenarioCaseFactory(collection=self.scenario_case.collection)
         self.vng_endpoint = VNGEndpointFactory(scenario_collection=self.scenario_case.collection)
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         self.head = {'Authorization': 'Token {}'.format(key)}
@@ -767,9 +768,9 @@ class TestHeaderInjection(WebTest):
         self.collection = ScenarioCaseCollectionFactory()
         self.endpoint = VNGEndpointEchoFactory(scenario_collection=self.collection)
         self.hi = HeaderInjectionFactory(session_type=self.endpoint.session_type)
-
+        self.user = UserFactory.create()
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         self.head = {'Authorization': 'Token {}'.format(key)}
@@ -820,7 +821,7 @@ class TestAuthProxy(WebTest):
         self.vng_header.session_type.save()
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         self.head = {'Authorization': 'Token {}'.format(key)}
