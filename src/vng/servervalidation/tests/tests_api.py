@@ -52,6 +52,7 @@ def create_server_run(name, tsu, env_name='environment1'):
 class RetrieveCreationTest(TransactionWebTest):
 
     def setUp(self):
+        self.user = UserFactory.create()
         self.test_scenario = PostmanTestFactory().test_scenario
         tsu1 = TestScenarioUrlFactory()
         tsu2 = TestScenarioUrlFactory()
@@ -63,7 +64,7 @@ class RetrieveCreationTest(TransactionWebTest):
 
     def get_user_key(self):
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
@@ -125,7 +126,7 @@ class TestNoAssertion(TransactionWebTest):
 
     def get_user_key(self):
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
@@ -344,7 +345,7 @@ class EnvironmentAPITests(TransactionWebTest):
 
     def get_user_key(self):
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user1.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}

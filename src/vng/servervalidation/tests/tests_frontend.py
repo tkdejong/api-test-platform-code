@@ -1044,7 +1044,10 @@ class TestScenarioCreateTests(WebTest):
         self.assertEqual(scenario.description, 'test description')
         self.assertEqual(scenario.public_logs, False)
 
-        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={'pk': scenario.pk})
+        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={
+            'api_id': self.api.id,
+            'pk': scenario.pk
+        })
         self.assertEqual(scenario_detail_path, response.request.path)
 
     def test_create_scenario_name_already_exists(self):
@@ -1087,7 +1090,10 @@ class TestScenarioCreateTests(WebTest):
         self.assertEqual(scenario.description, 'test description')
         self.assertEqual(scenario.public_logs, False)
 
-        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={'pk': scenario.pk})
+        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={
+            'api_id': self.api.id,
+            'pk': scenario.pk
+        })
         self.assertEqual(scenario_detail_path, response.request.path)
 
         variable = TestScenarioUrl.objects.first()
@@ -1121,7 +1127,10 @@ class TestScenarioCreateTests(WebTest):
         self.assertEqual(scenario.description, 'test description')
         self.assertEqual(scenario.public_logs, False)
 
-        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={'pk': scenario.pk})
+        scenario_detail_path = reverse('server_run:testscenario-detail', kwargs={
+            'api_id': self.api.id,
+            'pk': scenario.pk
+        })
         self.assertEqual(scenario_detail_path, response.request.path)
 
         postman_test = PostmanTest.objects.first()
