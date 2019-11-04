@@ -29,6 +29,10 @@ class API(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        permissions = (
+            ('create_scenario_for_api', 'Create a test scenario for this API'),
+        )
 
 class TestScenario(models.Model):
 

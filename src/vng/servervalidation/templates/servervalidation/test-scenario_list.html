@@ -1,5 +1,6 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load guardian_tags %}
 {% load i18n %}
 
 {% block title %}{% trans "Providers" %}{% endblock %}
@@ -11,9 +12,12 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                  {% trans "Test scenarios for " %} <b>{{api.name}}</b>
-		          <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right ml-2"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
-                  <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="icon-note"></i> {% trans "Create new test scenario" %}</a>
+                    {% trans "Test scenarios for " %} <b>{{api.name}}</b>
+                    <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right ml-2"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
+                    {% get_obj_perms request.user for api as "api_permissions" %}
+                    {% if "create_scenario_for_api" in api_permissions %}
+                        <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="icon-note"></i> {% trans "Create new test scenario" %}</a>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <table class="table">

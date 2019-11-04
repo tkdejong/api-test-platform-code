@@ -3,7 +3,7 @@ import pytz
 from datetime import time
 
 from django.db import transaction
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -15,6 +15,7 @@ from django.views import View
 from django.views.generic import DetailView, CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.core.exceptions import PermissionDenied
+from guardian.mixins import PermissionRequiredMixin
 
 import vng.postman.utils as postman
 
@@ -525,13 +526,17 @@ class LatestRunView(ServerRunOutputUuid):
         return server_runs.first()
 
 
+
 class CreateTestScenarioView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     template_name = 'servervalidation/test_scenario-create.html'
     form_class = CreateTestScenarioForm
+    permission_required = 'servervalidation.create_scenario_for_api'
 
-    # TODO define permissions per API
-    def get_permission_required(self):
-        return []
+    def on_permission_check_fail(self, request, response, obj=None):
+        raise PermissionDenied
+
+    def get_permission_object(self):
+        return API.objects.get(pk=self.kwargs['api_id'])
 
     def get_success_url(self):
         if hasattr(self, 'test_scenario'):
@@ -556,7 +561,6 @@ class CreateTestScenarioView(PermissionRequiredMixin, LoginRequiredMixin, Create
             data['postman_tests'] = PostmanTestFormSet()
         return data
 
-    # TODO postman tests validation required
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         data = request.POST
