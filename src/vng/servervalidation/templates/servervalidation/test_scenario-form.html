@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 
-{% block title %}{% trans "Test scenario creation" %}{% endblock%}
+{% block title %}{% if object %}{% trans "Test scenario update" %}{% else %}{% trans "Test scenario creation" %}{% endif %}{% endblock%}
 
 {% block content %}
 <div id="ui-view">
@@ -12,7 +12,11 @@
             <form class="" enctype="multipart/form-data" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
-                        {% trans "Create a new test scenario for: " %} <b>{{api.name}}</b>
+                        {% if object %}
+                            {% trans "Update test scenario: " %} <b>{{object.name}}</b>
+                        {% else %}
+                            {% trans "Create a new test scenario for: " %} <b>{{api.name}}</b>
+                        {% endif %}
                     </div>
                     <div class='card-body'>
                         <div class="mb-5">
@@ -49,7 +53,7 @@
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit">
-                                    <i class="fa fa-dot-circle-o"></i>{% trans "Start" %}</button>
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Submit" %}</button>
                             </div>
                             <div class="col-auto">
                                 <button class="btn btn-sm btn-danger" type="reset" onclick="location.href = {% url 'server_run:environment_list' api.id %};">

@@ -173,15 +173,16 @@ class CreateTestScenarioForm(forms.ModelForm):
 
     class Meta:
         model = TestScenario
-        fields = ['name', 'description', 'public_logs']
+        fields = ['name', 'description', 'public_logs', 'active']
         help_texts = {
             'name': ''
         }
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if TestScenario.objects.filter(name=name).exists():
-            raise ValidationError(_(
-                "A test scenario with this name already exists"
-            ))
+        if not self.instance:
+            if TestScenario.objects.filter(name=name).exists():
+                raise ValidationError(_(
+                    "A test scenario with this name already exists"
+                ))
         return name

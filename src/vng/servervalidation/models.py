@@ -31,6 +31,7 @@ class API(models.Model):
 
     class Meta:
         permissions = (
+            ('list_scenario_for_api', _('View the list of test scenarios for this API')),
             ('create_scenario_for_api', _('Create a test scenario for this API')),
             ('update_scenario_for_api', _('Update a test scenario for this API')),
             ('delete_scenario_for_api', _('Delete a test scenario for this API'))

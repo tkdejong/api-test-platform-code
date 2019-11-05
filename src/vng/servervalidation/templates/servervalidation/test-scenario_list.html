@@ -1,0 +1,35 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load guardian_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "Test scenarios" %}{% endblock %}
+
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Test scenarios for " %} <b>{{api.name}}</b>
+                    {% get_obj_perms request.user for api as "api_permissions" %}
+                    {% if "create_scenario_for_api" in api_permissions %}
+                        <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="icon-note"></i> {% trans "Create new test scenario" %}</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        {% include 'servervalidation/table/header-test-scenario.html' only %}
+                        {% for scenario in object_list %}
+                            {% include 'servervalidation/table/row-test-scenario.html' with scenario=scenario api_permissions=api_permissions %}
+                        {% endfor %}
+                    </table>
+                    {% include 'components/pagination/pagination.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
