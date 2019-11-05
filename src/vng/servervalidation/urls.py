@@ -7,7 +7,10 @@ from . import views, apps
 app_name = apps.AppConfig.__name__
 
 urlpatterns = [
+    path('<int:api_id>/testscenarios/', views.TestScenarioList.as_view(), name='test-scenario_list'),
     path('<int:api_id>/testscenario/<int:pk>/', views.TestScenarioDetail.as_view(), name='testscenario-detail'),
+    path('<int:api_id>/testscenario/<uuid:scenario_uuid>/update', views.TestScenarioUpdateView.as_view(), name='testscenario-update'),
+    path('<int:api_id>/testscenario/<uuid:scenario_uuid>/delete', views.TestScenarioDeleteView.as_view(), name='testscenario-delete'),
     path('<int:api_id>/<int:test_id>/create/', views.SelectEnvironment.as_view(), name='server-run_select_environment'),
     path('<int:api_id>/<int:test_id>/<int:env_id>/create/endpoints', views.CreateEndpoint.as_view(), name='endpoints_create'),
     path('<int:api_id>/create/', views.ServerRunForm.as_view(), name='server-run_create_item'),
@@ -24,6 +27,5 @@ urlpatterns = [
     path('<int:api_id>/', views.EnvironmentList.as_view(), name='environment_list'),
     path('<int:api_id>/<uuid:scenario_uuid>/<uuid:env_uuid>/', views.ServerRunList.as_view(), name='server-run_list'),
     path('<int:api_id>/<uuid:scenario_uuid>/<uuid:env_uuid>/latest/', views.LatestRunView.as_view(), name='server-run_latest'),
-    # path('', views.ServerRunList.as_view(), name='server-run_list'),
     path('<int:api_id>/scenario/create/', views.CreateTestScenarioView.as_view(), name='test-scenario_create_item'),
 ]

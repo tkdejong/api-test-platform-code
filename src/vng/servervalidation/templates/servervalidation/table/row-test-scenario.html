@@ -1,0 +1,17 @@
+{% load i18n %}
+{% spaceless %}
+
+<tr>
+    <td>
+        <a href="{% url 'server_run:testscenario-detail' scenario.api.id scenario.pk %}">{{ scenario.name }}</a>
+    </td>
+    <td>
+        {% if "delete_scenario_for_api" in api_permissions %}
+            <a href="{% url 'server_run:testscenario-delete' api.id scenario.uuid %}" class="btn btn-danger float-right ml-2" onclick="return confirm('Are you sure?');"><i class="icon-note"></i> {% trans "Delete" %}</a>
+        {% endif %}
+        {% if "update_scenario_for_api" in api_permissions %}
+            <a href="{% url 'server_run:testscenario-update' api.id scenario.uuid %}" class="btn btn-success float-right"><i class="icon-note"></i> {% trans "Update" %}</a>
+        {% endif %}
+    </td>
+</tr>
+{% endspaceless %}
