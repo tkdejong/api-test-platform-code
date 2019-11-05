@@ -77,7 +77,7 @@ class TestScenarioUrl(models.Model):
     name = models.CharField(_('name'), max_length=200, help_text=_(
         "The name of the variable"
     ))
-    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.CASCADE, help_text=_(
         "The test scenario to which this variable is linked"
     ))
     url = models.BooleanField(default=True, help_text=_('''When enabled a single-line field is shown to the user
@@ -104,7 +104,7 @@ class PostmanTest(OrderedModel):
         versions under the same name
         """
     ))
-    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.CASCADE, help_text=_(
         "The name of the test scenario to which this Postman test is linked"
     ))
     validation_file = models.FileField(null=True, blank=True, default=None, help_text=_(
@@ -163,7 +163,7 @@ class ScheduledTestScenario(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
         "The universally unique identifier of this scheduled test scenario, needed to retrieve the badge"
     ))
-    environment = models.OneToOneField(Environment, null=True, blank=True, on_delete=models.PROTECT, help_text=_(
+    environment = models.OneToOneField(Environment, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
         "The environment that will be used for provider runs of this scheduled scenario"
     ))
     active = models.BooleanField(default=True, help_text=_(
@@ -182,14 +182,14 @@ class ScheduledTestScenario(models.Model):
 
 class ServerRun(models.Model):
 
-    test_scenario = models.ForeignKey(TestScenario, on_delete=models.PROTECT, help_text=_(
+    test_scenario = models.ForeignKey(TestScenario, on_delete=models.CASCADE, help_text=_(
         "The test scenario for which this provider run was executed"
     ))
     scheduled_scenario = models.ForeignKey(
-        ScheduledTestScenario, on_delete=models.PROTECT,
+        ScheduledTestScenario, on_delete=models.CASCADE,
         null=True, blank=True, help_text=_("The scheduled test scenario for which this provider run was executed")
     )
-    environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.PROTECT, help_text=_(
+    environment = models.ForeignKey(Environment, null=True, blank=True, on_delete=models.CASCADE, help_text=_(
         "The environment that will be used for this provider run"
     ))
     started = models.DateTimeField(_('Started at'), default=timezone.now, help_text=_(
