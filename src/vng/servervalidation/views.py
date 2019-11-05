@@ -33,10 +33,10 @@ from .models import (
 from .task import execute_test
 
 
-class TestScenarioList(LoginRequiredMixin, ListView):
+class EnvironmentList(LoginRequiredMixin, ListView):
 
-    template_name = 'servervalidation/test-scenario_list.html'
-    context_object_name = 'test-scenario_list'
+    template_name = 'servervalidation/environment_list.html'
+    context_object_name = 'environment_list'
     paginate_by = 10
 
     def get_context_data(self, *args, **kwargs):
