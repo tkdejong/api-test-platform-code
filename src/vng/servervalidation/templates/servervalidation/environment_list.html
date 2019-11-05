@@ -12,18 +12,18 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Test scenarios for " %} <b>{{api.name}}</b>
+                    {% trans "Environments for " %} <b>{{api.name}}</b>
                     <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right ml-2"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
                     {% get_obj_perms request.user for api as "api_permissions" %}
                     {% if "create_scenario_for_api" in api_permissions %}
-                        <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="icon-note"></i> {% trans "Create new test scenario" %}</a>
+                        <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="icon-note"></i> {% trans "Configure test scenarios" %}</a>
                     {% endif %}
                 </div>
                 <div class="card-body">
                     <table class="table">
-                        {% include 'servervalidation/table/header-test-scenario.html' only %}
+                        {% include 'servervalidation/table/header-environment.html' only %}
                         {% for scenario, environment, last_run in object_list %}
-                            {% include 'servervalidation/table/row-test-scenario.html' with scenario=scenario environment=environment last_run=last_run %}
+                            {% include 'servervalidation/table/row-environment.html' with scenario=scenario environment=environment last_run=last_run %}
                         {% endfor %}
                     </table>
                     {% include 'components/pagination/pagination.html' %}
