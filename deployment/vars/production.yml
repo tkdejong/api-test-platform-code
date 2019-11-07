@@ -28,6 +28,7 @@ dbuser: vngatv
 # dbpassword: (see vault)
 
 uwsgi_port: 8084
+shields_port: 9000
 
 gcloud_project_id: vng-test-platform
 gcloud_compute_zone: europe-west4-a
