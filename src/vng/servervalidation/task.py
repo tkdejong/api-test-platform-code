@@ -28,18 +28,19 @@ logger = get_task_logger(__name__)
 @app.task
 def execute_test_scheduled():
     scheduled_scenarios = ScheduledTestScenario.objects.filter(active=True)
-    test_results = {user_id: [] for user_id in scheduled_scenarios.values_list('user', flat=True).distinct('user')}
+    test_results = {user_id: [] for user_id in scheduled_scenarios.values_list('environment__user', flat=True).distinct('environment__user')}
 
     for schedule in scheduled_scenarios:
+        environment = schedule.environment
         server_run = ServerRun.objects.create(
-            test_scenario=schedule.test_scenario,
+            test_scenario=environment.test_scenario,
             scheduled_scenario=schedule,
-            environment=schedule.environment,
-            user=schedule.user,
+            environment=environment,
+            user=environment.user,
             status=choices.StatusWithScheduledChoices.running
         )
         result = execute_test(server_run.pk, scheduled=True)
-        test_results[schedule.user.id].append((server_run, result))
+        test_results[environment.user.id].append((server_run, result))
 
     if test_results:
         send_email_failure(test_results)

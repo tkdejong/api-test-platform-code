@@ -3,7 +3,7 @@
 {% spaceless %}
     <tr>
         <td>
-        <a href="{% url 'server_run:server-run_detail' server_run.uuid %}">#{{ server_run.id|unlocalize }}</a>
+        <a href="{% url 'server_run:server-run_detail' server_run.test_scenario.api.id server_run.uuid %}">#{{ server_run.id|unlocalize }}</a>
         </td>
         <td>
             {% if server_run.status == choices.running %}
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="col-xs-4">
-                    <form method="POST" action="{% url 'server_run:server-run_stop' server_run.id %}">
+                    <form method="POST" action="{% url 'server_run:server-run_stop' server_run.test_scenario.api.id server_run.id %}">
                         {% csrf_token %}
                         <input type="submit" class="btn btn-primary" value="Stop">
                     </form>
