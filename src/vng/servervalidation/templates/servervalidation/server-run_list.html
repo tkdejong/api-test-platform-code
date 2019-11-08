@@ -54,7 +54,7 @@
                                     <td>
                                         <span display="block" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
                                             <a href="{% url 'server_run:server-run_latest' api.id test_scenario.uuid environment.uuid %}">
-                                                <img style="height:30px"  alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
+                                                <img style="height:30px"  alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
                                             </a>
                                         </span>
                                     </td>

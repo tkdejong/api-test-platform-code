@@ -398,12 +398,12 @@
 
     function setBadgeInfo() {
         document.getElementById("badge-description").innerHTML = "Shown below is the badge of the most recent provider run with the environment {{ server_run.environment }} that was started by the user <b>{{ object.user }}</b>.";
-        document.getElementById("badge").src = "https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}";
-        var gitSnippet = '[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}})]({{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_latest' object.test_scenario.api.id object.test_scenario.uuid object.environment.uuid %})'
+        document.getElementById("badge").src = "{{shields_url}}/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}";
+        var gitSnippet = '[![Status badge]({{shields_url}}/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}})]({{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_latest' object.test_scenario.api.id object.test_scenario.uuid object.environment.uuid %})'
 
         var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
             + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'server_run:server-run_latest' object.test_scenario.api.id object.test_scenario.uuid object.environment.uuid %}">\n'
-            + '<img style="width:100%" alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}"></span></a>'
+            + '<img style="width:100%" alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}"></span></a>'
 
         // this page's own source code
         gitSnippet = htmlEscape(gitSnippet);

@@ -1,5 +1,6 @@
 import re
 
+from django.conf import settings
 from django_webtest import WebTest
 from django.urls import reverse
 
@@ -746,7 +747,7 @@ class BadgesWithoutResultsTests(WebTest):
             'api_id': self.test_scenario.api.id
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
         self.assertNotIn('No results yet', response.text)
 
     def test_scenario_list_without_results(self):
@@ -760,7 +761,7 @@ class BadgesWithoutResultsTests(WebTest):
         }), user=self.user)
 
         self.assertIn('No results yet', response.text)
-        self.assertNotIn('https://img.shields.io/', response.text)
+        self.assertNotIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_list_with_results(self):
         server_run = ServerRunFactory.create(
@@ -774,7 +775,7 @@ class BadgesWithoutResultsTests(WebTest):
             'env_uuid': server_run.environment.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_list_without_results(self):
         server_run = ServerRunFactory.create(
@@ -788,7 +789,7 @@ class BadgesWithoutResultsTests(WebTest):
             'env_uuid': server_run.environment.uuid
         }), user=self.user)
 
-        self.assertNotIn('https://img.shields.io/', response.text)
+        self.assertNotIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_list_uses_latest_results(self):
         server_run_with_results = ServerRunFactory.create(
@@ -813,7 +814,7 @@ class BadgesWithoutResultsTests(WebTest):
             'env_uuid': server_run_with_results.environment.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_detail_with_results(self):
         server_run = ServerRunFactory.create(
@@ -826,7 +827,7 @@ class BadgesWithoutResultsTests(WebTest):
             'uuid': server_run.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
         self.assertNotIn('no results yet for this environment', response.text)
 
     def test_server_run_detail_without_results(self):
@@ -846,7 +847,7 @@ class BadgesWithoutResultsTests(WebTest):
         )
 
         self.assertIn('no results yet for this environment', badge_div.nextSibling.text)
-        self.assertNotIn('https://img.shields.io/', badge_div.nextSibling.text)
+        self.assertNotIn(settings.SHIELDS_URL, badge_div.nextSibling.text)
 
     def test_server_run_detail_uses_latest_results(self):
         server_run_with_results = ServerRunFactory.create(
@@ -870,7 +871,7 @@ class BadgesWithoutResultsTests(WebTest):
             'uuid': server_run_without_results.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
         self.assertNotIn('no results yet for this environment', response.text)
 
 
