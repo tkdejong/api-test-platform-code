@@ -131,6 +131,12 @@ class PostmanTest(OrderedModel):
                 self.valid_file_cached = cache
             return cache
 
+    @property
+    def filename(self):
+        if self.validation_file:
+            return self.validation_file.name.split('/')[-1]
+        return ''
+
     def __str__(self):
         return '{} {}'.format(self.test_scenario, self.validation_file)
 

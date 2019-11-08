@@ -484,7 +484,7 @@ class PostmanDownloadView(View):
         with open(pmt.validation_file.path) as f:
             response = HttpResponse(f, content_type='Application/json')
             response['Content-Length'] = len(response.content)
-            response['Content-Disposition'] = 'attachment;filename={}'.format(pmt.validation_file.name.split('/')[-1])
+            response['Content-Disposition'] = 'attachment;filename={}'.format(pmt.filename)
             return response
 
 

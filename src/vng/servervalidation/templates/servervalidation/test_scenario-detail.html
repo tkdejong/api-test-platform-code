@@ -29,7 +29,7 @@
                                 <i class="cui-bookmark fa bg-info p-4 font-2xl mr-3"></i>
                                 <div>
                                     <div class="text-value-sm text-info">
-                                    <a target="_blank" href="{% url 'server_run:postman_download' object.api.id pt.pk %}">{{ pt.validation_file|truncatechars:22 }}</a>
+                                    <a target="_blank" href="{% url 'server_run:postman_download' object.api.id pt.pk %}">{{ pt.filename|truncatechars:22 }}</a>
 
                                     </div>
                                     <div class="text-muted text-uppercase font-weight-bold small">{% trans "Download postman collection" %}</div>
