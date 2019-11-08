@@ -2,7 +2,7 @@
 {% load sniplates %}
 {% load i18n %}
 
-{% block title %}{% trans "Server run creation" %}{% endblock%}
+{% block title %}{% if object %}{% trans "Update environment" %}{% else %} {% trans "Server run creation" %} {% endif %}{% endblock%}
 
 
 {% block content %}
@@ -12,7 +12,11 @@
             <form class="" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
+                    {% if object %}
+                        {% trans "Update environment:" %} {{ object }}
+                    {% else %}
                         {% trans "Create provider-testrun for scenario:" %} {{ ts }}
+                    {% endif %}
                     </div>
                     <div class='card-body'>
                     {% load_widgets form='forms.html' %}
@@ -24,7 +28,7 @@
                         <div class="row">
                             <div class="col-auto mr-auto">
                                 <button class="btn btn-sm btn-primary" type="submit">
-                                    <i class="fa fa-dot-circle-o"></i>{% trans "Start" %}</button>
+                                    <i class="fa fa-dot-circle-o"></i>{% if object %} {% trans "Update" %} {% else %} {% trans "Start" %} {% endif %}</button>
                             </div>
                             <div class="col-auto">
                                 <button class="btn btn-sm btn-danger" type="reset" onclick="location.href = {% url 'server_run:server-run_list' ts.api.id ts.uuid environment.uuid %};">
