@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'ckeditor',
     'ordered_model',
+    'guardian',
     'django_admin_index',
     'django.contrib.admin',
     'registration',
@@ -354,7 +355,8 @@ AUTH_USER_MODEL = 'accounts.User'
 # Allow logging in with both username+password and email+password
 AUTHENTICATION_BACKENDS = [
     'vng.accounts.backends.UserModelEmailBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
 ]
 
 #

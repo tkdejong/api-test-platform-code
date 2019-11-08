@@ -47,6 +47,7 @@ drf-yasg
 gemma-zds-client
 django-admin-relation-links
 django-filer>=1.5.0
+django-guardian
 django-registration-redux
 django-recaptcha
 django-tinymce

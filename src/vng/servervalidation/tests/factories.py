@@ -43,33 +43,12 @@ class EnvironmentFactory(Dmf):
     test_scenario = factory.SubFactory(TestScenarioFactory)
 
 
-class FilerField(Dmf):
-    class Meta:
-        model = File
-
-    file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/Google.postman_collection.json')
-
-
-class FilerFieldNoAssertion(Dmf):
-    class Meta:
-        model = File
-
-    file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/Google_no_assertion.postman_collection.json')
-
-
-class FilerFieldSubFolder(Dmf):
-    class Meta:
-        model = File
-
-    file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/sub_sub_fold.postman_collection.json')
-
-
 class PostmanTestNoAssertionFactory(Dmf):
 
     class Meta:
         model = PostmanTest
     test_scenario = factory.SubFactory(TestScenarioFactory)
-    validation_file = factory.SubFactory(FilerFieldNoAssertion)
+    validation_file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/Google_no_assertion.postman_collection.json')
 
 
 class PostmanTestFactory(Dmf):
@@ -77,7 +56,7 @@ class PostmanTestFactory(Dmf):
     class Meta:
         model = PostmanTest
     test_scenario = factory.SubFactory(TestScenarioFactory)
-    validation_file = factory.SubFactory(FilerField)
+    validation_file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/Google.postman_collection.json')
     name = factory.Sequence(lambda n: "Postman test %d" % n)
 
 
@@ -86,8 +65,7 @@ class PostmanTestSubFolderFactory(Dmf):
     class Meta:
         model = PostmanTest
     test_scenario = factory.SubFactory(TestScenarioFactory)
-    validation_file = factory.SubFactory(FilerFieldSubFolder)
-
+    validation_file = factory.django.FileField(from_path=settings.MEDIA_ROOT + '/sub_sub_fold.postman_collection.json')
 
 class TestScenarioUrlFactory(Dmf):
 

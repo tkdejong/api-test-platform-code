@@ -1,15 +1,14 @@
-import factory
-import json
 import re
 
 from django_webtest import WebTest
 from django.urls import reverse
 
+from guardian.shortcuts import assign_perm
 from vng.postman.choices import ResultChoices
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import (
     ServerRun, PostmanTest, PostmanTestResult,
-    User, ScheduledTestScenario, Endpoint
+    User, ScheduledTestScenario, Endpoint, TestScenario, TestScenarioUrl
 )
 
 from .factories import (
@@ -108,7 +107,7 @@ class TestCreation(WebTest):
         form['Secret'] = 'secret'
         form.submit()
 
-        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        call = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
         self.assertIn(self.user.username, call.text)
@@ -185,7 +184,7 @@ class TestCreation(WebTest):
 
         res = form.submit().follow()
 
-        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        call = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
         self.assertIn(self.user.username, call.text)
@@ -249,7 +248,7 @@ class TestList(WebTest):
         ServerRunFactory.create(test_scenario=self.test_scenario2, user=self.user, stopped='2019-01-01T00:00:00Z')
 
     def test_list(self):
-        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        call = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.api1.id
         }), user=self.user)
 
@@ -743,7 +742,7 @@ class BadgesWithoutResultsTests(WebTest):
             stopped='2019-01-01T12:00:00Z',
             user=self.user
         )
-        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        response = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
 
@@ -756,7 +755,7 @@ class BadgesWithoutResultsTests(WebTest):
             stopped=None,
             user=self.user
         )
-        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        response = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
 
@@ -964,7 +963,7 @@ class ProviderOrderingTests(WebTest):
         )
 
     def test_ordering_test_scenario_list(self):
-        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        response = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.api.id
         }), user=self.user)
 

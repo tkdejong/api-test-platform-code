@@ -1,0 +1,85 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% trans "Test scenario update" %}{% else %}{% trans "Test scenario creation" %}{% endif %}{% endblock%}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-6 offset-sm-3">
+            <form class="" enctype="multipart/form-data" method="post">{% csrf_token %}
+                <div class="card">
+                    <div class="card-header">
+                        {% if object %}
+                            {% trans "Update test scenario: " %} <b>{{object.name}}</b>
+                        {% else %}
+                            {% trans "Create a new test scenario for: " %} <b>{{api.name}}</b>
+                        {% endif %}
+                    </div>
+                    <div class='card-body'>
+                        <div class="mb-5">
+                            {{ form|crispy }}
+                        </div>
+
+                        <div id="form_set_variables">
+                            <h3>{% trans "Variables for this test scenario" %}</h3>
+                            {{ variables.management_form|crispy }}
+                            {% for var in variables.forms %}
+                                {{ var|crispy }}
+                            {% endfor %}
+
+                            <div id="empty_form_variables" style="display:none">
+                                {{ variables.empty_form|crispy }}
+                            </div>
+                        </div>
+                        <input type="button" class="btn btn-secondary mb-5" value="Add another variable" id="add_more" onclick="addForm('variables')">
+
+                        <div id="form_set_postman">
+                            <h3>{% trans "Postman test scripts" %}</h3>
+                            {{ postman_tests.management_form|crispy }}
+                            {% for test in postman_tests.forms %}
+                                {{ test|crispy }}
+                            {% endfor %}
+
+                            <div id="empty_form_postman" style="display:none">
+                                {{ postman_tests.empty_form|crispy }}
+                            </div>
+                        </div>
+                        <input type="button" class="btn btn-secondary mb-5" value="Add another variable" id="add_more" onclick="addForm('postman')">
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" type="submit">
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Submit" %}</button>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-sm btn-danger" type="reset" onclick="location.href = {% url 'server_run:environment_list' api.id %};">
+                                    <i class="fa fa-ban"></i> {% trans "Reset" %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function addForm(formset) {
+        if(formset == 'variables') {
+            var formset_id = '#form_set_variables'
+            var prefix = '#id_testscenariourl_set'
+            var empty_form_id = '#empty_form_variables'
+        } else if(formset == 'postman') {
+            var formset_id = '#form_set_postman'
+            var prefix = '#id_postmantest_set'
+            var empty_form_id = '#empty_form_postman'
+        }
+        var form_idx = document.querySelector(prefix+'-TOTAL_FORMS').value;
+        document.querySelector(formset_id).innerHTML += document.querySelector(empty_form_id).innerHTML.replace(/__prefix__/g, form_idx);
+        document.querySelector(prefix+'-TOTAL_FORMS').value = parseInt(form_idx) + 1;
+    }
+</script>
+{% endblock %}
