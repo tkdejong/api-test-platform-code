@@ -163,6 +163,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'vng.utils.context_processors.settings',
                 'vng.utils.context_processors.api_list',
+                'vng.utils.context_processors.shields_url',
                 # REQUIRED FOR ADMIN INDEX
                 'django_admin_index.context_processors.dashboard',
             ],
@@ -429,3 +430,5 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Custom token creation to support multiple API tokens
 REST_AUTH_TOKEN_CREATOR = 'vng.apiAuthentication.utils.create_token'
+
+SHIELDS_URL = 'https://shields.api-test.nl'

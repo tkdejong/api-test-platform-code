@@ -26,3 +26,8 @@ def api_list(request):
     return {
         'api_list': API.objects.all()
     }
+
+def shields_url(request):
+    return {
+        'shields_url': django_settings.SHIELDS_URL
+    }
