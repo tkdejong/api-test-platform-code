@@ -3,7 +3,7 @@ import pytz
 from datetime import time
 
 from django.db import transaction
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -720,9 +720,10 @@ class TestScenarioDeleteView(ObjectPermissionMixin, PermissionRequiredMixin, Log
         return get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
 
 
-class UpdateEndpointView(LoginRequiredMixin, UpdateView):
+class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     template_name = 'servervalidation/endpoints_form.html'
     form_class = CreateEndpointForm
+    permission_required = 'servervalidation.update_environment_for_api'
 
     def get_object(self):
         return Environment.objects.get(id=self.kwargs['env_id'])
