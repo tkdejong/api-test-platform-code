@@ -1016,3 +1016,86 @@ class ProviderOrderingTests(WebTest):
         self.assertIn(str(self.server4.id), rows[1].findChild('a').text)
         self.assertIn(str(self.server1.id), rows[2].findChild('a').text)
         self.assertIn(str(self.server2.id), rows[3].findChild('a').text)
+
+
+class UpdateEnvironmentTests(WebTest):
+
+    def setUp(self):
+        self.test_scenario = TestScenarioFactory.create(authorization=choices.AuthenticationChoices.no_auth)
+        self.user = UserFactory.create()
+        assign_perm("update_environment_for_api", self.user, self.test_scenario.api)
+
+        self.tsu1 = TestScenarioUrlFactory.create(name='url', test_scenario=self.test_scenario)
+        self.tsu2 = TestScenarioUrlFactory.create(name='var', url=False, test_scenario=self.test_scenario)
+
+        self.environment = EnvironmentFactory.create(user=self.user, test_scenario=self.test_scenario)
+        self.var1 = EndpointFactory.create(
+            test_scenario_url=self.tsu1,
+            url='https://somewebsite.tk',
+            environment=self.environment
+        )
+        self.var2 = EndpointFactory.create(
+            test_scenario_url=self.tsu2,
+            url='token',
+            environment=self.environment
+        )
+
+    def test_update_environment_view_initial_data_correct(self):
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        self.assertEqual(form['url'].value, self.var1.url)
+        self.assertEqual(form['var'].value, self.var2.url)
+
+    def test_update_environment_modifies_variables(self):
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['url'] = 'https://www.google.com/'
+        form['var'] = 'Bearer token aaaaaaaaaaaaa'
+        form.submit().follow()
+
+        self.var1.refresh_from_db()
+        self.var2.refresh_from_db()
+
+        self.assertEqual(self.var1.url, 'https://www.google.com/')
+        self.assertEqual(self.var2.url, 'Bearer token aaaaaaaaaaaaa')
+
+    def test_update_environment_view_not_accessible_for_user_without_permission(self):
+        user = UserFactory.create()
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=user, status=[403])
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_environment_button_visible_for_user_with_permission(self):
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Update environment', response.text)
+
+    def test_update_environment_button_not_visible_for_user_without_permission(self):
+        user = UserFactory.create()
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), user=user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('Update environment', response.text)

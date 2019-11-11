@@ -3,7 +3,7 @@ import pytz
 from datetime import time
 
 from django.db import transaction
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -204,7 +204,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
 
 class CreateEndpoint(LoginRequiredMixin, CreateView):
 
-    template_name = 'servervalidation/endpoints_create.html'
+    template_name = 'servervalidation/endpoints_form.html'
     form_class = CreateEndpointForm
 
     def get_success_url(self):
@@ -718,3 +718,70 @@ class TestScenarioDeleteView(ObjectPermissionMixin, PermissionRequiredMixin, Log
 
     def get_object(self):
         return get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
+
+
+class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    template_name = 'servervalidation/endpoints_form.html'
+    form_class = CreateEndpointForm
+    permission_required = 'servervalidation.update_environment_for_api'
+
+    def get_object(self):
+        return Environment.objects.get(id=self.kwargs['env_id'])
+
+    def get_queryset(self, *args, **kwargs):
+        return Endpoint.objects.filter(environment_id=self.kwargs['env_id'])
+
+    def get_success_url(self):
+        env = self.get_object()
+        return reverse('server_run:server-run_list', kwargs={
+            'api_id': env.test_scenario.api.id,
+            'scenario_uuid': env.test_scenario.uuid,
+            'env_uuid': env.uuid
+        })
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        pre_form = data['form']
+
+        self.env = self.get_object()
+        self.ts = self.env.test_scenario
+
+        data['ts'] = self.ts
+        data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=self.ts)
+        data['environment'] = self.env
+        url_vars = TestScenarioUrl.objects.filter(
+            test_scenario=self.ts,
+            url=True
+        )
+        text_vars = TestScenarioUrl.objects.filter(
+            test_scenario=self.ts,
+            url=False
+        )
+        data['form'] = CreateEndpointForm(
+            url_vars=url_vars,
+            text_vars=text_vars,
+            url_placeholders=Endpoint.objects.filter(environment=self.env, test_scenario_url__in=url_vars).values_list('url', flat=True),
+            text_placeholders=Endpoint.objects.filter(environment=self.env, test_scenario_url__in=text_vars).values_list('url', flat=True)
+        )
+        if self.ts.jwt_enabled():
+            data['form'].add_text_area(['Client ID', 'Secret'])
+        elif self.ts.custom_header():
+            data['form'].add_text_area(['Authorization header'])
+        else:
+            pass
+        for k, v in pre_form.errors.items():
+            data['form'].errors[k] = v
+        return data
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        env = self.get_object()
+        endpoints = env.endpoint_set.all()
+        tsu_names = endpoints.values_list('test_scenario_url__name', flat=True)
+        for key, value in data.items():
+            if key in tsu_names:
+                endpoint = endpoints.get(test_scenario_url__name=key)
+                endpoint.url = value.strip()
+                endpoint.save()
+
+        return HttpResponseRedirect(self.get_success_url())

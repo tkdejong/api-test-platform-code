@@ -1,5 +1,6 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load guardian_tags %}
 {% load django_bootstrap_breadcrumbs %}
 {% load i18n %}
 
@@ -32,6 +33,10 @@
                         {% else %}
                             <a type="submit" class="btn btn-secondary float-right" href="{% url 'server_run:server-run_create_schedule' api.id environment.uuid %}">{% trans "Add schedule" %}</a>
                         {% endif %}
+                    {% endif %}
+                    {% get_obj_perms request.user for api as "api_permissions" %}
+                    {% if "update_environment_for_api" in api_permissions %}
+                        <a type="submit" class="btn btn-primary btn-success float-right mr-2" href="{% url 'server_run:endpoints_update' api.id test_scenario.id environment.id %}">{% trans "Update environment" %}</a>
                     {% endif %}
                 </div>
                 <div class="card-body">

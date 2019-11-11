@@ -1,10 +1,16 @@
 {% extends 'master.html' %}
 {% load sniplates %}
 {% load guardian_tags %}
+{% load django_bootstrap_breadcrumbs %}
 {% load i18n %}
 
 {% block title %}{% trans "Test scenarios" %}{% endblock %}
 
+{% block breadcrumb %}
+{% breadcrumb "Environments" 'server_run:environment_list' api.id %}
+{% breadcrumb "Test scenarios" 'server_run:server-run_list' api.id test_scenario.uuid environment.uuid %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 {% block content %}
 <div id="ui-view">
@@ -12,6 +18,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
+                {{api_id}}
                     {% trans "Test scenarios for " %} <b>{{api.name}}</b>
                     {% get_obj_perms request.user for api as "api_permissions" %}
                     {% if "create_scenario_for_api" in api_permissions %}

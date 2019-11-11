@@ -13,6 +13,7 @@ urlpatterns = [
     path('<int:api_id>/testscenario/<uuid:scenario_uuid>/delete', views.TestScenarioDeleteView.as_view(), name='testscenario-delete'),
     path('<int:api_id>/<int:test_id>/create/', views.SelectEnvironment.as_view(), name='server-run_select_environment'),
     path('<int:api_id>/<int:test_id>/<int:env_id>/create/endpoints', views.CreateEndpoint.as_view(), name='endpoints_create'),
+    path('<int:api_id>/<int:test_id>/<int:env_id>/update/endpoints', views.UpdateEndpointView.as_view(), name='endpoints_update'),
     path('<int:api_id>/create/', views.ServerRunForm.as_view(), name='server-run_create_item'),
     path('<int:api_id>/postman/<int:pk>/', views.PostmanDownloadView.as_view(), name='postman_download'),
     path('<int:api_id>/<int:server_id>/stop/', views.StopServer.as_view(), name='server-run_stop'),
