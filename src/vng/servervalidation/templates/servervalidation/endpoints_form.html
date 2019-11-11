@@ -46,8 +46,13 @@
                                     <i class="fa fa-dot-circle-o"></i>{% if object %} {% trans "Update" %} {% else %} {% trans "Start" %} {% endif %}</button>
                             </div>
                             <div class="col-auto">
-                                <button class="btn btn-sm btn-danger" type="reset" onclick="location.href = {% url 'server_run:server-run_list' ts.api.id ts.uuid environment.uuid %};">
-                                    <i class="fa fa-ban"></i> {% trans "Reset" %}</button>
+                                {% if object %}
+                                    <a class="btn btn-sm btn-danger" href="{% url 'server_run:server-run_list' ts.api.id ts.uuid object.uuid %}">
+                                        <i class="fa fa-ban"></i> {% trans "Cancel" %}</button>
+                                {% else %}
+                                    <a class="btn btn-sm btn-danger" href="{% url 'server_run:server-run_select_environment' ts.api.id ts.id %}">
+                                        <i class="fa fa-ban"></i> {% trans "Cancel" %}</button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
