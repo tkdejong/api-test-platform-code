@@ -7,7 +7,11 @@ from filer.models import File
 def migrate_postmantest_validation_files(apps, schema_editor):
     PostmanTest = apps.get_model('servervalidation', 'PostmanTest')
     for postmantest in PostmanTest.objects.all():
-        postmantest.validation_file = postmantest._validation_file.file
+        validation_file = postmantest._validation_file.file
+
+        # To ensure that the name of the file is no longer than 100 characters
+        validation_file.name = validation_file.name.split('/')[-1][:100]
+        postmantest.validation_file = validation_file
         postmantest.save()
 
 class Migration(migrations.Migration):
