@@ -1087,7 +1087,7 @@ class UpdateEnvironmentTests(WebTest):
         }), user=self.user)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Update environment', response.text)
+        self.assertIn('Modify environment', response.text)
 
     def test_update_environment_button_not_visible_for_user_without_permission(self):
         user = UserFactory.create()
@@ -1098,4 +1098,4 @@ class UpdateEnvironmentTests(WebTest):
         }), user=user)
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn('Update environment', response.text)
+        self.assertNotIn('Modify environment', response.text)
