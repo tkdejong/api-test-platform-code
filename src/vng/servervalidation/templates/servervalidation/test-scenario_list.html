@@ -1,9 +1,16 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load guardian_tags %}
+{% load django_bootstrap_breadcrumbs %}
 {% load i18n %}
 
-{% block title %}{% trans "Providers" %}{% endblock %}
+{% block title %}{% trans "Test scenarios" %}{% endblock %}
 
+{% block breadcrumb %}
+{% breadcrumb "Environments" 'server_run:environment_list' api.id %}
+{% breadcrumb "Test scenarios" 'server_run:server-run_list' api.id test_scenario.uuid environment.uuid %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 {% block content %}
 <div id="ui-view">
@@ -11,14 +18,18 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                  {% trans "Test scenarios for " %} <b>{{api.name}}</b>
-		  <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right"><i class="icon-note"></i> {% trans "Start testrun" %}</a>
+                {{api_id}}
+                    {% trans "Test scenarios for " %} <b>{{api.name}}</b>
+                    {% get_obj_perms request.user for api as "api_permissions" %}
+                    {% if "create_scenario_for_api" in api_permissions %}
+                        <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="icon-note"></i> {% trans "Create new test scenario" %}</a>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <table class="table">
                         {% include 'servervalidation/table/header-test-scenario.html' only %}
-                        {% for scenario, environment, last_run in object_list %}
-                            {% include 'servervalidation/table/row-test-scenario.html' with scenario=scenario environment=environment last_run=last_run %}
+                        {% for scenario in object_list %}
+                            {% include 'servervalidation/table/row-test-scenario.html' with scenario=scenario api_permissions=api_permissions %}
                         {% endfor %}
                     </table>
                     {% include 'components/pagination/pagination.html' %}

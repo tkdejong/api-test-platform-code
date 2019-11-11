@@ -3,7 +3,7 @@ import pytz
 from datetime import time
 
 from django.db import transaction
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -12,15 +12,20 @@ from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
-from django.views.generic import DetailView, CreateView, UpdateView
+from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.core.exceptions import PermissionDenied
+from guardian.mixins import PermissionRequiredMixin
 
 import vng.postman.utils as postman
 
 from ..utils import choices
 from ..utils.views import OwnerSingleObject, PDFGenerator
-from .forms import CreateServerRunForm, CreateEndpointForm, SelectEnvironmentForm
+from .forms import (
+    CreateServerRunForm, CreateEndpointForm,
+    SelectEnvironmentForm, CreateTestScenarioForm,
+    TestScenarioUrlFormSet, PostmanTestFormSet
+)
 from .models import (
     API, ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest,
     PostmanTestResult, ServerHeader, ScheduledTestScenario, Environment
@@ -28,10 +33,10 @@ from .models import (
 from .task import execute_test
 
 
-class TestScenarioList(LoginRequiredMixin, ListView):
+class EnvironmentList(LoginRequiredMixin, ListView):
 
-    template_name = 'servervalidation/test-scenario_list.html'
-    context_object_name = 'test-scenario_list'
+    template_name = 'servervalidation/environment_list.html'
+    context_object_name = 'environment_list'
     paginate_by = 10
 
     def get_context_data(self, *args, **kwargs):
@@ -199,7 +204,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
 
 class CreateEndpoint(LoginRequiredMixin, CreateView):
 
-    template_name = 'servervalidation/endpoints_create.html'
+    template_name = 'servervalidation/endpoints_form.html'
     form_class = CreateEndpointForm
 
     def get_success_url(self):
@@ -479,7 +484,7 @@ class PostmanDownloadView(View):
         with open(pmt.validation_file.path) as f:
             response = HttpResponse(f, content_type='Application/json')
             response['Content-Length'] = len(response.content)
-            response['Content-Disposition'] = 'attachment;filename={}'.format(pmt.validation_file.original_filename)
+            response['Content-Disposition'] = 'attachment;filename={}'.format(pmt.filename)
             return response
 
 
@@ -519,3 +524,264 @@ class LatestRunView(ServerRunOutputUuid):
             test_scenario__uuid=self.kwargs['scenario_uuid']
         ).order_by('-stopped')
         return server_runs.first()
+
+
+class ObjectPermissionMixin:
+    def on_permission_check_fail(self, request, response, obj=None):
+        raise PermissionDenied
+
+    def get_permission_object(self):
+        return API.objects.get(pk=self.kwargs['api_id'])
+
+
+class CreateTestScenarioView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    template_name = 'servervalidation/test_scenario-form.html'
+    form_class = CreateTestScenarioForm
+    permission_required = 'servervalidation.create_scenario_for_api'
+
+    def get_success_url(self):
+        if hasattr(self, 'test_scenario'):
+            return reverse('server_run:testscenario-detail', kwargs={
+                'api_id': self.kwargs['api_id'],
+                'pk': self.test_scenario.pk
+            })
+        return reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.kwargs['api_id']
+        })
+
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['api'] = API.objects.get(id=self.kwargs['api_id'])
+
+        data['form'] = self.form_class(self.request.POST or None)
+        data['variables'] = TestScenarioUrlFormSet(self.request.POST or None)
+        data['postman_tests'] = PostmanTestFormSet(self.request.POST or None, self.request.FILES or None)
+        return data
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+
+        form = self.form_class(request.POST)
+        variable_form = TestScenarioUrlFormSet(request.POST)
+        postman_form = PostmanTestFormSet(request.POST, request.FILES)
+
+        if form.is_valid() and variable_form.is_valid() and postman_form.is_valid():
+            api = API.objects.get(id=kwargs['api_id'])
+            self.test_scenario = TestScenario.objects.create(
+                api=api,
+                authorization=choices.AuthenticationChoices.no_auth,
+                **form.cleaned_data
+            )
+
+            variables = []
+            for data in variable_form.cleaned_data:
+                if data:
+                    data["test_scenario"] = self.test_scenario
+                    variables.append(TestScenarioUrl(**data))
+            TestScenarioUrl.objects.bulk_create(variables)
+
+            postman_tests = []
+            for data in postman_form.cleaned_data:
+                if data:
+                    data["test_scenario"] = self.test_scenario
+                    postman_tests.append(PostmanTest(**data))
+            PostmanTest.objects.bulk_create(postman_tests)
+
+            return HttpResponseRedirect(self.get_success_url())
+
+        context = {}
+        context['api'] = API.objects.get(id=self.kwargs['api_id'])
+        context['form'] = form
+        context['variables'] = variable_form
+        context['postman_tests'] = postman_form
+        return render(request, self.template_name, context)
+
+
+class TestScenarioList(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, ListView):
+
+    template_name = 'servervalidation/test-scenario_list.html'
+    context_object_name = 'test-scenario_list'
+    paginate_by = 10
+    permission_required = 'servervalidation.list_scenario_for_api'
+
+    def get_queryset(self, *args, **kwargs):
+        return TestScenario.objects.filter(api__id=self.kwargs['api_id'])
+
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['api'] = API.objects.get(id=self.kwargs['api_id'])
+        return data
+
+
+class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    model = TestScenario
+    form_class = CreateTestScenarioForm
+    pk_url_kwarg = 'scenario_uuid'
+    template_name = 'servervalidation/test_scenario-form.html'
+    context_object_name = 'testscenario-update'
+    permission_required = 'servervalidation.update_scenario_for_api'
+
+    def get_success_url(self):
+        return reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.kwargs['api_id']
+        })
+
+    def get_object(self):
+        return get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
+
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['api'] = API.objects.get(id=self.kwargs['api_id'])
+
+        test_scenario = self.get_object()
+
+        data['form'] = self.form_class(self.request.POST or None, instance=test_scenario)
+        data['variables'] = TestScenarioUrlFormSet(
+            self.request.POST or None,
+            instance=test_scenario
+        )
+        data['postman_tests'] = PostmanTestFormSet(
+            self.request.POST or None,
+            self.request.FILES or None,
+            instance=test_scenario
+        )
+        return data
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+
+        test_scenario = self.get_object()
+
+        form = self.form_class(request.POST, instance=test_scenario)
+        variable_form = TestScenarioUrlFormSet(request.POST, instance=test_scenario)
+        postman_form = PostmanTestFormSet(request.POST, request.FILES, instance=test_scenario)
+
+        if form.is_valid() and variable_form.is_valid() and postman_form.is_valid():
+            api = API.objects.get(id=kwargs['api_id'])
+
+            test_scenario = self.get_object()
+
+            for attr, value in form.cleaned_data.items():
+                setattr(test_scenario, attr, value)
+            test_scenario.save()
+
+            variables = []
+            for data in variable_form.cleaned_data:
+                if data:
+                    if data["id"] is not None:
+                        instance = data.pop("id")
+                        for attr, value in data.items():
+                            setattr(instance, attr, value)
+                        instance.save()
+                    else:
+                        data["test_scenario"] = test_scenario
+                        variables.append(TestScenarioUrl(**data))
+
+            TestScenarioUrl.objects.bulk_create(variables)
+            postman_tests = []
+            for data in postman_form.cleaned_data:
+                if data:
+                    if data["id"] is not None:
+                        instance = data.pop("id")
+                        for attr, value in data.items():
+                            setattr(instance, attr, value)
+                        instance.save()
+                    else:
+                        data["test_scenario"] = test_scenario
+                        postman_tests.append(PostmanTest(**data))
+            PostmanTest.objects.bulk_create(postman_tests)
+
+            return HttpResponseRedirect(self.get_success_url())
+
+        context = {}
+        context['api'] = API.objects.get(id=self.kwargs['api_id'])
+        context['form'] = form
+        context['variables'] = variable_form
+        context['postman_tests'] = postman_form
+        return render(request, self.template_name, context)
+
+
+class TestScenarioDeleteView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    model = TestScenario
+    pk_url_kwarg = 'scenario_uuid'
+    permission_required = 'servervalidation.delete_scenario_for_api'
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.kwargs['api_id']
+        })
+
+    def get_object(self):
+        return get_object_or_404(TestScenario, uuid=self.kwargs['scenario_uuid'])
+
+
+class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    template_name = 'servervalidation/endpoints_form.html'
+    form_class = CreateEndpointForm
+    permission_required = 'servervalidation.update_environment_for_api'
+
+    def get_object(self):
+        return Environment.objects.get(id=self.kwargs['env_id'])
+
+    def get_queryset(self, *args, **kwargs):
+        return Endpoint.objects.filter(environment_id=self.kwargs['env_id'])
+
+    def get_success_url(self):
+        env = self.get_object()
+        return reverse('server_run:server-run_list', kwargs={
+            'api_id': env.test_scenario.api.id,
+            'scenario_uuid': env.test_scenario.uuid,
+            'env_uuid': env.uuid
+        })
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        pre_form = data['form']
+
+        self.env = self.get_object()
+        self.ts = self.env.test_scenario
+
+        data['ts'] = self.ts
+        data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=self.ts)
+        data['environment'] = self.env
+        url_vars = TestScenarioUrl.objects.filter(
+            test_scenario=self.ts,
+            url=True
+        )
+        text_vars = TestScenarioUrl.objects.filter(
+            test_scenario=self.ts,
+            url=False
+        )
+        data['form'] = CreateEndpointForm(
+            url_vars=url_vars,
+            text_vars=text_vars,
+            url_placeholders=Endpoint.objects.filter(environment=self.env, test_scenario_url__in=url_vars).values_list('url', flat=True),
+            text_placeholders=Endpoint.objects.filter(environment=self.env, test_scenario_url__in=text_vars).values_list('url', flat=True)
+        )
+        if self.ts.jwt_enabled():
+            data['form'].add_text_area(['Client ID', 'Secret'])
+        elif self.ts.custom_header():
+            data['form'].add_text_area(['Authorization header'])
+        else:
+            pass
+        for k, v in pre_form.errors.items():
+            data['form'].errors[k] = v
+        return data
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        env = self.get_object()
+        endpoints = env.endpoint_set.all()
+        tsu_names = endpoints.values_list('test_scenario_url__name', flat=True)
+        for key, value in data.items():
+            if key in tsu_names:
+                endpoint = endpoints.get(test_scenario_url__name=key)
+                endpoint.url = value.strip()
+                endpoint.save()
+
+        return HttpResponseRedirect(self.get_success_url())

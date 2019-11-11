@@ -1,0 +1,36 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load guardian_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "Providers" %}{% endblock %}
+
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Environments for " %} <b>{{api.name}}</b>
+                    <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right ml-2"><i class="icon-control-play"></i> {% trans "Start testrun" %}</a>
+                    {% get_obj_perms request.user for api as "api_permissions" %}
+                    {% if "list_scenario_for_api" in api_permissions or "update_scenario_for_api" in api_permissions or "delete_scenario_for_api" in api_permissions %}
+                        <a href="{% url 'server_run:test-scenario_list' api.id %}" class="btn btn-primary float-right"><i class="icon-equalizer"></i> {% trans "Configure test scenarios" %}</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        {% include 'servervalidation/table/header-environment.html' only %}
+                        {% for scenario, environment, last_run in object_list %}
+                            {% include 'servervalidation/table/row-environment.html' with scenario=scenario environment=environment last_run=last_run %}
+                        {% endfor %}
+                    </table>
+                    {% include 'components/pagination/pagination.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
