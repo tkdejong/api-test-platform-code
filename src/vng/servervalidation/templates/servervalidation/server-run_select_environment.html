@@ -1,9 +1,17 @@
 {% extends 'master.html' %}
 {% load crispy_forms_tags %}
+{% load django_bootstrap_breadcrumbs %}
 {% load sniplates %}
 {% load i18n %}
 
-{% block title %}{% trans "Server run creation" %}{% endblock%}
+{% block title %}{% trans "Server run creation" %}{% endblock %}
+
+{% block breadcrumb %}
+{% breadcrumb "Environments" 'server_run:environment_list' test_scenario.api.id %}
+{% breadcrumb "Start new provider test" 'server_run:server-run_create_item' test_scenario.api.id %}
+{% breadcrumb "Select environment" 'server_run:test-scenario_list' object.api.id %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 
 {% block content %}

@@ -1,9 +1,21 @@
 {% extends 'master.html' %}
 {% load sniplates %}
 {% load crispy_forms_tags %}
+{% load django_bootstrap_breadcrumbs %}
 {% load i18n %}
 
 {% block title %}{% if object %}{% trans "Test scenario update" %}{% else %}{% trans "Test scenario creation" %}{% endif %}{% endblock%}
+
+{% block breadcrumb %}
+{% breadcrumb "Environments" 'server_run:environment_list' api.id %}
+{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api.id %}
+{% if object %}
+    {% breadcrumb "Test scenario update" 'server_run:testscenario-update' api.id test_scenario.uuid environment.uuid %}
+{% else %}
+    {% breadcrumb "Test scenario create" 'server_run:testscenario-create' api.id test_scenario.uuid environment.uuid %}
+{% endif %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 {% block content %}
 <div id="ui-view">
@@ -12,6 +24,8 @@
             <form class="" enctype="multipart/form-data" method="post">{% csrf_token %}
                 <div class="card">
                     <div class="card-header">
+                        {{test_scenario}}
+                        {{environment}}
                         {% if object %}
                             {% trans "Update test scenario: " %} <b>{{object.name}}</b>
                         {% else %}

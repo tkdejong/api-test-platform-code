@@ -3,9 +3,16 @@
 {% load i18n %}
 {% load static %}
 {% load inspection %}
+{% load django_bootstrap_breadcrumbs %}
 
 {% block title %}{% trans "Test Scenario" %}{% endblock %}
 
+{% block breadcrumb %}
+{% breadcrumb "Environments" 'server_run:environment_list' object.api.id %}
+{% breadcrumb "Test scenarios" 'server_run:test-scenario_list' object.api.id %}
+{% breadcrumb "Test scenario detail" 'server_run:testscenario-detail' object.api.id object.id %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 {% block content %}
 <div id="ui-view">
