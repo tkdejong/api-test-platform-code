@@ -13,19 +13,20 @@ def migrate_postmantest_validation_files(apps, schema_editor):
     for postmantest in PostmanTest.objects.all():
         validation_file = postmantest._validation_file
 
-        filepath = os.path.join(settings.MEDIA_ROOT, validation_file.file.name)
+        if validation_file is not None:
+            filepath = os.path.join(settings.MEDIA_ROOT, validation_file.file.name)
 
-        new_path = settings.MEDIA_ROOT
+            new_path = settings.MEDIA_ROOT
 
-        # To ensure that the name of the file is no longer than 100 characters
-        if len(validation_file.original_filename) > 99:
-            name = validation_file.original_filename[:96] + ".json"
-            new_path = os.path.join(new_path, name)
+            # To ensure that the name of the file is no longer than 100 characters
+            if len(validation_file.original_filename) > 99:
+                name = validation_file.original_filename[:96] + ".json"
+                new_path = os.path.join(new_path, name)
 
-        shutil.copy(filepath, new_path)
+            shutil.copy(filepath, new_path)
 
-        postmantest.validation_file = validation_file.original_filename
-        postmantest.save()
+            postmantest.validation_file = validation_file.original_filename
+            postmantest.save()
 
 class Migration(migrations.Migration):
 
