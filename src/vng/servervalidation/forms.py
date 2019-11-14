@@ -4,10 +4,17 @@ import collections
 from copy import deepcopy
 
 from django import forms
+from filer.models.filemodels import File
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.forms.models import inlineformset_factory
 
-from .models import ServerRun, Endpoint, TestScenario, Environment, ScheduledTestScenario
+from tinymce.widgets import TinyMCE
+
+from .models import (
+    ServerRun, Endpoint, TestScenario,
+    Environment, ScheduledTestScenario, TestScenarioUrl, PostmanTest
+)
 from ..utils.newman import NewmanManager
 from ..utils.forms import CustomModelChoiceField
 
@@ -124,3 +131,58 @@ class CreateEndpointForm(forms.Form):
                     widget=forms.Textarea(),
                     initial=placeholder
                 )
+
+
+class CreateTestScenarioUrlForm(forms.ModelForm):
+
+    class Meta:
+        model = TestScenarioUrl
+        exclude = ()
+
+
+TestScenarioUrlFormSet = inlineformset_factory(
+    TestScenario,
+    TestScenarioUrl,
+    form=CreateTestScenarioUrlForm,
+    can_delete=False,
+    extra=1
+)
+
+
+class UploadPostmanTestForm(forms.ModelForm):
+
+    validation_file = forms.FileField(required=True)
+
+    class Meta:
+        model = PostmanTest
+        exclude = ()
+
+
+PostmanTestFormSet = inlineformset_factory(
+    TestScenario,
+    PostmanTest,
+    form=UploadPostmanTestForm,
+    can_delete=False,
+    extra=1
+)
+
+
+class CreateTestScenarioForm(forms.ModelForm):
+
+    description = forms.CharField(widget=forms.Textarea)
+
+    class Meta:
+        model = TestScenario
+        fields = ['name', 'description', 'public_logs', 'active']
+        help_texts = {
+            'name': ''
+        }
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if not self.instance:
+            if TestScenario.objects.filter(name=name).exists():
+                raise ValidationError(_(
+                    "A test scenario with this name already exists"
+                ))
+        return name

@@ -4,6 +4,7 @@ import vng.servervalidation.models as model
 
 from ordered_model.admin import OrderedModelAdmin
 from django_admin_relation_links import AdminChangeLinksMixin
+from guardian.admin import GuardedModelAdmin
 
 from vng.testsession.models import SessionType
 
@@ -55,7 +56,7 @@ class APIForm(forms.ModelForm):
 
 
 @admin.register(model.API)
-class APIAdmin(admin.ModelAdmin):
+class APIAdmin(GuardedModelAdmin):
     list_display = ['name']
 
     form = APIForm

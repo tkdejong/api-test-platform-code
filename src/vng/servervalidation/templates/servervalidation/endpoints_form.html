@@ -1,0 +1,64 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% trans "Update environment" %}{% else %} {% trans "Server run creation" %} {% endif %}{% endblock%}
+
+{% block breadcrumb %}
+{% if object %}
+    {% breadcrumb "Environments" 'server_run:environment_list' ts.api.id %}
+    {% breadcrumb "Provider run list" 'server_run:server-run_list' ts.api.id ts.uuid object.uuid %}
+    {% breadcrumb "Update environment" 'server_run:test-scenario_list' object.api.id %}
+    {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% else %}
+    {% breadcrumb "Environments" 'server_run:environment_list' ts.api.id %}
+    {% breadcrumb "Start new provider test" 'server_run:server-run_create_item' ts.api.id %}
+    {% breadcrumb "Select environment" 'server_run:server-run_select_environment' ts.api.id ts.id %}
+    {% breadcrumb "Define variables" 'server_run:test-scenario_list' ts.api.id %}
+    {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-6 offset-sm-3">
+            <form class="" method="post">{% csrf_token %}
+                <div class="card">
+                    <div class="card-header">
+                    {% if object %}
+                        {% trans "Update environment:" %} {{ object }}
+                    {% else %}
+                        {% trans "Create provider-testrun for scenario:" %} {{ ts }}
+                    {% endif %}
+                    </div>
+                    <div class='card-body'>
+                    {% load_widgets form='forms.html' %}
+                    {% for field in form %}
+                        {% form_field field %}
+                    {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" type="submit">
+                                    <i class="fa fa-dot-circle-o"></i>{% if object %} {% trans "Update" %} {% else %} {% trans "Start" %} {% endif %}</button>
+                            </div>
+                            <div class="col-auto">
+                                {% if object %}
+                                    <a class="btn btn-sm btn-danger" href="{% url 'server_run:server-run_list' ts.api.id ts.uuid object.uuid %}">
+                                        <i class="fa fa-ban"></i> {% trans "Cancel" %}</button>
+                                {% else %}
+                                    <a class="btn btn-sm btn-danger" href="{% url 'server_run:server-run_select_environment' ts.api.id ts.id %}">
+                                        <i class="fa fa-ban"></i> {% trans "Cancel" %}</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

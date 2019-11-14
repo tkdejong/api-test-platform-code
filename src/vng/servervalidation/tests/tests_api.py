@@ -52,6 +52,7 @@ def create_server_run(name, tsu, env_name='environment1'):
 class RetrieveCreationTest(TransactionWebTest):
 
     def setUp(self):
+        self.user = UserFactory.create()
         self.test_scenario = PostmanTestFactory().test_scenario
         tsu1 = TestScenarioUrlFactory()
         tsu2 = TestScenarioUrlFactory()
@@ -63,7 +64,7 @@ class RetrieveCreationTest(TransactionWebTest):
 
     def get_user_key(self):
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
@@ -125,7 +126,7 @@ class TestNoAssertion(TransactionWebTest):
 
     def get_user_key(self):
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}
@@ -214,11 +215,11 @@ class PostmanTestAPITests(TransactionWebTest):
 
         self.assertEqual(response.json[0]['name'], 'postman_tests')
         self.assertEqual(response.json[0]['version'], '1.0.0')
-        self.assertIn(self.postman_tests1.validation_file.file.name, response.json[0]['validation_file'])
+        self.assertIn(self.postman_tests1.validation_file.name, response.json[0]['validation_file'])
 
         self.assertEqual(response.json[1]['name'], 'postman_tests')
         self.assertEqual(response.json[1]['version'], '1.0.1')
-        self.assertIn(self.postman_tests2.validation_file.file.name, response.json[1]['validation_file'])
+        self.assertIn(self.postman_tests2.validation_file.name, response.json[1]['validation_file'])
 
     def test_get_all_versions_empty(self):
         get_versions_url = reverse('apiv1server:provider:api_postman-test-get-all-versions', kwargs={
@@ -344,7 +345,7 @@ class EnvironmentAPITests(TransactionWebTest):
 
     def get_user_key(self):
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
-            ('username', get_username()),
+            ('username', self.user1.username),
             ('password', 'password')]))
         key = get_object(call.body)['key']
         head = {'Authorization': 'Token {}'.format(key)}

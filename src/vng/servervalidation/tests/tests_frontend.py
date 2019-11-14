@@ -1,15 +1,15 @@
-import factory
-import json
 import re
 
+from django.conf import settings
 from django_webtest import WebTest
 from django.urls import reverse
 
+from guardian.shortcuts import assign_perm
 from vng.postman.choices import ResultChoices
 from vng.testsession.tests.factories import UserFactory
 from vng.servervalidation.models import (
     ServerRun, PostmanTest, PostmanTestResult,
-    User, ScheduledTestScenario, Endpoint
+    User, ScheduledTestScenario, Endpoint, TestScenario, TestScenarioUrl
 )
 
 from .factories import (
@@ -108,7 +108,7 @@ class TestCreation(WebTest):
         form['Secret'] = 'secret'
         form.submit()
 
-        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        call = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
         self.assertIn(self.user.username, call.text)
@@ -185,7 +185,7 @@ class TestCreation(WebTest):
 
         res = form.submit().follow()
 
-        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        call = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
         self.assertIn(self.user.username, call.text)
@@ -249,7 +249,7 @@ class TestList(WebTest):
         ServerRunFactory.create(test_scenario=self.test_scenario2, user=self.user, stopped='2019-01-01T00:00:00Z')
 
     def test_list(self):
-        call = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        call = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.api1.id
         }), user=self.user)
 
@@ -743,11 +743,11 @@ class BadgesWithoutResultsTests(WebTest):
             stopped='2019-01-01T12:00:00Z',
             user=self.user
         )
-        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        response = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
         self.assertNotIn('No results yet', response.text)
 
     def test_scenario_list_without_results(self):
@@ -756,12 +756,12 @@ class BadgesWithoutResultsTests(WebTest):
             stopped=None,
             user=self.user
         )
-        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        response = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.test_scenario.api.id
         }), user=self.user)
 
         self.assertIn('No results yet', response.text)
-        self.assertNotIn('https://img.shields.io/', response.text)
+        self.assertNotIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_list_with_results(self):
         server_run = ServerRunFactory.create(
@@ -775,7 +775,7 @@ class BadgesWithoutResultsTests(WebTest):
             'env_uuid': server_run.environment.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_list_without_results(self):
         server_run = ServerRunFactory.create(
@@ -789,7 +789,7 @@ class BadgesWithoutResultsTests(WebTest):
             'env_uuid': server_run.environment.uuid
         }), user=self.user)
 
-        self.assertNotIn('https://img.shields.io/', response.text)
+        self.assertNotIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_list_uses_latest_results(self):
         server_run_with_results = ServerRunFactory.create(
@@ -814,7 +814,7 @@ class BadgesWithoutResultsTests(WebTest):
             'env_uuid': server_run_with_results.environment.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
 
     def test_server_run_detail_with_results(self):
         server_run = ServerRunFactory.create(
@@ -827,7 +827,7 @@ class BadgesWithoutResultsTests(WebTest):
             'uuid': server_run.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
         self.assertNotIn('no results yet for this environment', response.text)
 
     def test_server_run_detail_without_results(self):
@@ -847,7 +847,7 @@ class BadgesWithoutResultsTests(WebTest):
         )
 
         self.assertIn('no results yet for this environment', badge_div.nextSibling.text)
-        self.assertNotIn('https://img.shields.io/', badge_div.nextSibling.text)
+        self.assertNotIn(settings.SHIELDS_URL, badge_div.nextSibling.text)
 
     def test_server_run_detail_uses_latest_results(self):
         server_run_with_results = ServerRunFactory.create(
@@ -871,7 +871,7 @@ class BadgesWithoutResultsTests(WebTest):
             'uuid': server_run_without_results.uuid
         }), user=self.user)
 
-        self.assertIn('https://img.shields.io/', response.text)
+        self.assertIn(settings.SHIELDS_URL, response.text)
         self.assertNotIn('no results yet for this environment', response.text)
 
 
@@ -964,7 +964,7 @@ class ProviderOrderingTests(WebTest):
         )
 
     def test_ordering_test_scenario_list(self):
-        response = self.app.get(reverse('server_run:test-scenario_list', kwargs={
+        response = self.app.get(reverse('server_run:environment_list', kwargs={
             'api_id': self.api.id
         }), user=self.user)
 
@@ -1016,3 +1016,86 @@ class ProviderOrderingTests(WebTest):
         self.assertIn(str(self.server4.id), rows[1].findChild('a').text)
         self.assertIn(str(self.server1.id), rows[2].findChild('a').text)
         self.assertIn(str(self.server2.id), rows[3].findChild('a').text)
+
+
+class UpdateEnvironmentTests(WebTest):
+
+    def setUp(self):
+        self.test_scenario = TestScenarioFactory.create(authorization=choices.AuthenticationChoices.no_auth)
+        self.user = UserFactory.create()
+        assign_perm("update_environment_for_api", self.user, self.test_scenario.api)
+
+        self.tsu1 = TestScenarioUrlFactory.create(name='url', test_scenario=self.test_scenario)
+        self.tsu2 = TestScenarioUrlFactory.create(name='var', url=False, test_scenario=self.test_scenario)
+
+        self.environment = EnvironmentFactory.create(user=self.user, test_scenario=self.test_scenario)
+        self.var1 = EndpointFactory.create(
+            test_scenario_url=self.tsu1,
+            url='https://somewebsite.tk',
+            environment=self.environment
+        )
+        self.var2 = EndpointFactory.create(
+            test_scenario_url=self.tsu2,
+            url='token',
+            environment=self.environment
+        )
+
+    def test_update_environment_view_initial_data_correct(self):
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        self.assertEqual(form['url'].value, self.var1.url)
+        self.assertEqual(form['var'].value, self.var2.url)
+
+    def test_update_environment_modifies_variables(self):
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['url'] = 'https://www.google.com/'
+        form['var'] = 'Bearer token aaaaaaaaaaaaa'
+        form.submit().follow()
+
+        self.var1.refresh_from_db()
+        self.var2.refresh_from_db()
+
+        self.assertEqual(self.var1.url, 'https://www.google.com/')
+        self.assertEqual(self.var2.url, 'Bearer token aaaaaaaaaaaaa')
+
+    def test_update_environment_view_not_accessible_for_user_without_permission(self):
+        user = UserFactory.create()
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=user, status=[403])
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_update_environment_button_visible_for_user_with_permission(self):
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Modify environment', response.text)
+
+    def test_update_environment_button_not_visible_for_user_without_permission(self):
+        user = UserFactory.create()
+        response = self.app.get(reverse('server_run:server-run_list', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'scenario_uuid': self.test_scenario.uuid,
+            'env_uuid': self.environment.uuid
+        }), user=user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('Modify environment', response.text)

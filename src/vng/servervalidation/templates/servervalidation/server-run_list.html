@@ -1,5 +1,6 @@
 {% extends 'master.html' %}
 {% load sniplates %}
+{% load guardian_tags %}
 {% load django_bootstrap_breadcrumbs %}
 {% load i18n %}
 
@@ -8,7 +9,7 @@
 
 {% block breadcrumb %}
 {% if request.user == environment.user %}
-    {% breadcrumb "Test scenarios" 'server_run:test-scenario_list' api.id %}
+    {% breadcrumb "Test scenarios" 'server_run:environment_list' api.id %}
 {% endif %}
 {% breadcrumb "Provider tests" 'server_run:server-run_list' api_id test_scenario.uuid environment.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
@@ -33,6 +34,10 @@
                             <a type="submit" class="btn btn-secondary float-right" href="{% url 'server_run:server-run_create_schedule' api.id environment.uuid %}">{% trans "Add schedule" %}</a>
                         {% endif %}
                     {% endif %}
+                    {% get_obj_perms request.user for api as "api_permissions" %}
+                    {% if "update_environment_for_api" in api_permissions %}
+                        <a type="submit" class="btn btn-primary btn-success float-right mr-2" href="{% url 'server_run:endpoints_update' api.id test_scenario.id environment.id %}">{% trans "Modify environment" %}</a>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <div>
@@ -54,7 +59,7 @@
                                     <td>
                                         <span display="block" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
                                             <a href="{% url 'server_run:server-run_latest' api.id test_scenario.uuid environment.uuid %}">
-                                                <img style="height:30px"  alt="" src="https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
+                                                <img style="height:30px"  alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'apiv1server:latest-badge' environment.uuid %}">
                                             </a>
                                         </span>
                                     </td>

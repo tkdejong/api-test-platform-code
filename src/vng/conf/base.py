@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'ckeditor',
     'ordered_model',
+    'guardian',
     'django_admin_index',
     'django.contrib.admin',
     'registration',
@@ -162,6 +163,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'vng.utils.context_processors.settings',
                 'vng.utils.context_processors.api_list',
+                'vng.utils.context_processors.shields_url',
                 # REQUIRED FOR ADMIN INDEX
                 'django_admin_index.context_processors.dashboard',
             ],
@@ -354,7 +356,8 @@ AUTH_USER_MODEL = 'accounts.User'
 # Allow logging in with both username+password and email+password
 AUTHENTICATION_BACKENDS = [
     'vng.accounts.backends.UserModelEmailBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
 ]
 
 #
@@ -427,3 +430,5 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Custom token creation to support multiple API tokens
 REST_AUTH_TOKEN_CREATOR = 'vng.apiAuthentication.utils.create_token'
+
+SHIELDS_URL = 'https://shields.api-test.nl'
