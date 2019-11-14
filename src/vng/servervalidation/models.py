@@ -240,6 +240,7 @@ class ServerRun(models.Model):
         "Name of the software tested by this provider test"
     ))
     product_role = models.CharField(max_length=100, blank=True, null=True)
+    software_version = models.CharField(max_length=100, blank=True, null=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, help_text=_(
         "The universally unique identifier of this provider run, needed to retrieve the badge"
     ))
