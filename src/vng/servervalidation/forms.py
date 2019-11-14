@@ -145,7 +145,7 @@ TestScenarioUrlFormSet = inlineformset_factory(
     TestScenarioUrl,
     form=CreateTestScenarioUrlForm,
     can_delete=False,
-    extra=1
+    extra=0
 )
 
 
@@ -163,13 +163,13 @@ PostmanTestFormSet = inlineformset_factory(
     PostmanTest,
     form=UploadPostmanTestForm,
     can_delete=False,
-    extra=1
+    extra=0
 )
 
 
 class CreateTestScenarioForm(forms.ModelForm):
 
-    description = forms.CharField(widget=forms.Textarea)
+    description = forms.CharField(widget=TinyMCE())
 
     class Meta:
         model = TestScenario
