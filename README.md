@@ -2,7 +2,7 @@
 
 [![Build Status](https://jenkins.nlx.io/job/gemma-zaken-build-and-test/badge/icon?style=plastic)](https://jenkins.nlx.io/) ![Repo Status](https://img.shields.io/badge/status-concept-lightgrey.svg?style=plastic)
 
-[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&amp;url=https://vng-staging.maykin.nl/api/v1/provider-run-shield/3e4b881a-5f35-4575-a103-7b1b68f25d7f/)](https://vng-staging.maykin.nl/server/3e4b881a-5f35-4575-a103-7b1b68f25d7f/)
+[![Status badge](https://img.shields.io/endpoint.svg?style=for-the-badge&url=https%3A//api-test.nl/api/v1/provider-latest-badge/3fa51402-62c6-42d6-89fd-e14a2b818a6c/)](https://api-test.nl/server/2/dff1f823-ecc7-4ab8-8fb6-cc20793bd60f/3fa51402-62c6-42d6-89fd-e14a2b818a6c/latest/)
 
 Voor meer informatie zie [API-testplatform](https://github.com/VNG-Realisatie/api-testvoorziening)
 

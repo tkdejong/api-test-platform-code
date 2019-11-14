@@ -21,6 +21,7 @@
     - include: maykin-deployment/ansible/tasks/postgresql-11.yml
     - include: tasks/kubernetes.yml
     - include: tasks/gcloud.yml
+    - include: maykin-deployment/ansible/tasks/docker.yml
     - include: tasks/shields.yml
     - include: maykin-deployment/ansible/tasks/npm.yml
     - include: maykin-deployment/ansible/tasks/set-maintenance-mode.yml
