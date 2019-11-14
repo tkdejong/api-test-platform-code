@@ -169,7 +169,7 @@ PostmanTestFormSet = inlineformset_factory(
 
 class CreateTestScenarioForm(forms.ModelForm):
 
-    description = forms.CharField(widget=forms.Textarea)
+    description = forms.CharField(widget=TinyMCE())
 
     class Meta:
         model = TestScenario
