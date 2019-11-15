@@ -24,7 +24,8 @@ from ..utils.views import OwnerSingleObject, PDFGenerator
 from .forms import (
     CreateServerRunForm, CreateEndpointForm,
     SelectEnvironmentForm, CreateTestScenarioForm,
-    TestScenarioUrlFormSet, PostmanTestFormSet
+    TestScenarioUrlFormSet, PostmanTestFormSet,
+    TestScenarioUrlUpdateFormSet, PostmanTestUpdateFormSet
 )
 from .models import (
     API, ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest,
@@ -643,11 +644,11 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
         test_scenario = self.get_object()
 
         data['form'] = self.form_class(self.request.POST or None, instance=test_scenario)
-        data['variables'] = TestScenarioUrlFormSet(
+        data['variables'] = TestScenarioUrlUpdateFormSet(
             self.request.POST or None,
             instance=test_scenario
         )
-        data['postman_tests'] = PostmanTestFormSet(
+        data['postman_tests'] = PostmanTestUpdateFormSet(
             self.request.POST or None,
             self.request.FILES or None,
             instance=test_scenario
@@ -667,8 +668,8 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
         test_scenario = self.get_object()
 
         form = self.form_class(request.POST, instance=test_scenario)
-        variable_form = TestScenarioUrlFormSet(request.POST, instance=test_scenario)
-        postman_form = PostmanTestFormSet(request.POST, request.FILES, instance=test_scenario)
+        variable_form = TestScenarioUrlUpdateFormSet(request.POST, instance=test_scenario)
+        postman_form = PostmanTestUpdateFormSet(request.POST, request.FILES, instance=test_scenario)
 
         if form.is_valid() and variable_form.is_valid() and postman_form.is_valid():
             api = API.objects.get(id=kwargs['api_id'])
@@ -682,26 +683,34 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
             variables = []
             for data in variable_form.cleaned_data:
                 if data:
-                    if data["id"] is not None:
+                    if data["DELETE"]:
+                        data["id"].delete()
+                    elif data["id"] is not None:
                         instance = data.pop("id")
+                        data.pop("DELETE")
                         for attr, value in data.items():
                             setattr(instance, attr, value)
                         instance.save()
                     else:
                         data["test_scenario"] = test_scenario
+                        data.pop("DELETE")
                         variables.append(TestScenarioUrl(**data))
-
             TestScenarioUrl.objects.bulk_create(variables)
+
             postman_tests = []
             for data in postman_form.cleaned_data:
                 if data:
-                    if data["id"] is not None:
+                    if data["DELETE"]:
+                        data["id"].delete()
+                    elif data["id"] is not None:
                         instance = data.pop("id")
+                        data.pop("DELETE")
                         for attr, value in data.items():
                             setattr(instance, attr, value)
                         instance.save()
                     else:
                         data["test_scenario"] = test_scenario
+                        data.pop("DELETE")
                         postman_tests.append(PostmanTest(**data))
             PostmanTest.objects.bulk_create(postman_tests)
 
