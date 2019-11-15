@@ -145,7 +145,7 @@ class TestScenarioCreateTests(WebTest):
     def test_create_with_variable(self):
         response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
             'api_id': self.api.id
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         form = response.forms[1]
         form['name'] = 'some scenario name'
@@ -180,7 +180,7 @@ class TestScenarioCreateTests(WebTest):
     def test_create_with_postman_test(self):
         response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
             'api_id': self.api.id
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         form = response.forms[1]
         form['name'] = 'some scenario name'
@@ -336,7 +336,7 @@ class TestScenarioUpdateTests(WebTest):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
             'api_id': self.api.id,
             'scenario_uuid': self.test_scenario.uuid
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         number_of_vars = self.test_scenario.testscenariourl_set.count()
 
@@ -385,7 +385,7 @@ class TestScenarioUpdateTests(WebTest):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
             'api_id': self.api.id,
             'scenario_uuid': self.test_scenario.uuid
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         number_of_tests = self.test_scenario.postmantest_set.count()
 
