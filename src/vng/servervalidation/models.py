@@ -233,14 +233,14 @@ class ServerRun(models.Model):
     scheduled = models.BooleanField(default=False, help_text=_(
         "If enabled, this provider run will be executed every day at midnight"
     ))
-    supplier_name = models.CharField(max_length=100, blank=True, null=True, help_text=_(
+    supplier_name = models.CharField(max_length=100, blank=True, default="", help_text=_(
         "Name of the supplier of the software product"
     ))
-    software_product = models.CharField(max_length=100, blank=True, null=True, help_text=_(
+    software_product = models.CharField(max_length=100, blank=True, default="", help_text=_(
         "Name of the software tested by this provider test"
     ))
-    product_role = models.CharField(max_length=100, blank=True, null=True)
-    software_version = models.CharField(max_length=100, blank=True, null=True)
+    product_role = models.CharField(max_length=100, blank=True, default="")
+    software_version = models.CharField(max_length=100, blank=True, default="")
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, help_text=_(
         "The universally unique identifier of this provider run, needed to retrieve the badge"
     ))
