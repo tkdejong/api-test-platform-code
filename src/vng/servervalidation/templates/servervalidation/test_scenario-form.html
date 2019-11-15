@@ -84,16 +84,25 @@
 <script>
     function addForm(formset) {
         if(formset == 'variables') {
-            var formset_id = '#form_set_variables'
-            var prefix = '#id_testscenariourl_set'
-            var empty_form_id = '#empty_form_variables'
+            var formset_id = 'form_set_variables';
+            var prefix = '#id_testscenariourl_set';
+            var empty_form_id = 'empty_form_variables';
         } else if(formset == 'postman') {
-            var formset_id = '#form_set_postman'
-            var prefix = '#id_postmantest_set'
-            var empty_form_id = '#empty_form_postman'
+            var formset_id = 'form_set_postman';
+            var prefix = '#id_postmantest_set';
+            var empty_form_id = 'empty_form_postman';
         }
         var form_idx = document.querySelector(prefix+'-TOTAL_FORMS').value;
-        document.querySelector(formset_id).innerHTML += document.querySelector(empty_form_id).innerHTML.replace(/__prefix__/g, form_idx);
+
+        var empty_form = document.getElementById(empty_form_id).cloneNode(true);
+        empty_form.innerHTML = empty_form.innerHTML.replace(/__prefix__/g, form_idx);
+        empty_form.className = "form-group";
+        empty_form.style.display = "";
+        empty_form.removeAttribute("id");
+
+        // Appendchild to avoid resetting data that was entered in the other
+        // forms in the formset by the user
+        document.getElementById(formset_id).appendChild(empty_form);
         document.querySelector(prefix+'-TOTAL_FORMS').value = parseInt(form_idx) + 1;
     }
 </script>

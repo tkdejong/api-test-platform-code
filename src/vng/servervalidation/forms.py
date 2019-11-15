@@ -148,6 +148,14 @@ TestScenarioUrlFormSet = inlineformset_factory(
     extra=0
 )
 
+TestScenarioUrlUpdateFormSet = inlineformset_factory(
+    TestScenario,
+    TestScenarioUrl,
+    form=CreateTestScenarioUrlForm,
+    can_delete=True,
+    extra=0
+)
+
 
 class UploadPostmanTestForm(forms.ModelForm):
 
@@ -163,6 +171,14 @@ PostmanTestFormSet = inlineformset_factory(
     PostmanTest,
     form=UploadPostmanTestForm,
     can_delete=False,
+    extra=0
+)
+
+PostmanTestUpdateFormSet = inlineformset_factory(
+    TestScenario,
+    PostmanTest,
+    form=UploadPostmanTestForm,
+    can_delete=True,
     extra=0
 )
 
