@@ -20,5 +20,5 @@ urlpatterns = base_urlpatterns + [
     url(r'^consumer/', include('vng.testsession.urls', namespace='testsession')),
     url(r'^pages/', include('django.contrib.flatpages.urls')),
     # path('', views.Dashboard.as_view(), name='dashboard'),
-    path('', flatpage, {'url': '/'}, name='dashboard'),
+    path('', flatpage, {'url': '/'}, name='home'),
 ]

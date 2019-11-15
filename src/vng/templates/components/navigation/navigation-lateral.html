@@ -6,8 +6,8 @@
     <ul class="nav">
         {% if user.is_authenticated %}
         <li class="nav-item">
-	        <a class="nav-link" href="{% url 'dashboard' %}">
-	        <i class="nav-icon icon-speedometer"></i>{% trans "Dashboard" %}</a>
+	        <a class="nav-link" href="{% url 'home' %}">
+	        <i class="nav-icon icon-speedometer"></i>{% trans "Home" %}</a>
 	    </li>
 
         <li class="nav-title">{% trans "APIs" %}</li>
