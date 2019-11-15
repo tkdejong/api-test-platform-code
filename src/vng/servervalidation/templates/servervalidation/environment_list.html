@@ -13,10 +13,10 @@
             <div class="card">
                 <div class="card-header">
                     {% trans "Environments for " %} <b>{{api.name}}</b>
-                    <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right ml-2"><i class="icon-control-play"></i> {% trans "Start testrun" %}</a>
+                    <a href="{% url 'server_run:server-run_create_item' api.id %}" class="btn btn-success float-right ml-2"><i class="cui-library-add"></i> {% trans "Create environment" %}</a>
                     {% get_obj_perms request.user for api as "api_permissions" %}
                     {% if "list_scenario_for_api" in api_permissions or "update_scenario_for_api" in api_permissions or "delete_scenario_for_api" in api_permissions %}
-                        <a href="{% url 'server_run:test-scenario_list' api.id %}" class="btn btn-primary float-right"><i class="icon-equalizer"></i> {% trans "Configure test scenarios" %}</a>
+                        <a href="{% url 'server_run:test-scenario_list' api.id %}" class="btn btn-primary float-right"><i class="cui-equalizer"></i> {% trans "Configure test scenarios" %}</a>
                     {% endif %}
                 </div>
                 <div class="card-body">
