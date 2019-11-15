@@ -22,7 +22,7 @@
                     {% trans "Test scenarios for " %} <b>{{api.name}}</b>
                     {% get_obj_perms request.user for api as "api_permissions" %}
                     {% if "create_scenario_for_api" in api_permissions %}
-                        <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="icon-note"></i> {% trans "Create new test scenario" %}</a>
+                        <a href="{% url 'server_run:test-scenario_create_item' api.id %}" class="btn btn-primary float-right"><i class="cui-library-add"></i> {% trans "Create new test scenario" %}</a>
                     {% endif %}
                 </div>
                 <div class="card-body">
