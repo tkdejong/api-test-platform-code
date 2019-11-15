@@ -556,6 +556,12 @@ class CreateTestScenarioView(ObjectPermissionMixin, PermissionRequiredMixin, Log
         data['form'] = self.form_class(self.request.POST or None)
         data['variables'] = TestScenarioUrlFormSet(self.request.POST or None)
         data['postman_tests'] = PostmanTestFormSet(self.request.POST or None, self.request.FILES or None)
+
+        # Number of forms to be shown in formset
+        extra = self.request.GET.get("extra")
+        if extra:
+            data['variables'].extra = int(extra)
+            data['postman_tests'].extra = int(extra)
         return data
 
     @transaction.atomic
@@ -646,6 +652,12 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
             self.request.FILES or None,
             instance=test_scenario
         )
+
+        # Number of forms to be shown in formset
+        extra = self.request.GET.get("extra")
+        if extra:
+            data['variables'].extra = int(extra)
+            data['postman_tests'].extra = int(extra)
         return data
 
     @transaction.atomic

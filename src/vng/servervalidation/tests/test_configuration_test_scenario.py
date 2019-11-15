@@ -1,6 +1,5 @@
 from django_webtest import WebTest
 from django.urls import reverse
-from unittest import skip
 
 from guardian.shortcuts import assign_perm
 from vng.testsession.tests.factories import UserFactory
@@ -143,11 +142,10 @@ class TestScenarioCreateTests(WebTest):
         })
         self.assertEqual(scenario_detail_path, response.request.path)
 
-    @skip
     def test_create_with_variable(self):
         response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
             'api_id': self.api.id
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         form = response.forms[1]
         form['name'] = 'some scenario name'
@@ -179,11 +177,10 @@ class TestScenarioCreateTests(WebTest):
         self.assertEqual(variable.placeholder, 'bearer token')
         self.assertEqual(variable.test_scenario, scenario)
 
-    @skip
     def test_create_with_postman_test(self):
         response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
             'api_id': self.api.id
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         form = response.forms[1]
         form['name'] = 'some scenario name'
@@ -335,12 +332,11 @@ class TestScenarioUpdateTests(WebTest):
         self.assertEqual(self.test_scenario_url.hidden, True)
         self.assertEqual(self.test_scenario_url.placeholder, 'bearer token')
 
-    @skip
     def test_update_scenario_add_new_variable(self):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
             'api_id': self.api.id,
             'scenario_uuid': self.test_scenario.uuid
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         number_of_vars = self.test_scenario.testscenariourl_set.count()
 
@@ -385,12 +381,11 @@ class TestScenarioUpdateTests(WebTest):
         self.assertTrue(self.postman_test.validation_file)
         self.assertEqual(self.postman_test.published_url, 'https://example.com')
 
-    @skip
     def test_update_scenario_add_new_postman_test(self):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
             'api_id': self.api.id,
             'scenario_uuid': self.test_scenario.uuid
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         number_of_tests = self.test_scenario.postmantest_set.count()
 
