@@ -1,6 +1,7 @@
 import re
 
 from django.conf import settings
+from django.core import mail
 from django_webtest import WebTest
 from django.urls import reverse
 
@@ -11,6 +12,7 @@ from vng.servervalidation.models import (
     ServerRun, PostmanTest, PostmanTestResult,
     User, ScheduledTestScenario, Endpoint, TestScenario, TestScenarioUrl
 )
+from vng.servervalidation.task import send_email_failure
 
 from .factories import (
     TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory,
@@ -1099,3 +1101,64 @@ class UpdateEnvironmentTests(WebTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn('Modify environment', response.text)
+
+
+class ScheduledScenarioEmailTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create(email="test@test.nl")
+        self.scheduled = ScheduledTestScenarioFactory.create(environment__user=self.user)
+
+    def test_email_no_results(self):
+        server_run = ServerRunFactory.create(
+            environment=self.scheduled.environment,
+            test_scenario=self.scheduled.environment.test_scenario,
+            user=self.user
+        )
+        send_email_failure({self.user.id: [(server_run, None)]})
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+
+        self.assertIn(self.user.email, email.to)
+
+        self.assertIn('errors', email.body)
+        self.assertNotIn('Failed', email.body)
+        self.assertNotIn('Successful', email.body)
+
+    def test_email_successful(self):
+        server_run = ServerRunFactory.create(
+            environment=self.scheduled.environment,
+            test_scenario=self.scheduled.environment.test_scenario,
+            user=self.user
+        )
+        send_email_failure({self.user.id: [(server_run, False)]})
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+
+        self.assertIn(self.user.email, email.to)
+
+        self.assertIn('Successful', email.body)
+        self.assertNotIn('Failed', email.body)
+        self.assertNotIn('errors', email.body)
+
+    def test_email_failed(self):
+        server_run = ServerRunFactory.create(
+            environment=self.scheduled.environment,
+            test_scenario=self.scheduled.environment.test_scenario,
+            user=self.user
+        )
+        send_email_failure({self.user.id: [(server_run, True)]})
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+
+        self.assertIn(self.user.email, email.to)
+
+        self.assertIn('Failed', email.body)
+        self.assertNotIn('Successful', email.body)
+        self.assertNotIn('errors', email.body)
