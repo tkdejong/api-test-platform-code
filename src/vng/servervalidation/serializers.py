@@ -72,6 +72,7 @@ class ServerRunSerializer(serializers.ModelSerializer):
             'started',
             'stopped',
             'environment',
+            'software_version',
             'client_id',
             'secret',
             'status',

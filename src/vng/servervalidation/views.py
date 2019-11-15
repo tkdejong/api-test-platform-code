@@ -125,6 +125,7 @@ class ServerRunForm(CreateView):
         self.request.session['supplier_name'] = form.instance.supplier_name
         self.request.session['software_product'] = form.instance.software_product
         self.request.session['product_role'] = form.instance.product_role
+        self.request.session['software_version'] = form.instance.software_version
         return redirect(reverse('server_run:server-run_select_environment', kwargs={
             "api_id": self.kwargs['api_id'],
             "test_id": ts_id
@@ -188,6 +189,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
             scheduled_scenario=scheduled,
             supplier_name=self.request.session.get('supplier_name', ''),
             software_product=self.request.session.get('software_product', ''),
+            software_version=self.request.session.get('software_version', ''),
             product_role=self.request.session.get('product_role', '')
         )
 
@@ -223,6 +225,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             test_scenario=self.ts,
             supplier_name=self.request.session.get('supplier_name', ''),
             software_product=self.request.session.get('software_product', ''),
+            software_version=self.request.session.get('software_version', ''),
             product_role=self.request.session.get('product_role', '')
         )
 
@@ -311,6 +314,7 @@ class ServerRunOutputUpdate(UpdateView):
     fields = [
         'supplier_name',
         'software_product',
+        'software_version',
         'product_role',
     ]
     template_name = 'servervalidation/server-run_update.html'
