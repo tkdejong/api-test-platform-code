@@ -183,6 +183,10 @@
                                 <td>{{ object.software_product|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
+                                <td scope="row"><strong>{% trans "Software version" %}</td>
+                                <td>{{ object.software_version|default_if_none:'' }}</td>
+                            </tr>
+                            <tr>
                                 <td scope="row"><strong>{% trans "Product role" %}</td>
                                 <td>{{ object.product_role|default_if_none:''|urlize }}</td>
                             </tr>
