@@ -803,10 +803,20 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
         env = self.get_object()
         endpoints = env.endpoint_set.all()
         tsu_names = endpoints.values_list('test_scenario_url__name', flat=True)
+
+        modified = False
         for key, value in data.items():
             if key in tsu_names:
                 endpoint = endpoints.get(test_scenario_url__name=key)
-                endpoint.url = value.strip()
-                endpoint.save()
+
+                if value.strip() != endpoint.url:
+                    endpoint.url = value.strip()
+                    endpoint.save()
+                    modified = True
+
+        # Delete all historic server runs for this environment
+        # if changes were made
+        if modified:
+            env.serverrun_set.all().delete()
 
         return HttpResponseRedirect(self.get_success_url())
