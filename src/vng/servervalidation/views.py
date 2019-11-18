@@ -722,6 +722,7 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
 
         context = {}
         context['api'] = API.objects.get(id=self.kwargs['api_id'])
+        context['object'] = self.get_object()
         context['form'] = form
         context['variables'] = variable_form
         context['postman_tests'] = postman_form

@@ -266,6 +266,26 @@ class TestScenarioCreateTests(WebTest):
 
         self.assertNotIn('Configure test scenarios', response.text)
 
+    def test_create_postman_test_file_validation(self):
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), {"extra": 1}, user=self.user)
+
+        form = response.forms[1]
+        form['name'] = 'some scenario name'
+        form['description'] = 'test description'
+        form['public_logs'] = False
+
+        form['postmantest_set-0-name'] = 'sometestscript'
+        form['postmantest_set-0-version'] = '1.0.2'
+
+        form['postmantest_set-0-published_url'] = 'https://example.com'
+
+        response = form.submit()
+
+        error_div = response.html.find('p', {'id': 'error_1_id_postmantest_set-0-validation_file'})
+        self.assertIn('required', error_div.text)
+
 
 class TestScenarioUpdateTests(WebTest):
 
