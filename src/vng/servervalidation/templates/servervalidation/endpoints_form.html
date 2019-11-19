@@ -42,8 +42,13 @@
                     <div class="card-footer">
                         <div class="row">
                             <div class="col-auto mr-auto">
-                                <button class="btn btn-sm btn-primary" type="submit">
-                                    <i class="fa fa-dot-circle-o"></i>{% if object %} {% trans "Update" %} {% else %} {% trans "Start" %} {% endif %}</button>
+                                {% if object %}
+                                    <button class="btn btn-sm btn-primary" id="submit" type="submit">
+                                        <i class="fa fa-dot-circle-o"></i>{% trans "Update" %}</button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-primary" id="submit" type="submit">
+                                        <i class="fa fa-dot-circle-o"></i>{% trans "Start" %}</button>
+                                {% endif %}
                             </div>
                             <div class="col-auto">
                                 {% if object %}
@@ -61,4 +66,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    var form = document.getElementsByTagName("form")[1];
+
+    form.addEventListener("input", function () {
+        var submit = document.getElementById("submit");
+        submit.onclick = function() { return confirm('Modifying an environment will remove all of the previous provider runs for this environment.'); };
+    });
+</script>
 {% endblock %}
