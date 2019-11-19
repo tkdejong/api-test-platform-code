@@ -1107,6 +1107,7 @@ class UpdateEnvironmentTests(WebTest):
         self.assertNotIn('Modify environment', response.text)
 
     def test_update_environment_deletes_previous_provider_runs_if_modified(self):
+        scheduled = ScheduledTestScenarioFactory.create(environment=self.environment)
         ServerRunFactory.create_batch(3, environment=self.environment)
 
         self.assertEqual(self.environment.serverrun_set.count(), 3)
@@ -1123,6 +1124,13 @@ class UpdateEnvironmentTests(WebTest):
         form.submit().follow()
 
         self.assertEqual(self.environment.serverrun_set.count(), 0)
+
+        self.environment.refresh_from_db()
+        self.environment.user.refresh_from_db()
+        self.test_scenario.refresh_from_db()
+        scheduled.refresh_from_db()
+        self.tsu1.refresh_from_db()
+        self.tsu2.refresh_from_db()
 
     def test_update_environment_keeps_previous_provider_runs_if_not_modified(self):
         ServerRunFactory.create_batch(3, environment=self.environment)
