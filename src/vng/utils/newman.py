@@ -20,6 +20,7 @@ class NewmanManager:
     RUN_REPORT = ('NODE_OPTIONS="--max-old-space-size=2048" '
                        '{} run --reporters "htmlextra,json" {} '
                        '--timeout-request 5000 '
+                       '--delay-request 50 '
                        '--reporter-htmlextra-darkTheme '
                        '--reporter-htmlextra-testPaging '
                        '--reporter-htmlextra-title '
