@@ -207,7 +207,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
 
 class CreateEndpoint(LoginRequiredMixin, CreateView):
 
-    template_name = 'servervalidation/endpoints_form.html'
+    template_name = 'servervalidation/endpoints_create.html'
     form_class = CreateEndpointForm
 
     def get_success_url(self):
@@ -746,7 +746,7 @@ class TestScenarioDeleteView(ObjectPermissionMixin, PermissionRequiredMixin, Log
 
 
 class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
-    template_name = 'servervalidation/endpoints_form.html'
+    template_name = 'servervalidation/endpoints_update.html'
     form_class = CreateEndpointForm
     permission_required = 'servervalidation.update_environment_for_api'
 
