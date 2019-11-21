@@ -1106,6 +1106,48 @@ class UpdateEnvironmentTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn('Modify environment', response.text)
 
+    def test_update_environment_deletes_previous_provider_runs_if_modified(self):
+        scheduled = ScheduledTestScenarioFactory.create(environment=self.environment)
+        ServerRunFactory.create_batch(3, environment=self.environment)
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['url'] = 'https://www.google.com/'
+        form['var'] = 'Bearer token aaaaaaaaaaaaa'
+        form.submit().follow()
+
+        self.assertEqual(self.environment.serverrun_set.count(), 0)
+
+        self.environment.refresh_from_db()
+        self.environment.user.refresh_from_db()
+        self.test_scenario.refresh_from_db()
+        scheduled.refresh_from_db()
+        self.tsu1.refresh_from_db()
+        self.tsu2.refresh_from_db()
+
+    def test_update_environment_keeps_previous_provider_runs_if_not_modified(self):
+        ServerRunFactory.create_batch(3, environment=self.environment)
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form.submit().follow()
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
 
 class ScheduledScenarioEmailTests(WebTest):
 

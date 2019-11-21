@@ -207,7 +207,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
 
 class CreateEndpoint(LoginRequiredMixin, CreateView):
 
-    template_name = 'servervalidation/endpoints_form.html'
+    template_name = 'servervalidation/endpoints_create.html'
     form_class = CreateEndpointForm
 
     def get_success_url(self):
@@ -747,7 +747,7 @@ class TestScenarioDeleteView(ObjectPermissionMixin, PermissionRequiredMixin, Log
 
 
 class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
-    template_name = 'servervalidation/endpoints_form.html'
+    template_name = 'servervalidation/endpoints_update.html'
     form_class = CreateEndpointForm
     permission_required = 'servervalidation.update_environment_for_api'
 
@@ -804,10 +804,20 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
         env = self.get_object()
         endpoints = env.endpoint_set.all()
         tsu_names = endpoints.values_list('test_scenario_url__name', flat=True)
+
+        modified = False
         for key, value in data.items():
             if key in tsu_names:
                 endpoint = endpoints.get(test_scenario_url__name=key)
-                endpoint.url = value.strip()
-                endpoint.save()
+
+                if value.strip() != endpoint.url:
+                    endpoint.url = value.strip()
+                    endpoint.save()
+                    modified = True
+
+        # Delete all historic server runs for this environment
+        # if changes were made
+        if modified:
+            env.serverrun_set.all().delete()
 
         return HttpResponseRedirect(self.get_success_url())
