@@ -106,9 +106,11 @@ def execute_test(server_run_pk, scheduled=False, email=False):
 
             ptr.log.save(file_name, File(open(file_html.name)))
             ptr.save_json(file_name, File(open(file_json.name)))
-            ptr.status = ptr.get_outcome_json()
+
+            _, negative = ptr.get_call_results()
+            status = ResultChoices.success if not negative else ResultChoices.failed
             ptr.save()
-            failure = failure or (ptr.status == ResultChoices.failed)
+            failure = failure or (status == ResultChoices.failed)
 
         server_run.status_exec = 'Completed'
     except Exception as e:

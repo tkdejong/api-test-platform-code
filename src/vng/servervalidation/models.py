@@ -305,9 +305,11 @@ class PostmanTestResult(models.Model):
             return '{} - {}'.format(self.pk, self.status)
 
     def is_success(self):
-        if self.status == ResultChoices.success:
+        _, negative = self.get_call_results()
+        status = ResultChoices.success if not negative else ResultChoices.failed
+        if status == ResultChoices.success:
             return 1
-        if self.status == ResultChoices.failed:
+        if status == ResultChoices.failed:
             return -1
         else:
             return 0
