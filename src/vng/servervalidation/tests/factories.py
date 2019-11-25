@@ -131,6 +131,21 @@ class PostmanTestResultFailureFactory(PostmanTestResultFactory):
     ''')
 
 
+class PostmanTestResultFailedCallFactory(PostmanTestResultFactory):
+
+    class Meta:
+        model = PostmanTestResult
+
+    log_json = factory.django.FileField(data=b'''
+        {
+            "run": {
+                "executions": [{"request": {"url": "test"}, "response": {"code": 400}}],
+                "timings": {"started": "100", "stopped": "200"}
+            }
+        }
+    ''')
+
+
 class ScheduledTestScenarioFactory(Dmf):
 
     class Meta:

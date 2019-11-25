@@ -335,6 +335,33 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_badge_success_with_failing_request(self):
+        server_run = ServerRunFactory.create(
+            test_scenario=self.test_scenario1, stopped='2019-01-01T12:00:00Z',
+            user=self.user1, environment=self.environment4
+        )
+        ptr = PostmanTestResultFailedCallFactory.create(server_run=server_run, status=ResultChoices.success)
+
+        call_results = ptr.get_aggregate_results()
+        self.assertEqual(call_results["calls"]["failed"], 1)
+
+        get_badge_url = reverse('apiv1server:latest-badge', kwargs={
+            'uuid': self.environment4.uuid
+        })
+        response = self.app.get(get_badge_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json
+        expected_response = {
+            'schemaVersion': 1,
+            'label': 'API Test Platform',
+            'message': 'Success',
+            'color': 'green',
+            'isError': False
+        }
+        self.assertDictEqual(data, expected_response)
+
 
 class EnvironmentAPITests(TransactionWebTest):
 
