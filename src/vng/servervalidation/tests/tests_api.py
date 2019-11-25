@@ -15,7 +15,8 @@ from vng.utils.choices import StatusChoices
 from ..models import PostmanTestResult
 from .factories import (
     ServerRunFactory, TestScenarioFactory, TestScenarioUrlFactory, PostmanTestFactory,
-    PostmanTestNoAssertionFactory, EndpointFactory, PostmanTestResultFactory, EnvironmentFactory
+    PostmanTestNoAssertionFactory, EndpointFactory, PostmanTestResultFactory, EnvironmentFactory,
+    PostmanTestResultFailureFactory, PostmanTestResultFailedCallFactory
 )
 from ...utils.factories import UserFactory
 
@@ -286,7 +287,7 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
         PostmanTestResultFactory.create(server_run=self.server_run1, status=ResultChoices.failed)
         PostmanTestResultFactory.create(server_run=self.server_run2, status=ResultChoices.success)
         PostmanTestResultFactory.create(server_run=self.server_run3, status=ResultChoices.failed)
-        PostmanTestResultFactory.create(server_run=self.server_run4, status=ResultChoices.failed)
+        PostmanTestResultFailureFactory.create(server_run=self.server_run4, status=ResultChoices.failed)
         PostmanTestResultFactory.create(server_run=self.server_run5, status=ResultChoices.failed)
 
     def test_get_latest_success(self):
