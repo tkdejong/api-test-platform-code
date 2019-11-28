@@ -233,13 +233,14 @@ class ServerRun(models.Model):
     scheduled = models.BooleanField(default=False, help_text=_(
         "If enabled, this provider run will be executed every day at midnight"
     ))
-    supplier_name = models.CharField(max_length=100, blank=True, null=True, help_text=_(
+    supplier_name = models.CharField(max_length=100, blank=True, default="", help_text=_(
         "Name of the supplier of the software product"
     ))
-    software_product = models.CharField(max_length=100, blank=True, null=True, help_text=_(
+    software_product = models.CharField(max_length=100, blank=True, default="", help_text=_(
         "Name of the software tested by this provider test"
     ))
-    product_role = models.CharField(max_length=100, blank=True, null=True)
+    product_role = models.CharField(max_length=100, blank=True, default="")
+    software_version = models.CharField(max_length=100, blank=True, default="")
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, help_text=_(
         "The universally unique identifier of this provider run, needed to retrieve the badge"
     ))
@@ -304,9 +305,11 @@ class PostmanTestResult(models.Model):
             return '{} - {}'.format(self.pk, self.status)
 
     def is_success(self):
-        if self.status == ResultChoices.success:
+        _, negative = self.get_call_results()
+        status = ResultChoices.success if not negative else ResultChoices.failed
+        if status == ResultChoices.success:
             return 1
-        if self.status == ResultChoices.failed:
+        if status == ResultChoices.failed:
             return -1
         else:
             return 0

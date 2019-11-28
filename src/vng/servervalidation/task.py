@@ -39,8 +39,9 @@ def execute_test_scheduled():
             user=environment.user,
             status=choices.StatusWithScheduledChoices.running
         )
-        result = execute_test(server_run.pk, scheduled=True)
-        test_results[environment.user.id].append((server_run, result))
+        execute_test(server_run.pk, scheduled=True)
+        failed = server_run.get_execution_result()
+        test_results[environment.user.id].append((server_run, failed))
 
     if test_results:
         send_email_failure(test_results)
@@ -105,9 +106,11 @@ def execute_test(server_run_pk, scheduled=False, email=False):
 
             ptr.log.save(file_name, File(open(file_html.name)))
             ptr.save_json(file_name, File(open(file_json.name)))
-            ptr.status = ptr.get_outcome_json()
+
+            _, negative = ptr.get_call_results()
+            status = ResultChoices.success if not negative else ResultChoices.failed
             ptr.save()
-            failure = failure or (ptr.status == ResultChoices.failed)
+            failure = failure or (status == ResultChoices.failed)
 
         server_run.status_exec = 'Completed'
     except Exception as e:
@@ -131,9 +134,10 @@ def send_email_failure(test_results):
     domain = Site.objects.get_current().domain
 
     for user_id, result_list in test_results.items():
-        msg_html = render_to_string('servervalidation/failed_test_email.html', {
-            'successful': [(run, failed) for run, failed in result_list if not failed],
-            'failure': [(run, failed) for run, failed in result_list if failed],
+        msg_html = render_to_string('servervalidation/scheduled_test_email.html', {
+            'successful': [(run, failed) for run, failed in result_list if failed is False],
+            'failure': [(run, failed) for run, failed in result_list if failed is True],
+            'error': [(run, failed) for run, failed in result_list if failed is None],
             'domain': domain
         })
 

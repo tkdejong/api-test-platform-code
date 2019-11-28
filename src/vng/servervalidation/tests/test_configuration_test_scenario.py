@@ -145,7 +145,7 @@ class TestScenarioCreateTests(WebTest):
     def test_create_with_variable(self):
         response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
             'api_id': self.api.id
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         form = response.forms[1]
         form['name'] = 'some scenario name'
@@ -180,7 +180,7 @@ class TestScenarioCreateTests(WebTest):
     def test_create_with_postman_test(self):
         response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
             'api_id': self.api.id
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         form = response.forms[1]
         form['name'] = 'some scenario name'
@@ -266,6 +266,26 @@ class TestScenarioCreateTests(WebTest):
 
         self.assertNotIn('Configure test scenarios', response.text)
 
+    def test_create_postman_test_file_validation(self):
+        response = self.app.get(reverse('server_run:test-scenario_create_item', kwargs={
+            'api_id': self.api.id
+        }), {"extra": 1}, user=self.user)
+
+        form = response.forms[1]
+        form['name'] = 'some scenario name'
+        form['description'] = 'test description'
+        form['public_logs'] = False
+
+        form['postmantest_set-0-name'] = 'sometestscript'
+        form['postmantest_set-0-version'] = '1.0.2'
+
+        form['postmantest_set-0-published_url'] = 'https://example.com'
+
+        response = form.submit()
+
+        error_div = response.html.find('p', {'id': 'error_1_id_postmantest_set-0-validation_file'})
+        self.assertIn('required', error_div.text)
+
 
 class TestScenarioUpdateTests(WebTest):
 
@@ -336,7 +356,7 @@ class TestScenarioUpdateTests(WebTest):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
             'api_id': self.api.id,
             'scenario_uuid': self.test_scenario.uuid
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         number_of_vars = self.test_scenario.testscenariourl_set.count()
 
@@ -385,7 +405,7 @@ class TestScenarioUpdateTests(WebTest):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
             'api_id': self.api.id,
             'scenario_uuid': self.test_scenario.uuid
-        }), user=self.user)
+        }), {"extra": 1}, user=self.user)
 
         number_of_tests = self.test_scenario.postmantest_set.count()
 
@@ -408,6 +428,34 @@ class TestScenarioUpdateTests(WebTest):
         self.assertEqual(postman_test.version, '2.0.0')
         self.assertTrue(postman_test.validation_file)
         self.assertEqual(postman_test.published_url, 'https://google.com')
+
+    def test_update_scenario_delete_existing_variable(self):
+        response = self.app.get(reverse('server_run:testscenario-update', kwargs={
+            'api_id': self.api.id,
+            'scenario_uuid': self.test_scenario.uuid
+        }), {"extra": 1}, user=self.user)
+
+        form = response.forms[1]
+
+        form['testscenariourl_set-0-DELETE'] = True
+
+        response = form.submit()
+
+        self.assertEqual(self.test_scenario.testscenariourl_set.count(), 0)
+
+    def test_update_scenario_delete_existing_postmantest(self):
+        response = self.app.get(reverse('server_run:testscenario-update', kwargs={
+            'api_id': self.api.id,
+            'scenario_uuid': self.test_scenario.uuid
+        }), {"extra": 1}, user=self.user)
+
+        form = response.forms[1]
+
+        form['postmantest_set-0-DELETE'] = True
+
+        response = form.submit().follow()
+
+        self.assertEqual(self.test_scenario.postmantest_set.count(), 0)
 
     def test_view_update_page_with_permission(self):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
@@ -478,3 +526,99 @@ class TestScenarioDeleteTests(WebTest):
         }), user=user, status=[403])
 
         self.assertEqual(response.status_code, 403)
+
+
+class TestScenarioConfigIntegrationTests(WebTest):
+
+    def setUp(self):
+        self.api = APIFactory.create(name="ZGW")
+        self.test_scenario = TestScenarioFactory.create(name="API tests", description="bla")
+        self.test_scenario_url1 = TestScenarioUrlFactory.create(name="token", test_scenario=self.test_scenario)
+        self.test_scenario_url2 = TestScenarioUrlFactory.create(name="url", test_scenario=self.test_scenario)
+        self.postman_test1 = PostmanTestFactory.create(name="test1", test_scenario=self.test_scenario)
+        self.postman_test2 = PostmanTestFactory.create(name="test2", test_scenario=self.test_scenario)
+        self.user = UserFactory.create()
+        assign_perm("update_scenario_for_api", self.user, self.api)
+        assign_perm("list_scenario_for_api", self.user, self.api)
+
+    def test_update_scenario_delete_update_create_variables(self):
+        response = self.app.get(reverse('server_run:testscenario-update', kwargs={
+            'api_id': self.api.id,
+            'scenario_uuid': self.test_scenario.uuid
+        }), {'extra': 1}, user=self.user)
+
+        form = response.forms[1]
+
+        # Delete an existing variable
+        form['testscenariourl_set-0-DELETE'] = True
+
+        # Update an existing variable
+        form['testscenariourl_set-1-name'] = 'updatedvar'
+        form['testscenariourl_set-1-url'] = False
+        form['testscenariourl_set-1-hidden'] = True
+        form['testscenariourl_set-1-placeholder'] = 'token'
+
+        # Add a new variable
+        form['testscenariourl_set-2-name'] = 'newvar'
+        form['testscenariourl_set-2-url'] = True
+        form['testscenariourl_set-2-hidden'] = False
+        form['testscenariourl_set-2-placeholder'] = 'https://example.com'
+
+        response = form.submit()
+
+        variables = self.test_scenario.testscenariourl_set.all().order_by('pk')
+        self.assertEqual(variables.count(), 2)
+
+        self.test_scenario_url2.refresh_from_db()
+        self.assertEqual(self.test_scenario_url2.name, 'updatedvar')
+        self.assertEqual(self.test_scenario_url2.url, False)
+        self.assertEqual(self.test_scenario_url2.hidden, True)
+        self.assertEqual(self.test_scenario_url2.placeholder, 'token')
+
+        new_variable = variables.last()
+        self.assertEqual(new_variable.name, 'newvar')
+        self.assertEqual(new_variable.url, True)
+        self.assertEqual(new_variable.hidden, False)
+        self.assertEqual(new_variable.placeholder, 'https://example.com')
+
+    def test_update_scenario_delete_update_create_postman_tests(self):
+        response = self.app.get(reverse('server_run:testscenario-update', kwargs={
+            'api_id': self.api.id,
+            'scenario_uuid': self.test_scenario.uuid
+        }), {'extra': 1}, user=self.user)
+
+        form = response.forms[1]
+
+        # Delete an existing Postman test
+        form['postmantest_set-0-DELETE'] = True
+
+        # Update an existing Postman test
+        form['postmantest_set-1-name'] = 'updatedtest'
+        form['postmantest_set-1-version'] = '2.0.0'
+        upload_file = open('README.md', 'rb')
+        form['postmantest_set-1-validation_file'] = [upload_file.name, b'{}']
+        form['postmantest_set-1-published_url'] = 'https://example.com'
+
+        # Add a new Postman test
+        form['postmantest_set-2-name'] = 'newtest'
+        form['postmantest_set-2-version'] = '1.0.2'
+        upload_file = open('README.rst', 'rb')
+        form['postmantest_set-2-validation_file'] = [upload_file.name, b'{}']
+        form['postmantest_set-2-published_url'] = 'https://google.com'
+
+        response = form.submit().follow()
+
+        postman_tests = self.test_scenario.postmantest_set.all().order_by('pk')
+        self.assertEqual(postman_tests.count(), 2)
+
+        self.postman_test2.refresh_from_db()
+        self.assertEqual(self.postman_test2.name, 'updatedtest')
+        self.assertEqual(self.postman_test2.version, '2.0.0')
+        self.assertTrue(self.postman_test2.validation_file)
+        self.assertEqual(self.postman_test2.published_url, 'https://example.com')
+
+        new_test = postman_tests.last()
+        self.assertEqual(new_test.name, 'newtest')
+        self.assertEqual(new_test.version, '1.0.2')
+        self.assertTrue(new_test.validation_file)
+        self.assertEqual(new_test.published_url, 'https://google.com')

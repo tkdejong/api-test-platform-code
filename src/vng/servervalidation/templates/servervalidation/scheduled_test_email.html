@@ -1,14 +1,13 @@
 <p>
     Dear Sir/Mrs,
     <br>
-    One or more scheduled tests have failed, you can find all the details below.
-    Below are the results of the scheduled tests that have been run by the API Test Platform
+    One or more scheduled tests have been carried out, below are the results of the scheduled tests that have been run by the API Test Platform
     <br>
     You are receiving this e-mail because you configured one or more scheduled provider tests in the VNG API Test Platform.
 </p>
 <p>
 {% if failure %}
-Failed
+Failed:
 <ul>
     {% for s in failure %}
         <li>
@@ -33,6 +32,21 @@ Failed
 Successful:
     <ul>
         {% for s in successful %}
+            <li>
+                <a href="https://{{domain}}{% url 'server_run:server-run_detail' s.0.test_scenario.api.id s.0.uuid %}">
+                    {{s.0.test_scenario.name}}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</p>
+{% endif %}
+
+{% if error %}
+<p>
+Provider tests where errors occurred:
+    <ul>
+        {% for s in error %}
             <li>
                 <a href="https://{{domain}}{% url 'server_run:server-run_detail' s.0.test_scenario.api.id s.0.uuid %}">
                     {{s.0.test_scenario.name}}

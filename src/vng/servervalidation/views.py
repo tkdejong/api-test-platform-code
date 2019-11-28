@@ -24,7 +24,8 @@ from ..utils.views import OwnerSingleObject, PDFGenerator
 from .forms import (
     CreateServerRunForm, CreateEndpointForm,
     SelectEnvironmentForm, CreateTestScenarioForm,
-    TestScenarioUrlFormSet, PostmanTestFormSet
+    TestScenarioUrlFormSet, PostmanTestFormSet,
+    TestScenarioUrlUpdateFormSet, PostmanTestUpdateFormSet
 )
 from .models import (
     API, ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest,
@@ -125,6 +126,7 @@ class ServerRunForm(CreateView):
         self.request.session['supplier_name'] = form.instance.supplier_name
         self.request.session['software_product'] = form.instance.software_product
         self.request.session['product_role'] = form.instance.product_role
+        self.request.session['software_version'] = form.instance.software_version
         return redirect(reverse('server_run:server-run_select_environment', kwargs={
             "api_id": self.kwargs['api_id'],
             "test_id": ts_id
@@ -188,6 +190,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
             scheduled_scenario=scheduled,
             supplier_name=self.request.session.get('supplier_name', ''),
             software_product=self.request.session.get('software_product', ''),
+            software_version=self.request.session.get('software_version', ''),
             product_role=self.request.session.get('product_role', '')
         )
 
@@ -204,7 +207,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
 
 class CreateEndpoint(LoginRequiredMixin, CreateView):
 
-    template_name = 'servervalidation/endpoints_form.html'
+    template_name = 'servervalidation/endpoints_create.html'
     form_class = CreateEndpointForm
 
     def get_success_url(self):
@@ -223,6 +226,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             test_scenario=self.ts,
             supplier_name=self.request.session.get('supplier_name', ''),
             software_product=self.request.session.get('software_product', ''),
+            software_version=self.request.session.get('software_version', ''),
             product_role=self.request.session.get('product_role', '')
         )
 
@@ -311,6 +315,7 @@ class ServerRunOutputUpdate(UpdateView):
     fields = [
         'supplier_name',
         'software_product',
+        'software_version',
         'product_role',
     ]
     template_name = 'servervalidation/server-run_update.html'
@@ -556,6 +561,12 @@ class CreateTestScenarioView(ObjectPermissionMixin, PermissionRequiredMixin, Log
         data['form'] = self.form_class(self.request.POST or None)
         data['variables'] = TestScenarioUrlFormSet(self.request.POST or None)
         data['postman_tests'] = PostmanTestFormSet(self.request.POST or None, self.request.FILES or None)
+
+        # Number of forms to be shown in formset
+        extra = self.request.GET.get("extra")
+        if extra:
+            data['variables'].extra = int(extra)
+            data['postman_tests'].extra = int(extra)
         return data
 
     @transaction.atomic
@@ -637,15 +648,21 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
         test_scenario = self.get_object()
 
         data['form'] = self.form_class(self.request.POST or None, instance=test_scenario)
-        data['variables'] = TestScenarioUrlFormSet(
+        data['variables'] = TestScenarioUrlUpdateFormSet(
             self.request.POST or None,
             instance=test_scenario
         )
-        data['postman_tests'] = PostmanTestFormSet(
+        data['postman_tests'] = PostmanTestUpdateFormSet(
             self.request.POST or None,
             self.request.FILES or None,
             instance=test_scenario
         )
+
+        # Number of forms to be shown in formset
+        extra = self.request.GET.get("extra")
+        if extra:
+            data['variables'].extra = int(extra)
+            data['postman_tests'].extra = int(extra)
         return data
 
     @transaction.atomic
@@ -655,8 +672,8 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
         test_scenario = self.get_object()
 
         form = self.form_class(request.POST, instance=test_scenario)
-        variable_form = TestScenarioUrlFormSet(request.POST, instance=test_scenario)
-        postman_form = PostmanTestFormSet(request.POST, request.FILES, instance=test_scenario)
+        variable_form = TestScenarioUrlUpdateFormSet(request.POST, instance=test_scenario)
+        postman_form = PostmanTestUpdateFormSet(request.POST, request.FILES, instance=test_scenario)
 
         if form.is_valid() and variable_form.is_valid() and postman_form.is_valid():
             api = API.objects.get(id=kwargs['api_id'])
@@ -670,26 +687,34 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
             variables = []
             for data in variable_form.cleaned_data:
                 if data:
-                    if data["id"] is not None:
+                    if data["DELETE"]:
+                        data["id"].delete()
+                    elif data["id"] is not None:
                         instance = data.pop("id")
+                        data.pop("DELETE")
                         for attr, value in data.items():
                             setattr(instance, attr, value)
                         instance.save()
                     else:
                         data["test_scenario"] = test_scenario
+                        data.pop("DELETE")
                         variables.append(TestScenarioUrl(**data))
-
             TestScenarioUrl.objects.bulk_create(variables)
+
             postman_tests = []
             for data in postman_form.cleaned_data:
                 if data:
-                    if data["id"] is not None:
+                    if data["DELETE"]:
+                        data["id"].delete()
+                    elif data["id"] is not None:
                         instance = data.pop("id")
+                        data.pop("DELETE")
                         for attr, value in data.items():
                             setattr(instance, attr, value)
                         instance.save()
                     else:
                         data["test_scenario"] = test_scenario
+                        data.pop("DELETE")
                         postman_tests.append(PostmanTest(**data))
             PostmanTest.objects.bulk_create(postman_tests)
 
@@ -697,6 +722,7 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
 
         context = {}
         context['api'] = API.objects.get(id=self.kwargs['api_id'])
+        context['object'] = self.get_object()
         context['form'] = form
         context['variables'] = variable_form
         context['postman_tests'] = postman_form
@@ -721,7 +747,7 @@ class TestScenarioDeleteView(ObjectPermissionMixin, PermissionRequiredMixin, Log
 
 
 class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
-    template_name = 'servervalidation/endpoints_form.html'
+    template_name = 'servervalidation/endpoints_update.html'
     form_class = CreateEndpointForm
     permission_required = 'servervalidation.update_environment_for_api'
 
@@ -778,10 +804,20 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
         env = self.get_object()
         endpoints = env.endpoint_set.all()
         tsu_names = endpoints.values_list('test_scenario_url__name', flat=True)
+
+        modified = False
         for key, value in data.items():
             if key in tsu_names:
                 endpoint = endpoints.get(test_scenario_url__name=key)
-                endpoint.url = value.strip()
-                endpoint.save()
+
+                if value.strip() != endpoint.url:
+                    endpoint.url = value.strip()
+                    endpoint.save()
+                    modified = True
+
+        # Delete all historic server runs for this environment
+        # if changes were made
+        if modified:
+            env.serverrun_set.all().delete()
 
         return HttpResponseRedirect(self.get_success_url())

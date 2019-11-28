@@ -35,8 +35,8 @@
     <td>
         {% with server_run.get_all_call_results as results %}
             {% if server_run.success is not None %}
-                {{results.0}}<i class="cui-circle-check "></i>
-                {{results.1}}<i class="cui-circle-x "></i>
+                {{results.0}}<i class="cui-check "></i>
+                {{results.1}}<i class="cui-x-circle "></i>
             {% endif %}
         {% endwith %}
     </td>
