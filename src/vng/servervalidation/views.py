@@ -786,8 +786,12 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
         data['form'] = CreateEndpointForm(
             url_vars=url_vars,
             text_vars=text_vars,
-            url_placeholders=Endpoint.objects.filter(environment=self.env, test_scenario_url__in=url_vars).values_list('url', flat=True),
-            text_placeholders=Endpoint.objects.filter(environment=self.env, test_scenario_url__in=text_vars).values_list('url', flat=True)
+            url_placeholders=Endpoint.objects.filter(
+                environment=self.env, test_scenario_url__in=url_vars
+            ).order_by('test_scenario_url').values_list('url', flat=True),
+            text_placeholders=Endpoint.objects.filter(
+                environment=self.env, test_scenario_url__in=text_vars
+            ).order_by('test_scenario_url').values_list('url', flat=True)
         )
         if self.ts.jwt_enabled():
             data['form'].add_text_area(['Client ID', 'Secret'])
