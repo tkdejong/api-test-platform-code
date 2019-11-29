@@ -123,9 +123,6 @@ class ServerRunForm(CreateView):
 
     def form_valid(self, form):
         ts_id = form.instance.test_scenario.id
-        self.request.session['supplier_name'] = form.instance.supplier_name
-        self.request.session['software_product'] = form.instance.software_product
-        self.request.session['product_role'] = form.instance.product_role
         self.request.session['software_version'] = form.instance.software_version
         return redirect(reverse('server_run:server-run_select_environment', kwargs={
             "api_id": self.kwargs['api_id'],
@@ -186,12 +183,8 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
         self.server = ServerRun(
             user=self.request.user,
             test_scenario=ts,
-            # scheduled=self.request.session.get('server_run_scheduled', False),
             scheduled_scenario=scheduled,
-            supplier_name=self.request.session.get('supplier_name', ''),
-            software_product=self.request.session.get('software_product', ''),
             software_version=self.request.session.get('software_version', ''),
-            product_role=self.request.session.get('product_role', '')
         )
 
     def create_server_run(self, env):
@@ -224,10 +217,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             user=self.request.user,
             environment=self.env,
             test_scenario=self.ts,
-            supplier_name=self.request.session.get('supplier_name', ''),
-            software_product=self.request.session.get('software_product', ''),
             software_version=self.request.session.get('software_version', ''),
-            product_role=self.request.session.get('product_role', '')
         )
 
     def get_context_data(self, **kwargs):
@@ -307,16 +297,42 @@ class ServerRunOutput(OwnerSingleObject, DetailView):
         return context
 
 
+class EnvironmentInfoUpdate(UpdateView):
+
+    model = Environment
+    slug_field = 'uuid'
+    slug_url_kwarg = 'env_uuid'
+    fields = [
+        'supplier_name',
+        'software_product',
+        'product_role',
+    ]
+    template_name = 'servervalidation/environment-info_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'server_run:server-run_list',
+            kwargs={
+                'api_id': self.kwargs['api_id'],
+                'scenario_uuid': self.object.test_scenario.uuid,
+                'env_uuid': self.object.uuid
+            }
+        )
+
+    def get_object(self, queryset=None):
+        res = super().get_object(queryset=queryset)
+        if res.user != self.request.user:
+            raise PermissionDenied()
+        return res
+
+
 class ServerRunOutputUpdate(UpdateView):
 
     model = ServerRun
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
     fields = [
-        'supplier_name',
-        'software_product',
         'software_version',
-        'product_role',
     ]
     template_name = 'servervalidation/server-run_update.html'
 

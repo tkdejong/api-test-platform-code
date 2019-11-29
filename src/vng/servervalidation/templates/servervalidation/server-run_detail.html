@@ -176,11 +176,11 @@
                         <tbody>
                             <tr>
                                 <td scope="row"><strong>{% trans "Supplier name" %}</td>
-                                <td>{{ object.supplier_name|default_if_none:''|urlize }}</td>
+                                <td>{{ object.environment.supplier_name|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
                                 <td scope="row"><strong>{% trans "Software product" %}</td>
-                                <td>{{ object.software_product|default_if_none:''|urlize }}</td>
+                                <td>{{ object.environment.software_product|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
                                 <td scope="row"><strong>{% trans "Software version" %}</td>
@@ -188,7 +188,7 @@
                             </tr>
                             <tr>
                                 <td scope="row"><strong>{% trans "Product role" %}</td>
-                                <td>{{ object.product_role|default_if_none:''|urlize }}</td>
+                                <td>{{ object.environment.product_role|default_if_none:''|urlize }}</td>
                             </tr>
                         </tbody>
                     </table>
