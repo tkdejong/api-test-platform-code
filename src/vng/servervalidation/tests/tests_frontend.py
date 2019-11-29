@@ -1148,6 +1148,27 @@ class UpdateEnvironmentTests(WebTest):
 
         self.assertEqual(self.environment.serverrun_set.count(), 3)
 
+    def test_placeholders_correct_order_after_update(self):
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+
+        form['url'] = 'https://www.bla.com/'
+        form.submit().follow()
+
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        self.assertEqual(form['url'].value, 'https://www.bla.com/')
+        self.assertEqual(form['var'].value, self.var2.url)
+
 
 class ScheduledScenarioEmailTests(WebTest):
 
