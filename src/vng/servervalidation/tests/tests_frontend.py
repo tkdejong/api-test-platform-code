@@ -407,15 +407,9 @@ class IntegrationTest(WebTest):
             user=self.user
         )
         form = call.forms[1]
-        form['supplier_name'] = 'test_name'
-        form['software_product'] = 'test_software'
-        form['product_role'] = 'test_product'
         form['software_version'] = '1.0.0'
         res = form.submit().follow()
         new_server = ServerRun.objects.latest('id')
-        self.assertEqual(new_server.supplier_name, 'test_name')
-        self.assertEqual(new_server.software_product, 'test_software')
-        self.assertEqual(new_server.product_role, 'test_product')
         self.assertEqual(new_server.software_version, '1.0.0')
 
         call = self.app.get(
