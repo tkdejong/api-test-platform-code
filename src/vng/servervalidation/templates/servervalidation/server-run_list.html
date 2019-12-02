@@ -53,6 +53,7 @@
                                 {% endif %}
                             {% endif %}
                         </table>
+
                         {% if environment.last_run %}
                             <table class="ml-auto mt-auto mr-auto mb-3">
                                 <tr>
@@ -65,6 +66,32 @@
                                     </td>
                                 </tr>
                             </table>
+                        {% endif %}
+
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <td scope="row"><strong>{% trans "Supplier name" %}</td>
+                                    <td>{{ environment.supplier_name|default_if_none:''|urlize }}</td>
+                                </tr>
+                                <tr>
+                                    <td scope="row"><strong>{% trans "Software product" %}</td>
+                                    <td>{{ environment.software_product|default_if_none:''|urlize }}</td>
+                                </tr>
+                                <tr>
+                                    <td scope="row"><strong>{% trans "Product role" %}</td>
+                                    <td>{{ environment.product_role|default_if_none:''|urlize }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        {% if request.user.is_authenticated %}
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-auto mr-auto">
+                                        <a class="btn btn-primary" href="{% url 'server_run:environment_info-update' environment.test_scenario.api.id environment.test_scenario.uuid environment.uuid %}">{% trans "Update" %}</a>
+                                    </div>
+                                </div>
+                            </div>
                         {% endif %}
                     </div>
                     <table class="table">

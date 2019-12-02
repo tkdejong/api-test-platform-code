@@ -397,7 +397,7 @@ class IntegrationTest(WebTest):
         }), user=self.user)
         self.assertIn(str(ServerRun.objects.filter(user=self.user).count()), call.text)
 
-    def test_information_form(self):
+    def test_serverrun_information_form(self):
         self.test_badge()
         new_server = ServerRun.objects.latest('id')
         call = self.app.get(
@@ -407,21 +407,50 @@ class IntegrationTest(WebTest):
             user=self.user
         )
         form = call.forms[1]
-        form['supplier_name'] = 'test_name'
-        form['software_product'] = 'test_software'
-        form['product_role'] = 'test_product'
         form['software_version'] = '1.0.0'
         res = form.submit().follow()
         new_server = ServerRun.objects.latest('id')
-        self.assertEqual(new_server.supplier_name, 'test_name')
-        self.assertEqual(new_server.software_product, 'test_software')
-        self.assertEqual(new_server.product_role, 'test_product')
         self.assertEqual(new_server.software_version, '1.0.0')
 
         call = self.app.get(
             reverse(
                 'server_run:server-run_info-update',
                 kwargs={'api_id': new_server.test_scenario.api.id, 'uuid': new_server.uuid}),
+            user='random',
+            status=[403]
+        )
+
+    def test_environment_information_form(self):
+        env = EnvironmentFactory.create(user=self.user)
+        call = self.app.get(
+            reverse(
+                'server_run:environment_info-update',
+                kwargs={
+                    'api_id': env.test_scenario.api.id,
+                    'scenario_uuid': env.test_scenario.uuid,
+                    'env_uuid': env.uuid
+                }),
+            user=self.user
+        )
+        form = call.forms[1]
+        form['supplier_name'] = 'test_name'
+        form['product_role'] = 'test_product'
+        form['software_product'] = 'test_software'
+        res = form.submit().follow()
+
+        env.refresh_from_db()
+        self.assertEqual(env.supplier_name, 'test_name')
+        self.assertEqual(env.software_product, 'test_software')
+        self.assertEqual(env.product_role, 'test_product')
+
+        call = self.app.get(
+            reverse(
+                'server_run:environment_info-update',
+                kwargs={
+                    'api_id': env.test_scenario.api.id,
+                    'scenario_uuid': env.test_scenario.uuid,
+                    'env_uuid': env.uuid
+                }),
             user='random',
             status=[403]
         )

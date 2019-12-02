@@ -13,7 +13,13 @@ Failed:
         <li>
             <a href="https://{{domain}}{% url 'server_run:server-run_detail' s.0.test_scenario.api.id s.0.uuid %}">
                 {{s.0.test_scenario.name}}
-            </a>, started at {{s.0.started}}.
+            </a>, started at {{s.0.started}}
+            {% if s.0.environment.software_product %}
+                for product <b>{{s.0.environment.software_product}}</b>
+                {% if s.0.environment.supplier_name %}
+                    of provider <b>{{s.0.environment.supplier_name}}</b>
+                {% endif %}
+            {% endif %}
             <ul>
                 {% for pr in s.0.postmantestresult_set.all %}
                     <li>
@@ -36,6 +42,12 @@ Successful:
                 <a href="https://{{domain}}{% url 'server_run:server-run_detail' s.0.test_scenario.api.id s.0.uuid %}">
                     {{s.0.test_scenario.name}}
                 </a>
+                {% if s.0.environment.software_product %}
+                    for product <b>{{s.0.environment.software_product}}</b>
+                    {% if s.0.environment.supplier_name %}
+                        of provider <b>{{s.0.environment.supplier_name}}</b>
+                    {% endif %}
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
@@ -51,6 +63,12 @@ Provider tests where errors occurred:
                 <a href="https://{{domain}}{% url 'server_run:server-run_detail' s.0.test_scenario.api.id s.0.uuid %}">
                     {{s.0.test_scenario.name}}
                 </a>
+                {% if s.0.environment.software_product %}
+                    for product <b>{{s.0.environment.software_product}}</b>
+                    {% if s.0.environment.supplier_name %}
+                        of provider <b>{{s.0.environment.supplier_name}}</b>
+                    {% endif %}
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
