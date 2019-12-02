@@ -343,7 +343,12 @@ class ServerRunLatestBadgeAPITests(TransactionWebTest):
         ptr = PostmanTestResultFailedCallFactory.create(server_run=server_run, status=ResultChoices.success)
 
         call_results = ptr.get_aggregate_results()
-        self.assertEqual(call_results["calls"]["failed"], 1)
+
+        self.assertEqual(call_results["assertions"]["passed"], 1)
+        self.assertEqual(call_results["assertions"]["failed"], 0)
+
+        # Call only fails if one or more assertions for that call fail
+        self.assertEqual(call_results["calls"]["failed"], 0)
 
         get_badge_url = reverse('apiv1server:latest-badge', kwargs={
             'uuid': self.environment4.uuid
