@@ -380,16 +380,20 @@ class PostmanTestResult(models.Model):
         passed, error = 0, 0
         positive, negative = 0, 0
         for call in self.get_json_obj():
-            if postman.get_call_result(call):
-                positive += 1
-            else:
-                negative += 1
+            success = True
+            if not postman.get_call_result(call):
+                success = False
             if 'assertions' in call:
                 for assertion in call['assertions']:
                     if 'error' in assertion:
                         error += 1
+                        success = False
                     else:
                         passed += 1
+            if success:
+                positive += 1
+            else:
+                negative += 1
         return {
             'assertions': {
                 'passed': passed,
