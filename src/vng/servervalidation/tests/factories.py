@@ -139,7 +139,7 @@ class PostmanTestResultFailedCallFactory(PostmanTestResultFactory):
     log_json = factory.django.FileField(data=b'''
         {
             "run": {
-                "executions": [{"request": {"url": "test"}, "response": {"code": 400}}],
+                "executions": [{"request": {"url": "test"}, "response": {"code": 400}, "item": {"error_test": false}, "assertions": [{}]}],
                 "timings": {"started": "100", "stopped": "200"}
             }
         }

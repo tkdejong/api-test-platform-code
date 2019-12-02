@@ -152,6 +152,13 @@ class Environment(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, help_text=_(
         "The universally unique identifier of this environment"
     ))
+    supplier_name = models.CharField(max_length=100, blank=True, default="", help_text=_(
+        "Name of the supplier of the software product"
+    ))
+    software_product = models.CharField(max_length=100, blank=True, default="", help_text=_(
+        "Name of the software tested by tests for this environment"
+    ))
+    product_role = models.CharField(max_length=100, blank=True, default="")
 
     class Meta:
         unique_together = ('name', 'test_scenario', 'user',)
@@ -233,13 +240,6 @@ class ServerRun(models.Model):
     scheduled = models.BooleanField(default=False, help_text=_(
         "If enabled, this provider run will be executed every day at midnight"
     ))
-    supplier_name = models.CharField(max_length=100, blank=True, default="", help_text=_(
-        "Name of the supplier of the software product"
-    ))
-    software_product = models.CharField(max_length=100, blank=True, default="", help_text=_(
-        "Name of the software tested by this provider test"
-    ))
-    product_role = models.CharField(max_length=100, blank=True, default="")
     software_version = models.CharField(max_length=100, blank=True, default="")
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, help_text=_(
         "The universally unique identifier of this provider run, needed to retrieve the badge"
@@ -380,16 +380,20 @@ class PostmanTestResult(models.Model):
         passed, error = 0, 0
         positive, negative = 0, 0
         for call in self.get_json_obj():
-            if postman.get_call_result(call):
-                positive += 1
-            else:
-                negative += 1
+            success = True
+            if not postman.get_call_result(call):
+                success = False
             if 'assertions' in call:
                 for assertion in call['assertions']:
                     if 'error' in assertion:
                         error += 1
+                        success = False
                     else:
                         passed += 1
+            if success:
+                positive += 1
+            else:
+                negative += 1
         return {
             'assertions': {
                 'passed': passed,

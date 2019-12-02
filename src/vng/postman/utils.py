@@ -31,8 +31,7 @@ def get_call_result(call):
     # if the response is not present it means that it has not been performed
     if 'response' not in call or 'code' not in call['response']:
         return False
-    return call['response']['code'] not in error_codes \
-        and ('error_test' not in call['item'] or not call['item']['error_test'])
+    return ('error_test' not in call['item'] or not call['item']['error_test'])
 
 
 def get_json_obj(content, file=False):
