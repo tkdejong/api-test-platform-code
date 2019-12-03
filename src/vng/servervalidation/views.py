@@ -176,7 +176,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
                     'env_uuid': env.uuid
                 }))
         else:
-            return render(request, self.template_name, {'form': form})
+            return render(request, self.template_name, {'form': form, 'api': test_scenario.api})
 
     def fetch_server(self, scheduled=None):
         ts = get_object_or_404(TestScenario, pk=self.kwargs['test_id'])
