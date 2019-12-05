@@ -429,10 +429,10 @@ class IntegrationTest(WebTest):
             user=self.user
         )
         form = call.forms[1]
-        form['software_version'] = '1.0.0'
+        form['build_version'] = '1.0.0'
         res = form.submit().follow()
         new_server = ServerRun.objects.latest('id')
-        self.assertEqual(new_server.software_version, '1.0.0')
+        self.assertEqual(new_server.build_version, '1.0.0')
 
         call = self.app.get(
             reverse(

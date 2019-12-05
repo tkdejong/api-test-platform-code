@@ -240,7 +240,7 @@ class ServerRun(models.Model):
     scheduled = models.BooleanField(default=False, help_text=_(
         "If enabled, this provider run will be executed every day at midnight"
     ))
-    software_version = models.CharField(max_length=100, blank=True, default="")
+    build_version = models.CharField(max_length=100, blank=True, default="")
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, help_text=_(
         "The universally unique identifier of this provider run, needed to retrieve the badge"
     ))

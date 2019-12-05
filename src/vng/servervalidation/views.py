@@ -123,7 +123,7 @@ class ServerRunForm(CreateView):
 
     def form_valid(self, form):
         ts_id = form.instance.test_scenario.id
-        self.request.session['software_version'] = form.instance.software_version
+        self.request.session['build_version'] = form.instance.build_version
         return redirect(reverse('server_run:server-run_select_environment', kwargs={
             "api_id": self.kwargs['api_id'],
             "test_id": ts_id
@@ -184,7 +184,7 @@ class SelectEnvironment(LoginRequiredMixin, CreateView):
             user=self.request.user,
             test_scenario=ts,
             scheduled_scenario=scheduled,
-            software_version=self.request.session.get('software_version', ''),
+            build_version=self.request.session.get('build_version', ''),
         )
 
     def create_server_run(self, env):
@@ -217,7 +217,7 @@ class CreateEndpoint(LoginRequiredMixin, CreateView):
             user=self.request.user,
             environment=self.env,
             test_scenario=self.ts,
-            software_version=self.request.session.get('software_version', ''),
+            build_version=self.request.session.get('build_version', ''),
         )
 
     def get_context_data(self, **kwargs):
@@ -332,7 +332,7 @@ class ServerRunOutputUpdate(UpdateView):
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
     fields = [
-        'software_version',
+        'build_version',
     ]
     template_name = 'servervalidation/server-run_update.html'
 

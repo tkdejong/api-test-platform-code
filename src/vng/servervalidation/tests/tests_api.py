@@ -43,7 +43,7 @@ def create_server_run(name, tsu, env_name='environment1'):
         'test_scenario': name,
         'client_id': 'client_id_field',
         'secret': 'secret_field',
-        'software_version': '123456789',
+        'build_version': '123456789',
         'environment': {
             'name': env_name,
             'endpoints': endpoints
@@ -82,7 +82,7 @@ class RetrieveCreationTest(TransactionWebTest):
         call = self.app.post_json(reverse('apiv1server:provider:api_server-run-list'), self.server_run, headers=self.get_user_key())
         call = call.json
         self.assertEqual(call['secret'], self.server_run['secret'])
-        self.assertEqual(call['software_version'], self.server_run['software_version'])
+        self.assertEqual(call['build_version'], self.server_run['build_version'])
 
         self.server_run['uuid'] = call['uuid']
         call = self.app.get(reverse('apiv1server:provider:api_server-run-detail', kwargs={
