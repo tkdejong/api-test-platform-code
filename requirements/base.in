@@ -14,7 +14,7 @@ django-choices
 django-rosetta
 django-sniplates
 django-redis
--e git+git://github.com/maykinmedia/django-admin-index@master#egg=django_admin_index
+-e git+git://github.com/maykinmedia/django-admin-index@feature/menu-and-env-notice#egg=django_admin_index
 django-import-export
 django-crispy-forms>=1.8.0
 django-countries
