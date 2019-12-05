@@ -185,7 +185,7 @@
                             </tr>
                             <tr>
                                 <td scope="row"><strong>{% trans "Software version" %}</td>
-                                <td>{{ object.software_version|default_if_none:'' }}</td>
+                                <td>{{ object.build_version|default_if_none:'' }}</td>
                             </tr>
                             <tr>
                                 <td scope="row"><strong>{% trans "Product role" %}</td>
