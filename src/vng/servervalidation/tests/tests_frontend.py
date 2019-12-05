@@ -2,6 +2,7 @@ import re
 
 from django.conf import settings
 from django.core import mail
+from django.utils.translation import ugettext as _
 from django_webtest import WebTest
 from django.urls import reverse
 
@@ -238,6 +239,27 @@ class TestCreation(WebTest):
         })
         call = self.app.get(url, user=self.user)
         self.assertIn(str(server.pk), call.text)
+
+    def test_create_new_env_existing_name(self):
+        EnvironmentFactory.create(name="testenv2", test_scenario=self.test_scenario, user=self.user)
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
+        form = call.forms[1]
+        form['test_scenario'] = self.tsf.test_scenario.pk
+
+        res = form.submit().follow()
+        form = res.forms[1]
+        form['create_env'] = 'testenv2'
+
+        res = form.submit()
+
+        self.assertIn(_(
+            "An environment with this name for this test scenario already exists, please choose "
+            "a different name or select an existing environment."
+        ), res.text)
+
+        self.assertFalse(ServerRun.objects.exists())
 
 
 class TestList(WebTest):
