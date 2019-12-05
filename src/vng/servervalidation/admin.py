@@ -61,6 +61,12 @@ class APIAdmin(GuardedModelAdmin):
 
     form = APIForm
 
+    def get_obj_perms_base_context(self, request, obj):
+        context = super().get_obj_perms_base_context(request, obj)
+        permission_codes = [code for code, _ in obj._meta.permissions]
+        context["model_perms"] = context["model_perms"].filter(codename__in=permission_codes)
+        return context
+
 @admin.register(model.PostmanTest)
 class PostmanTestAdmin(AdminChangeLinksMixin, OrderedModelAdmin):
     list_display = ['name', 'version', 'test_scenario', 'move_up_down_links',
