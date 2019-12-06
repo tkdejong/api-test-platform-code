@@ -1,6 +1,8 @@
 import re
 
 from django.conf import settings
+from django.core import mail
+from django.utils.translation import ugettext as _
 from django_webtest import WebTest
 from django.urls import reverse
 
@@ -11,6 +13,7 @@ from vng.servervalidation.models import (
     ServerRun, PostmanTest, PostmanTestResult,
     User, ScheduledTestScenario, Endpoint, TestScenario, TestScenarioUrl
 )
+from vng.servervalidation.task import send_email_failure
 
 from .factories import (
     TestScenarioFactory, ServerRunFactory, TestScenarioUrlFactory, PostmanTestFactory,
@@ -237,6 +240,27 @@ class TestCreation(WebTest):
         call = self.app.get(url, user=self.user)
         self.assertIn(str(server.pk), call.text)
 
+    def test_create_new_env_existing_name(self):
+        EnvironmentFactory.create(name="testenv2", test_scenario=self.test_scenario, user=self.user)
+        call = self.app.get(reverse('server_run:server-run_create_item', kwargs={
+            'api_id': self.test_scenario.api.id
+        }), user=self.user)
+        form = call.forms[1]
+        form['test_scenario'] = self.tsf.test_scenario.pk
+
+        res = form.submit().follow()
+        form = res.forms[1]
+        form['create_env'] = 'testenv2'
+
+        res = form.submit()
+
+        self.assertIn(_(
+            "An environment with this name for this test scenario already exists, please choose "
+            "a different name or select an existing environment."
+        ), res.text)
+
+        self.assertFalse(ServerRun.objects.exists())
+
 
 class TestList(WebTest):
 
@@ -395,7 +419,7 @@ class IntegrationTest(WebTest):
         }), user=self.user)
         self.assertIn(str(ServerRun.objects.filter(user=self.user).count()), call.text)
 
-    def test_information_form(self):
+    def test_serverrun_information_form(self):
         self.test_badge()
         new_server = ServerRun.objects.latest('id')
         call = self.app.get(
@@ -405,17 +429,50 @@ class IntegrationTest(WebTest):
             user=self.user
         )
         form = call.forms[1]
-        form['supplier_name'] = 'test_name'
-        form['software_product'] = 'test_software'
-        form['product_role'] = 'test_product'
+        form['build_version'] = '1.0.0'
         res = form.submit().follow()
         new_server = ServerRun.objects.latest('id')
-        self.assertEqual(new_server.product_role, 'test_product')
+        self.assertEqual(new_server.build_version, '1.0.0')
 
         call = self.app.get(
             reverse(
                 'server_run:server-run_info-update',
                 kwargs={'api_id': new_server.test_scenario.api.id, 'uuid': new_server.uuid}),
+            user='random',
+            status=[403]
+        )
+
+    def test_environment_information_form(self):
+        env = EnvironmentFactory.create(user=self.user)
+        call = self.app.get(
+            reverse(
+                'server_run:environment_info-update',
+                kwargs={
+                    'api_id': env.test_scenario.api.id,
+                    'scenario_uuid': env.test_scenario.uuid,
+                    'env_uuid': env.uuid
+                }),
+            user=self.user
+        )
+        form = call.forms[1]
+        form['supplier_name'] = 'test_name'
+        form['product_role'] = 'test_product'
+        form['software_product'] = 'test_software'
+        res = form.submit().follow()
+
+        env.refresh_from_db()
+        self.assertEqual(env.supplier_name, 'test_name')
+        self.assertEqual(env.software_product, 'test_software')
+        self.assertEqual(env.product_role, 'test_product')
+
+        call = self.app.get(
+            reverse(
+                'server_run:environment_info-update',
+                kwargs={
+                    'api_id': env.test_scenario.api.id,
+                    'scenario_uuid': env.test_scenario.uuid,
+                    'env_uuid': env.uuid
+                }),
             user='random',
             status=[403]
         )
@@ -1099,3 +1156,127 @@ class UpdateEnvironmentTests(WebTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn('Modify environment', response.text)
+
+    def test_update_environment_deletes_previous_provider_runs_if_modified(self):
+        scheduled = ScheduledTestScenarioFactory.create(environment=self.environment)
+        ServerRunFactory.create_batch(3, environment=self.environment)
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form['url'] = 'https://www.google.com/'
+        form['var'] = 'Bearer token aaaaaaaaaaaaa'
+        form.submit().follow()
+
+        self.assertEqual(self.environment.serverrun_set.count(), 0)
+
+        self.environment.refresh_from_db()
+        self.environment.user.refresh_from_db()
+        self.test_scenario.refresh_from_db()
+        scheduled.refresh_from_db()
+        self.tsu1.refresh_from_db()
+        self.tsu2.refresh_from_db()
+
+    def test_update_environment_keeps_previous_provider_runs_if_not_modified(self):
+        ServerRunFactory.create_batch(3, environment=self.environment)
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form.submit().follow()
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
+    def test_placeholders_correct_order_after_update(self):
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+
+        form['url'] = 'https://www.bla.com/'
+        form.submit().follow()
+
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        self.assertEqual(form['url'].value, 'https://www.bla.com/')
+        self.assertEqual(form['var'].value, self.var2.url)
+
+
+class ScheduledScenarioEmailTests(WebTest):
+
+    def setUp(self):
+        self.user = UserFactory.create(email="test@test.nl")
+        self.scheduled = ScheduledTestScenarioFactory.create(environment__user=self.user)
+
+    def test_email_no_results(self):
+        server_run = ServerRunFactory.create(
+            environment=self.scheduled.environment,
+            test_scenario=self.scheduled.environment.test_scenario,
+            user=self.user
+        )
+        send_email_failure({self.user.id: [(server_run, None)]})
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+
+        self.assertIn(self.user.email, email.to)
+
+        self.assertIn('errors', email.body)
+        self.assertNotIn('Failed', email.body)
+        self.assertNotIn('Successful', email.body)
+
+    def test_email_successful(self):
+        server_run = ServerRunFactory.create(
+            environment=self.scheduled.environment,
+            test_scenario=self.scheduled.environment.test_scenario,
+            user=self.user
+        )
+        send_email_failure({self.user.id: [(server_run, False)]})
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+
+        self.assertIn(self.user.email, email.to)
+
+        self.assertIn('Successful', email.body)
+        self.assertNotIn('Failed', email.body)
+        self.assertNotIn('errors', email.body)
+
+    def test_email_failed(self):
+        server_run = ServerRunFactory.create(
+            environment=self.scheduled.environment,
+            test_scenario=self.scheduled.environment.test_scenario,
+            user=self.user
+        )
+        send_email_failure({self.user.id: [(server_run, True)]})
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+
+        self.assertIn(self.user.email, email.to)
+
+        self.assertIn('Failed', email.body)
+        self.assertNotIn('Successful', email.body)
+        self.assertNotIn('errors', email.body)

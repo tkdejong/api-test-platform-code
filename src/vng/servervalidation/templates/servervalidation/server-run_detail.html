@@ -2,6 +2,7 @@
 {% load sniplates %}
 {% load i18n %}
 {% load django_bootstrap_breadcrumbs %}
+{% load tag_library %}
 
 {% block title %}{% trans "Server-run detail" %}{% endblock%}
 
@@ -176,15 +177,19 @@
                         <tbody>
                             <tr>
                                 <td scope="row"><strong>{% trans "Supplier name" %}</td>
-                                <td>{{ object.supplier_name|default_if_none:''|urlize }}</td>
+                                <td>{{ object.environment.supplier_name|default_if_none:''|urlize }}</td>
                             </tr>
                             <tr>
                                 <td scope="row"><strong>{% trans "Software product" %}</td>
-                                <td>{{ object.software_product|default_if_none:''|urlize }}</td>
+                                <td>{{ object.environment.software_product|default_if_none:''|urlize }}</td>
+                            </tr>
+                            <tr>
+                                <td scope="row"><strong>{% trans "Software version" %}</td>
+                                <td>{{ object.build_version|default_if_none:'' }}</td>
                             </tr>
                             <tr>
                                 <td scope="row"><strong>{% trans "Product role" %}</td>
-                                <td>{{ object.product_role|default_if_none:''|urlize }}</td>
+                                <td>{{ object.environment.product_role|default_if_none:''|urlize }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -245,7 +250,7 @@
                                 <td>
                                     {{ calls.response.code }} {{ calls.response.status }}
                                 </td>
-                                {% if calls.response.code >= 200 and calls.response.code < 400  %}
+                                {% if calls|get_call_result  %}
                                 <td class="table-success">
                                     <p class='icon icon--checkmark'></p>
                                 </td>

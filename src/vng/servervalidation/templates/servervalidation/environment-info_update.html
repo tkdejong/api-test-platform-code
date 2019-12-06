@@ -3,10 +3,10 @@
 {% load i18n %}
 {% load django_bootstrap_breadcrumbs %}
 
-{% block title %}{% trans "Server-run detail" %}{% endblock%}
+{% block title %}{% trans "Update environment information" %}{% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Home" 'server_run:server-run_detail' object.test_scenario.api.id object.uuid %}
+{% breadcrumb "Home" 'server_run:server-run_list' object.test_scenario.api.id object.test_scenario.uuid object.uuid %}
 {% breadcrumb 'Detail' 'testsession:sessions' %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}

@@ -4,7 +4,7 @@
 #
 #    pip-compile --no-index --output-file requirements/base.txt requirements/base.in
 #
--e git+git://github.com/maykinmedia/django-admin-index@master#egg=django_admin_index
+-e git+git://github.com/maykinmedia/django-admin-index@feature/menu-and-env-notice#egg=django_admin_index
 -e git+https://github.com/maykinmedia/django-subdomains.git@d1a88358569f522a81f1b9b3659aa429e55f22ea#egg=django_subdomains
 amqp==2.4.1               # via kombu
 billiard==3.5.0.5         # via celery
@@ -29,7 +29,7 @@ django-choices==1.6.1
 django-ckeditor==5.7.1
 django-compat==1.0.15     # via django-background-tasks, django-hijack, django-hijack-admin
 django-countries==5.3.2
-django-crispy-forms==1.7.2
+django-crispy-forms==1.8.1
 django-dynamic-raw-id==2.4
 django-filer==1.5.0
 django-filter==1.1.0      # via djangorestframework-filters

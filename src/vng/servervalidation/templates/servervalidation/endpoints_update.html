@@ -1,0 +1,56 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load i18n %}
+
+{% block title %}{% trans "Update environment" %}{% endblock%}
+
+{% block breadcrumb %}
+{% breadcrumb "Environments" 'server_run:environment_list' ts.api.id %}
+{% breadcrumb "Provider run list" 'server_run:server-run_list' ts.api.id ts.uuid object.uuid %}
+{% breadcrumb "Update environment" 'server_run:test-scenario_list' object.api.id %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-6 offset-sm-3">
+            <form class="" method="post">{% csrf_token %}
+                <div class="card">
+                    <div class="card-header">
+                        {% trans "Update environment:" %} {{ object }}
+                    </div>
+                    <div class='card-body'>
+                    {% load_widgets form='forms.html' %}
+                    {% for field in form %}
+                        {% form_field field %}
+                    {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" id="submit" type="submit">
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Update" %}</button>
+                            </div>
+                            <div class="col-auto">
+                                <a class="btn btn-sm btn-danger" href="{% url 'server_run:server-run_list' ts.api.id ts.uuid object.uuid %}">
+                                    <i class="fa fa-ban"></i> {% trans "Cancel" %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var form = document.getElementsByTagName("form")[1];
+
+    form.addEventListener("input", function () {
+        var submit = document.getElementById("submit");
+        submit.onclick = function() { return confirm('Modifying an environment will remove all of the previous provider runs for this environment.'); };
+    });
+</script>
+{% endblock %}

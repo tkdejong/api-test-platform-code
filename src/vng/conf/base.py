@@ -94,7 +94,7 @@ TINYMCE_DEFAULT_CONFIG = {
     'theme': "advanced",
     'cleanup_on_startup': True,
     'custom_undo_redo_levels': 10,
-    'width': '80%',
+    'width': '100%',
     'height': 500,
     'theme_advanced_resizing': True
 }
