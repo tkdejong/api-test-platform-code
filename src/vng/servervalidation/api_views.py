@@ -19,6 +19,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 import vng.postman.utils as ptm
+from vng.postman.choices import ResultChoices
 
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 
@@ -169,7 +170,7 @@ class ResultServerView(views.APIView):
                     _call['status'] = 'Success'
                 postman_res_output['calls'].append(_call)
 
-            postman_res_output['status'] = postman.status
+            postman_res_output['status'] = ResultChoices.success if postman.is_success() == 1 else ResultChoices.failed
             response.append(postman_res_output)
         return JsonResponse(response, safe=False)
 

@@ -40,8 +40,8 @@ def execute_test_scheduled():
             status=choices.StatusWithScheduledChoices.running
         )
         execute_test(server_run.pk, scheduled=True)
-        failed = server_run.get_execution_result()
-        test_results[environment.user.id].append((server_run, failed))
+        success = server_run.get_execution_result()
+        test_results[environment.user.id].append((server_run, success))
 
     if test_results:
         send_email_failure(test_results)
@@ -135,9 +135,9 @@ def send_email_failure(test_results):
 
     for user_id, result_list in test_results.items():
         msg_html = render_to_string('servervalidation/scheduled_test_email.html', {
-            'successful': [(run, failed) for run, failed in result_list if failed is False],
-            'failure': [(run, failed) for run, failed in result_list if failed is True],
-            'error': [(run, failed) for run, failed in result_list if failed is None],
+            'successful': [(run, success) for run, success in result_list if success is True],
+            'failure': [(run, success) for run, success in result_list if success is False],
+            'error': [(run, success) for run, success in result_list if success is None],
             'domain': domain
         })
 

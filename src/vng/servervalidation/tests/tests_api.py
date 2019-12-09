@@ -94,7 +94,8 @@ class RetrieveCreationTest(TransactionWebTest):
             'uuid': self.server_run['uuid']
         }), headers=self.get_user_key())
         ptr = PostmanTestResult.objects.filter(postman_test__test_scenario=self.test_scenario.pk).first()
-        self.assertEqual(call.json[0]['status'], ptr.status)
+        ptr_status = ResultChoices.success if ptr.is_success() == 1 else ResultChoices.failed
+        self.assertEqual(call.json[0]['status'], ptr_status)
 
     def test_retrieve_server_run(self):
         headers = self.get_user_key()
@@ -468,7 +469,7 @@ class ServerRunResultAPITests(WebTest):
         }), user=self.user)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json[0]['status'], ResultChoices.failed)
+        self.assertEqual(response.json[0]['status'], ResultChoices.success)
         self.assertEqual(response.json[0]['calls'][0]['status'], 'Error')
 
     def test_get_result_request_with_response(self):
@@ -497,3 +498,29 @@ class ServerRunResultAPITests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json[0]['status'], ResultChoices.success)
         self.assertEqual(response.json[0]['calls'][0]['status'], 'Success')
+
+    def test_get_result_no_status_on_result(self):
+        postman_result = PostmanTestResultFactory.create(server_run=self.server_run, status=None)
+        with open(postman_result.log_json.path, 'w') as f:
+            json.dump(
+                {
+                    'run': {
+                        'executions': [
+                            {
+                                'item': {'name': 'no response'},
+                                'request': {'method': 'GET', 'url': 'https://some-url.com'},
+                                'assertions': [{'error': 'bla'}, {}]
+                            }
+                        ],
+                        'timings': {'started': '100', 'stopped': '200'}
+                    }
+                },
+                f
+            )
+
+        response = self.app.get(reverse('apiv1server:provider_result', kwargs={
+            'uuid': self.server_run.uuid
+        }), user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json[0]['status'], ResultChoices.failed)
