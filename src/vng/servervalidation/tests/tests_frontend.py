@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core import mail
 from django.utils.translation import ugettext as _
 from django_webtest import WebTest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
 from guardian.shortcuts import assign_perm
@@ -1233,7 +1234,7 @@ class ScheduledScenarioEmailTests(WebTest):
             test_scenario=self.scheduled.environment.test_scenario,
             user=self.user
         )
-        send_email_failure({self.user.id: [(server_run, None)]})
+        send_email_failure({self.user.id: [(server_run, server_run.get_execution_result())]})
 
         self.assertEqual(len(mail.outbox), 1)
 
@@ -1251,7 +1252,15 @@ class ScheduledScenarioEmailTests(WebTest):
             test_scenario=self.scheduled.environment.test_scenario,
             user=self.user
         )
-        send_email_failure({self.user.id: [(server_run, False)]})
+        ptr = PostmanTestResultFactory.create(server_run=server_run, log_json=SimpleUploadedFile('test.json', b'''
+            {
+                "run": {
+                    "executions": [{"request": {"url": "test"}, "response": {"code": 400}, "item": {"error_test": false}}],
+                    "timings": {"started": "100", "stopped": "200"}
+                }
+            }
+        '''))
+        send_email_failure({self.user.id: [(server_run, server_run.get_execution_result())]})
 
         self.assertEqual(len(mail.outbox), 1)
 
@@ -1269,7 +1278,18 @@ class ScheduledScenarioEmailTests(WebTest):
             test_scenario=self.scheduled.environment.test_scenario,
             user=self.user
         )
-        send_email_failure({self.user.id: [(server_run, True)]})
+        ptr = PostmanTestResultFactory.create(server_run=server_run, log_json=SimpleUploadedFile('test.json', b'''
+            {
+                "run": {
+                    "executions": [{
+                        "request": {"url": "test"}, "response": {"code": 400}, "item": {"error_test": false},
+                        "assertions": [{"error": "bla"}, {}]
+                    }],
+                    "timings": {"started": "100", "stopped": "200"}
+                }
+            }
+        '''))
+        send_email_failure({self.user.id: [(server_run, server_run.get_execution_result())]})
 
         self.assertEqual(len(mail.outbox), 1)
 
