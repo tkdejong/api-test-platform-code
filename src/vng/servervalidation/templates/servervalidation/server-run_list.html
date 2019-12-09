@@ -40,19 +40,48 @@
                     {% endif %}
                 </div>
                 <div class="card-body">
-                    <div>
-                        <table class="ml-auto mt-auto mr-auto mb-3">
-                            <tr><td><h4><b>API:</b> {{ api.name }}</h4></td></tr>
-                            <tr><td><h4><b>Test scenario:</b> {{ test_scenario }}</h4></td></tr>
-                            <tr><td><h4><b>Environment:</b> {{ environment.name }}</h4></td></tr>
-                            {% if environment.scheduledtestscenario %}
-                                {% if environment.scheduledtestscenario.active %}
-                                    <tr><td><h4>{% trans "Scheduled to run every night at: " %} <b>{{schedule_time|time:"H:i"}}</b></h4></td></tr>
-                                {% else %}
-                                    <tr><td><h4>{% trans "Schedule is currently not active" %}</h4></td></tr>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <table class="ml-auto mt-auto mr-auto mb-3">
+                                <tr><td><h4><b>API:</b> {{ api.name }}</h4></td></tr>
+                                <tr><td><h4><b>Test scenario:</b> {{ test_scenario }}</h4></td></tr>
+                                <tr><td><h4><b>Environment:</b> {{ environment.name }}</h4></td></tr>
+                                {% if environment.scheduledtestscenario %}
+                                    {% if environment.scheduledtestscenario.active %}
+                                        <tr><td><h4>{% trans "Scheduled to run every night at: " %} <b>{{schedule_time|time:"H:i"}}</b></h4></td></tr>
+                                    {% else %}
+                                        <tr><td><h4>{% trans "Schedule is currently not active" %}</h4></td></tr>
+                                    {% endif %}
                                 {% endif %}
+                            </table>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td scope="row"><strong>{% trans "Supplier name" %}</td>
+                                        <td>{{ environment.supplier_name|default_if_none:''|urlize }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row"><strong>{% trans "Software product" %}</td>
+                                        <td>{{ environment.software_product|default_if_none:''|urlize }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row"><strong>{% trans "Product role" %}</td>
+                                        <td>{{ environment.product_role|default_if_none:''|urlize }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            {% if request.user.is_authenticated %}
+                                <div class="row mb-5">
+                                    <div class="col-auto mr-auto">
+                                        <a class="btn btn-primary" href="{% url 'server_run:environment_info-update' environment.test_scenario.api.id environment.test_scenario.uuid environment.uuid %}">{% trans "Update" %}</a>
+                                    </div>
+                                </div>
                             {% endif %}
-                        </table>
+                        </div>
+                    </div>
 
                         {% if environment.last_run %}
                             <table class="ml-auto mt-auto mr-auto mb-3">
@@ -68,32 +97,6 @@
                             </table>
                         {% endif %}
 
-                        <table class="table table-striped">
-                            <tbody>
-                                <tr>
-                                    <td scope="row"><strong>{% trans "Supplier name" %}</td>
-                                    <td>{{ environment.supplier_name|default_if_none:''|urlize }}</td>
-                                </tr>
-                                <tr>
-                                    <td scope="row"><strong>{% trans "Software product" %}</td>
-                                    <td>{{ environment.software_product|default_if_none:''|urlize }}</td>
-                                </tr>
-                                <tr>
-                                    <td scope="row"><strong>{% trans "Product role" %}</td>
-                                    <td>{{ environment.product_role|default_if_none:''|urlize }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        {% if request.user.is_authenticated %}
-                            <div class="card-footer">
-                                <div class="row">
-                                    <div class="col-auto mr-auto">
-                                        <a class="btn btn-primary" href="{% url 'server_run:environment_info-update' environment.test_scenario.api.id environment.test_scenario.uuid environment.uuid %}">{% trans "Update" %}</a>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
                     <table class="table">
                         {% include 'servervalidation/table/header-server-run.html' only %}
                         {% for server_run in object_list %}
