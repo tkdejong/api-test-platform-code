@@ -300,9 +300,8 @@ class TestLog(WebTest):
                             status=[302, 401, 403, 404])
 
     def test_api_session(self):
-        session_type = SessionType.objects.first()
-        session_type.api = APIFactory.create()
-        session_type.save()
+        session_type = SessionTypeFactory.create()
+        vng_endpoint = VNGEndpointFactory.create(session_type=session_type)
 
         call = self.app.post(reverse('apiv1_auth:rest_login'), params=collections.OrderedDict([
             ('username', self.user.username),
