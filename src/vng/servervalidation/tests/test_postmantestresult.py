@@ -75,3 +75,22 @@ class PostmanTestResultTests(TestCase):
             'assertions': {'passed': 1, 'failed': 1, 'total': 2},
             'calls': {'success': 0, 'failed': 1, 'total': 1}
         })
+
+    def test_get_aggregated_results_test_script_errors(self):
+        ptr = PostmanTestResultFactory.create(log_json=SimpleUploadedFile('test.json', b'''
+            {
+                "run": {
+                    "executions": [{
+                        "request": {"url": "test"}, "response": {"code": 400}, "item": {"error_test": true},
+                        "testScript": [{"error": "bla"}, {}]
+                    }],
+                    "timings": {"started": "100", "stopped": "200"}
+                }
+            }
+        '''))
+        res = ptr.get_aggregate_results()
+
+        self.assertDictEqual(res, {
+            'assertions': {'passed': 0, 'failed': 1, 'total': 1},
+            'calls': {'success': 0, 'failed': 1, 'total': 1}
+        })
