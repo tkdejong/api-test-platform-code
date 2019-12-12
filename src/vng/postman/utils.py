@@ -31,6 +31,10 @@ def get_call_result(call):
     # if the response is not present it means that it has not been performed
     if 'response' not in call or 'code' not in call['response']:
         return False
+
+    # check for errors in the script
+    if any(script for script in call.get("testScript", []) if 'error' in script):
+        return False
     return ('error_test' not in call['item'] or not call['item']['error_test'])
 
 

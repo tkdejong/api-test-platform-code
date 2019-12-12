@@ -367,6 +367,11 @@ class PostmanTestResult(models.Model):
     def get_call_results(self):
         positive, negative = 0, 0
         for call in self.get_json_obj():
+            if 'testScript' in call:
+                for script in call['testScript']:
+                    if 'error' in script:
+                        negative += 1
+
             # Count the failed and successful assertions
             if 'assertions' in call:
                 for assertion in call['assertions']:
@@ -383,6 +388,11 @@ class PostmanTestResult(models.Model):
             success = True
             if not postman.get_call_result(call):
                 success = False
+            if 'testScript' in call:
+                for script in call['testScript']:
+                    if 'error' in script:
+                        error += 1
+                        success = False
             if 'assertions' in call:
                 for assertion in call['assertions']:
                     if 'error' in assertion:
