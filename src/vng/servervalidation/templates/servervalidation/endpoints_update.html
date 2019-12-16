@@ -2,6 +2,7 @@
 {% load sniplates %}
 {% load django_bootstrap_breadcrumbs %}
 {% load i18n %}
+{% load crispy_forms_tags %}
 
 {% block title %}{% trans "Update environment" %}{% endblock%}
 
@@ -23,6 +24,9 @@
                     </div>
                     <div class='card-body'>
                     {% load_widgets form='forms.html' %}
+                    {{ env_form|crispy }}
+
+                    <h4>Variables:</h4>
                     {% for field in form %}
                         {% form_field field %}
                     {% endfor %}
@@ -47,10 +51,14 @@
 
 <script>
     var form = document.getElementsByTagName("form")[1];
+    var inputs = form.getElementsByTagName("input");
+    var submit = document.getElementById("submit");
 
-    form.addEventListener("input", function () {
-        var submit = document.getElementById("submit");
-        submit.onclick = function() { return confirm('Modifying an environment will remove all of the previous provider runs for this environment.'); };
-    });
+    // Modifying only the environment name should not delete previous runs
+    for(i=2; i<inputs.length; i++) {
+        inputs[i].addEventListener("input", function () {
+            submit.onclick = function() { return confirm('Modifying an environment will remove all of the previous provider runs for this environment.'); };
+        });
+    }
 </script>
 {% endblock %}

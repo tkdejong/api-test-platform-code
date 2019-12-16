@@ -202,3 +202,12 @@ class CreateTestScenarioForm(forms.ModelForm):
                     "A test scenario with this name already exists"
                 ))
         return name
+
+
+class EnvironmentUpdateForm(forms.ModelForm):
+
+    name = forms.CharField(required=False, help_text=_("The name of the environment"))
+
+    class Meta:
+        model = Environment
+        fields = ['name']
