@@ -86,6 +86,7 @@
             </div>
             </div>
         </div>
+
         <div class="row">
             {% for postman in postman_result %}
             {% with postman.get_aggregate_results as results %}
@@ -99,6 +100,7 @@
                     </div>
                     <div class="card-body">
                         <div class='table-responsive'>
+                            <h4>Collection name: {{postman.postman_test.name}}</h4>
                             <table class="table">
                                 <thead>
                                     <th>{% trans "Property" %}</th>
@@ -159,7 +161,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6">
+        {% endwith %}
+        {% endfor %}
+
+        <div class="col-sm-6">
                 <div class="card">
                     <div class="card-header">
                         {{object}}
@@ -168,6 +173,40 @@
                         {{object.test_scenario.description|safe}}
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        {% trans "Environment variables" %}
+                        <button class="btn btn-secondary float-right" type="button" data-toggle="collapse" data-target="#env-vars" aria-expanded="false" aria-controls="collapseExample">{% trans "Toggle variables"%}</button>
+                    </div>
+                    <div id="env-vars" {% if not request.GET.showenv %} class="collapse" {% endif %}>
+                        <div class="card-body">
+                            <div class='table-responsive'>
+                                <table class="table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <th>{% trans "Variable name"%}</th>
+                                            <th>{% trans "Value"%}</th>
+                                        </tr>
+                                        {% for ep in object.environment.endpoint_set.all %}
+                                            <tr>
+                                                <td>{{ ep.test_scenario_url.name }}</td>
+                                                <td>
+                                                    {% if not ep.test_scenario_url.hidden or request.user == object.user %}
+                                                        {{ ep.url }}
+                                                    {% else %}
+                                                        <i>{% trans "hidden" %}</i>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
                 <div class="card">
                 <div class="card-header">
                     {% trans "Supplier information" %}
@@ -205,9 +244,6 @@
                 {% endif %}
             </div>
             </div>
-
-        {% endwith %}
-        {% endfor %}
 
     </div>
 

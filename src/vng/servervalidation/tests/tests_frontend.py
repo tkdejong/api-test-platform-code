@@ -567,19 +567,19 @@ class ServerRunHiddenVarsTests(WebTest):
 
 
     def test_detail_page_replace_hidden_vars_with_placeholders_for_other_user(self):
-        response = self.app.get(self.detail_url, user=self.user2)
+        response = self.app.get(self.detail_url, user=self.user2, params={"showenv": True})
 
         self.assertNotContains(response, 'https://url1.com/')
         self.assertContains(response, 'https://url2.com/')
 
     def test_detail_page_replace_hidden_vars_with_placeholders_for_no_user(self):
-        response = self.app.get(self.detail_url)
+        response = self.app.get(self.detail_url, params={"showenv": True})
 
         self.assertNotContains(response, 'https://url1.com/')
         self.assertContains(response, 'https://url2.com/')
 
     def test_detail_page_hidden_vars_visible_for_same_user(self):
-        response = self.app.get(self.detail_url, user=self.user)
+        response = self.app.get(self.detail_url, params={"showenv": True}, user=self.user)
 
         self.assertContains(response, 'https://url1.com/')
         self.assertContains(response, 'https://url2.com/')
