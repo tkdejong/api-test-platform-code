@@ -179,7 +179,7 @@
                         {% trans "Environment variables" %}
                         <button class="btn btn-secondary float-right" type="button" data-toggle="collapse" data-target="#env-vars" aria-expanded="false" aria-controls="collapseExample">{% trans "Toggle variables"%}</button>
                     </div>
-                    <div id="env-vars" class="collapse">
+                    <div id="env-vars" {% if not request.GET.showenv %} class="collapse" {% endif %}>
                         <div class="card-body">
                             <div class='table-responsive'>
                                 <table class="table table-striped">
@@ -192,7 +192,7 @@
                                             <tr>
                                                 <td>{{ ep.test_scenario_url.name }}</td>
                                                 <td>
-                                                    {% if not ep.test_scenario_url.hidden or request.user == server_run.user %}
+                                                    {% if not ep.test_scenario_url.hidden or request.user == object.user %}
                                                         {{ ep.url }}
                                                     {% else %}
                                                         <i>{% trans "hidden" %}</i>
