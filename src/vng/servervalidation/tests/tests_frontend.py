@@ -1109,6 +1109,20 @@ class UpdateEnvironmentTests(WebTest):
         self.assertEqual(form['url'].value, self.var1.url)
         self.assertEqual(form['var'].value, self.var2.url)
 
+    def test_update_environment_modify_name(self):
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form["name"] = "modified_name"
+        form.submit().follow()
+
+        self.environment.refresh_from_db()
+        self.assertEqual(self.environment.name, "modified_name")
+
     def test_update_environment_modifies_variables(self):
         response = self.app.get(reverse('server_run:endpoints_update', kwargs={
             'api_id': self.test_scenario.api.id,
@@ -1196,6 +1210,23 @@ class UpdateEnvironmentTests(WebTest):
         }), user=self.user)
 
         form = response.forms[1]
+        form.submit().follow()
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
+    def test_update_environment_keeps_previous_provider_runs_if_only_name_modified(self):
+        ServerRunFactory.create_batch(3, environment=self.environment)
+
+        self.assertEqual(self.environment.serverrun_set.count(), 3)
+
+        response = self.app.get(reverse('server_run:endpoints_update', kwargs={
+            'api_id': self.test_scenario.api.id,
+            'test_id': self.test_scenario.id,
+            'env_id': self.environment.id
+        }), user=self.user)
+
+        form = response.forms[1]
+        form["name"] = "modified_name"
         form.submit().follow()
 
         self.assertEqual(self.environment.serverrun_set.count(), 3)
