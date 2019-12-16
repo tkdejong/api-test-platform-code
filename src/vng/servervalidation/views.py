@@ -25,7 +25,7 @@ from .forms import (
     CreateServerRunForm, CreateEndpointForm,
     SelectEnvironmentForm, CreateTestScenarioForm,
     TestScenarioUrlFormSet, PostmanTestFormSet,
-    TestScenarioUrlUpdateFormSet, PostmanTestUpdateFormSet
+    TestScenarioUrlUpdateFormSet, PostmanTestUpdateFormSet, EnvironmentUpdateForm
 )
 from .models import (
     API, ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest,
@@ -783,6 +783,9 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
+
+        data['env_form'] = EnvironmentUpdateForm()
+
         pre_form = data['form']
 
         self.env = self.get_object()
@@ -822,6 +825,14 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
     def post(self, request, *args, **kwargs):
         data = request.POST
         env = self.get_object()
+
+        env_form = EnvironmentUpdateForm(data)
+        if env_form.is_valid():
+            name = env_form.cleaned_data["name"]
+            if name:
+                env.name = name
+                env.save()
+
         endpoints = env.endpoint_set.all()
         tsu_names = endpoints.values_list('test_scenario_url__name', flat=True)
 
