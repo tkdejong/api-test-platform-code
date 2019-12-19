@@ -7,6 +7,7 @@ from django import forms
 from filer.models.filemodels import File
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from guardian.admin import AdminUserObjectPermissionsForm, AdminGroupObjectPermissionsForm
 from django.forms.models import inlineformset_factory
 
 from tinymce.widgets import TinyMCE
@@ -211,3 +212,22 @@ class EnvironmentUpdateForm(forms.ModelForm):
     class Meta:
         model = Environment
         fields = ['name']
+
+
+class CustomPermissionChoicesMixin:
+    def get_obj_perms_field_choices(self):
+        """
+        Show only the custom permissions as the available object permissions
+        """
+        choices = super().get_obj_perms_field_choices()
+        permission_codes = [code for code, _ in self.obj._meta.permissions]
+        choices = [(perm, label) for perm, label in choices if perm in permission_codes]
+        return choices
+
+
+class CustomAdminUserObjectPermissionsForm(CustomPermissionChoicesMixin, AdminUserObjectPermissionsForm):
+    pass
+
+
+class CustomAdminGroupObjectPermissionsForm(CustomPermissionChoicesMixin, AdminGroupObjectPermissionsForm):
+    pass
