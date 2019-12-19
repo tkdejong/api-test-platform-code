@@ -28,20 +28,6 @@
     </td>
 </tr>
 
-{% for ep in server_run.environment.endpoint_set.all %}
-    <tr>
-
-        <td>{{ ep.test_scenario_url.name }}</td>
-        <td>
-            {% if not ep.test_scenario_url.hidden or request.user == server_run.user %}
-                {{ ep.url }}
-            {% else %}
-                <i>{% trans "hidden" %}</i>
-            {% endif %}
-        </td>
-    </tr>
-{% endfor %}
-
 <tr>
     <td>{% trans "Started" %}</td>
     <td>{{ server_run.started|date:"N j, Y, H:i" }}</td>
