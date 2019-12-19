@@ -8,6 +8,8 @@ from guardian.admin import GuardedModelAdmin
 
 from vng.testsession.models import SessionType
 
+from .forms import CustomAdminUserObjectPermissionsForm, CustomAdminGroupObjectPermissionsForm
+
 def get_all_fields(mo):
     l = [field.name for field in mo._meta.fields]
     l.remove('id')
@@ -66,6 +68,13 @@ class APIAdmin(GuardedModelAdmin):
         permission_codes = [code for code, _ in obj._meta.permissions]
         context["model_perms"] = context["model_perms"].filter(codename__in=permission_codes)
         return context
+
+    def get_obj_perms_manage_group_form(self, request):
+        return CustomAdminGroupObjectPermissionsForm
+
+    def get_obj_perms_manage_user_form(self, request):
+        return CustomAdminGroupObjectPermissionsForm
+
 
 @admin.register(model.PostmanTest)
 class PostmanTestAdmin(AdminChangeLinksMixin, OrderedModelAdmin):
