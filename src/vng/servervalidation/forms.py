@@ -231,3 +231,12 @@ class CustomAdminUserObjectPermissionsForm(CustomPermissionChoicesMixin, AdminUs
 
 class CustomAdminGroupObjectPermissionsForm(CustomPermissionChoicesMixin, AdminGroupObjectPermissionsForm):
     pass
+
+
+class CollectionGeneratorForm(forms.Form):
+    oas_file = forms.FileField(required=True, help_text=_(
+        "A .yaml file containing an OpenAPI specification"
+    ))
+    filename = forms.CharField(required=True, help_text=_(
+        "The name to be used for the generated Postman collection"
+    ))
