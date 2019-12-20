@@ -1,0 +1,47 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load django_bootstrap_breadcrumbs %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "Postman collection generator" %}{% endblock %}
+
+
+{% block breadcrumb %}
+{% breadcrumb "Home" 'home' %}
+{% breadcrumb "Postman collection generator" 'server_run:collection_generator' %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <div class="card">
+                <div class="card-header">
+                    Generate a Postman collection
+                </div>
+                <div class="card-body">
+                    <p>
+                        {% blocktrans %}
+                            Upload a .yaml file with an OpenAPI specification and it will be converted to a Postman collection
+                            using <a href="https://github.com/postmanlabs/openapi-to-postman">openapi2postman</a> and basic assertions
+                            that check status codes and response bodies will be added by the ATP.
+                        {% endblocktrans %}
+                    </p>
+                    <form class="" method="post" enctype="multipart/form-data">{% csrf_token %}
+                        {{form|crispy}}
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" type="submit" name="generate_new">
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Generate Postman collection" %}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
