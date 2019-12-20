@@ -36,13 +36,13 @@ function() {\n\tpm.response.to.have.status(200);\n});')
         self.assertEqual(event["script"]["exec"][1], 'pm.test("Alle BESLUITen opvragen. \
 heeft valide body", function() {\n\tconst Ajv = require(\'ajv\');\n\tvar ajv = \
 new Ajv({logger: console});\n\tvar schema = {"properties": {"count": {"type": "integer"}, \
-"results": {"properties": {"verantwoordelijkeOrganisatie": {"type": "string"}, "besluittype": \
+"results": {"items": {"properties": {"verantwoordelijkeOrganisatie": {"type": "string"}, "besluittype": \
 {"format": "uri"}, "datum": {"format": "date"}, "ingangsdatum": {"format": "date"}, "url": \
 {"format": "uri"}, "identificatie": {"type": "string"}, "zaak": {"format": "uri"}, \
 "toelichting": {"type": "string"}, "bestuursorgaan": {"type": "string"}, "vervaldatum": \
 {"format": "date"}, "vervalreden": {"type": "string"}, "vervalredenWeergave": \
 {"type": "string"}, "publicatiedatum": {"format": "date"}, "verzenddatum": \
-{"format": "date"}, "uiterlijkeReactiedatum": {"format": "date"}}}, "next": \
+{"format": "date"}, "uiterlijkeReactiedatum": {"format": "date"}}}}, "next": \
 {"format": "uri"}, "previous": {"format": "uri"}}};\n\tpm.expect(ajv.validate\
 (schema, pm.response.json())).to.be.true;\n});')
 

@@ -159,7 +159,7 @@ def generate_schema(schema, body, openapi_types, openapi_format):
         for key, value in body.items():
             if isinstance(value, list):
                 for i in value:
-                    generate_schema(schema["properties"][key], i, openapi_types, openapi_format)
+                    generate_schema(schema["properties"][key]["items"], i, openapi_types, openapi_format)
             elif isinstance(value, dict):
                 generate_schema(schema["properties"][key], value, openapi_types, openapi_format)
             elif isinstance(value, str):
