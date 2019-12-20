@@ -138,20 +138,21 @@ def generate_testscript(item, openapi_types, openapi_format):
             "type": "text/javascript"
         }
     ]
-    if status_code != 204:
-        infinite_dict = lambda: defaultdict(infinite_dict)
-        schema = infinite_dict()
-        if item["response"][0]["body"]:
-            valid_body = json.loads(item["response"][0]["body"])
-            generate_schema(schema, valid_body, openapi_types, openapi_format)
+    # TODO fix json schema generation
+    # if status_code != 204:
+    #     infinite_dict = lambda: defaultdict(infinite_dict)
+    #     schema = infinite_dict()
+    #     if item["response"][0]["body"]:
+    #         valid_body = json.loads(item["response"][0]["body"])
+    #         generate_schema(schema, valid_body, openapi_types, openapi_format)
 
-            validate_body_script = ("pm.test(\"{} heeft valide body\", function() {{\n"
-                                "\tconst Ajv = require('ajv');\n"
-                                "\tvar ajv = new Ajv({{logger: console}});\n"
-                                "\tvar schema = {};\n"
-                                "\tpm.expect(ajv.validate(schema, pm.response.json())).to.be.true;\n"
-                                "}});").format(item['name'], json.dumps(schema))
-            event[0]["script"]["exec"].append(validate_body_script)
+    #         validate_body_script = ("pm.test(\"{} heeft valide body\", function() {{\n"
+    #                             "\tconst Ajv = require('ajv');\n"
+    #                             "\tvar ajv = new Ajv({{logger: console}});\n"
+    #                             "\tvar schema = {};\n"
+    #                             "\tpm.expect(ajv.validate(schema, pm.response.json())).to.be.true;\n"
+    #                             "}});").format(item['name'], json.dumps(schema))
+    #         event[0]["script"]["exec"].append(validate_body_script)
     return event
 
 def generate_schema(schema, body, openapi_types, openapi_format):
