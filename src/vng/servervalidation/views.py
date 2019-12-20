@@ -1,10 +1,14 @@
 import json
+import os
 import pytz
+from uuid import uuid4
 from datetime import time
 
+from django.conf import settings
 from django.db import transaction
+from django.core.files.storage import default_storage
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -12,7 +16,7 @@ from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
-from django.views.generic import DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.list import ListView
 from django.core.exceptions import PermissionDenied
 from guardian.mixins import PermissionRequiredMixin
@@ -20,12 +24,14 @@ from guardian.mixins import PermissionRequiredMixin
 import vng.postman.utils as postman
 
 from ..utils import choices
+from ..utils.newman import OpenAPIConverter
 from ..utils.views import OwnerSingleObject, PDFGenerator
 from .forms import (
     CreateServerRunForm, CreateEndpointForm,
     SelectEnvironmentForm, CreateTestScenarioForm,
     TestScenarioUrlFormSet, PostmanTestFormSet,
-    TestScenarioUrlUpdateFormSet, PostmanTestUpdateFormSet, EnvironmentUpdateForm
+    TestScenarioUrlUpdateFormSet, PostmanTestUpdateFormSet, EnvironmentUpdateForm,
+    CollectionGeneratorForm
 )
 from .models import (
     API, ServerRun, Endpoint, TestScenarioUrl, TestScenario, PostmanTest,
@@ -852,3 +858,49 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
             env.serverrun_set.all().delete()
 
         return HttpResponseRedirect(self.get_success_url())
+
+
+class CollectionFromOASView(LoginRequiredMixin, FormView):
+    template_name = "servervalidation/collection_generator.html"
+    form_class = CollectionGeneratorForm
+
+    def get_success_url(self):
+        return reverse("server_run:collection_generator")
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        files = request.FILES.getlist('file_field')
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        oas_converter = OpenAPIConverter()
+        oas_filepath = os.path.join(settings.MEDIA_ROOT, "{}.yaml".format(uuid4()))
+        default_storage.save(oas_filepath, form.cleaned_data["oas_file"])
+
+        tmp_filepath = os.path.join(settings.MEDIA_ROOT, "{}.json".format(uuid4()))
+        generate = oas_converter.generate_collection(oas_filepath, tmp_filepath)
+        if not os.path.exists(tmp_filepath):
+            form.add_error("oas_file", _(
+                "openapi2postman was not able to convert the uploaded file, "
+                "please upload a valid OpenAPI specification"
+            ))
+            return super().form_invalid(form)
+
+        try:
+            oas_converter.process_collection()
+            response = HttpResponse(open(tmp_filepath, "rb"), content_type='application/json')
+            filename = form.cleaned_data["filename"]
+            response['Content-Disposition'] = 'attachment;filename={}.json'.format(filename)
+        except:
+            form.add_error("oas_file", _(
+                "Something went wrong while adding assertions to the postman collection"
+            ))
+            return super().form_invalid(form)
+        finally:
+            os.remove(oas_filepath)
+            os.remove(tmp_filepath)
+        return response
