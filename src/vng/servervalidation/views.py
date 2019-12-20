@@ -790,12 +790,12 @@ class UpdateEndpointView(ObjectPermissionMixin, PermissionRequiredMixin, LoginRe
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
 
-        data['env_form'] = EnvironmentUpdateForm()
-
         pre_form = data['form']
 
         self.env = self.get_object()
         self.ts = self.env.test_scenario
+
+        data['env_form'] = EnvironmentUpdateForm(initial={"name": self.env.name})
 
         data['ts'] = self.ts
         data['test_scenario'] = TestScenarioUrl.objects.filter(test_scenario=self.ts)
