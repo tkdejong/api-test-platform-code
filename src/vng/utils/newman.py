@@ -19,7 +19,7 @@ class DidNotRunException(Exception):
 class NewmanManager:
     REPORT_FOLDER = settings.MEDIA_ROOT + '/newman'
     newman_path = os.path.join(settings.BASE_DIR, 'node_modules', 'newman', 'bin', 'newman.js')
-    RUN_REPORT = ('NODE_OPTIONS="--max-old-space-size=2048" '
+    RUN_REPORT = ('NODE_OPTIONS="--max-old-space-size=4096" '
                        '{} run --reporters "htmlextra,json" {} '
                        '--timeout-request 50000 '
                        '--reporter-htmlextra-darkTheme '
