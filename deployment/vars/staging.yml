@@ -3,7 +3,7 @@
 user_name: maykin
 group_name: staff
 project_name: vng
-target: staging
+target: develop
 project_root: "/srv/sites/{{ project_name }}-{{ target }}"
 project_src_dir: "vng"
 celery_worker_path: "vng"
