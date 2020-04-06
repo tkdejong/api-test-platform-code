@@ -18,6 +18,7 @@
     "homepage": "https://maykinmedia.nl",
     "dependencies": {
         "@coreui/coreui": "^2.1.9",
+        "acorn": "^7.1.1",
         "bem.js": "^1.0.10",
         "bootstrap": "^4.3.1",
         "bourbon-neat": "^1.8.0",
@@ -29,6 +30,7 @@
         "json-formatter-js": "^2.2.1",
         "kind-of": "^6.0.3",
         "material-design-icons": "2.2.3",
+        "minimist": "^1.2.5",
         "newman": "^4.5.7",
         "newman-reporter-html": "^1.0.5",
         "newman-reporter-htmlextra": "^1.8.2",
