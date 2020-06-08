@@ -512,7 +512,7 @@ class TestUrlMatchingPatterns(WebTest):
         self.assertEqual(last_report.scenario_case, self.scenario_case)
 
 
-@override_settings(SUBDOMAIN_SEPARATOR='-')
+@override_settings(SUBDOMAIN_SEPARATOR='-', ALLOWED_HOSTS=["*"])
 class TestSandboxMode(WebTest):
 
     def setUp(self):
@@ -520,7 +520,7 @@ class TestSandboxMode(WebTest):
         self.sc = ScenarioCaseFactory(url='status/{code}')
         self.endpoint = VNGEndpointFactory(
             scenario_collection=self.sc.collection,
-            url='https://postman-echo.com/'
+            url='https://postman-echo.com'
         )
         self.session_type = self.endpoint.session_type
 
