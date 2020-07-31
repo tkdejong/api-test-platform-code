@@ -710,7 +710,10 @@ class TestScenarioUpdateView(ObjectPermissionMixin, PermissionRequiredMixin, Log
             for data in variable_form.cleaned_data:
                 if data:
                     if data["DELETE"]:
-                        data["id"].delete()
+                        # In case a new variable was added, but it also was
+                        # marked for deletion
+                        if data["id"]:
+                            data["id"].delete()
                     elif data["id"] is not None:
                         instance = data.pop("id")
                         data.pop("DELETE")
