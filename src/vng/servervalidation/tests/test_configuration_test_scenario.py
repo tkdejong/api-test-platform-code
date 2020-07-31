@@ -377,6 +377,33 @@ class TestScenarioUpdateTests(WebTest):
         self.assertEqual(test_scenario_url.hidden, False)
         self.assertEqual(test_scenario_url.placeholder, 'https://example.com')
 
+    def test_update_scenario_add_and_delete_new_variable(self):
+        response = self.app.get(reverse('server_run:testscenario-update', kwargs={
+            'api_id': self.api.id,
+            'scenario_uuid': self.test_scenario.uuid
+        }), {"extra": 1}, user=self.user)
+
+        number_of_vars = self.test_scenario.testscenariourl_set.count()
+
+        form = response.forms[1]
+
+        form['testscenariourl_set-1-name'] = 'newvar'
+        form['testscenariourl_set-1-url'] = True
+        form['testscenariourl_set-1-hidden'] = False
+        form['testscenariourl_set-1-placeholder'] = 'https://example.com'
+        form['testscenariourl_set-1-DELETE'] = True
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.location, reverse('server_run:test-scenario_list', kwargs={
+            'api_id': self.api.id,
+        }))
+
+        self.assertEqual(self.test_scenario.testscenariourl_set.count(), number_of_vars)
+
+        self.assertFalse(TestScenarioUrl.objects.filter(name="newvar"))
+
     def test_update_scenario_update_existing_postman_test(self):
         response = self.app.get(reverse('server_run:testscenario-update', kwargs={
             'api_id': self.api.id,
