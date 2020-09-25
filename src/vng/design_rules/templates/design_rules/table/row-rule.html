@@ -1,0 +1,112 @@
+{% load subdomainurls %}
+{% load l10n %}
+{% load i18n %}
+
+{% spaceless %}
+<tr>
+    <td>
+        <a href="{% url 'design_rules:detail' api.id session.uuid %}">#{{ session.id|unlocalize }}</a>
+    </td>
+    <td>
+        {% if session.status == choices.running %}
+            <span class="badge badge-pill badge-success">{% trans "Running" %}</span>
+        {% elif session.status == choices.starting %}
+            <span class="badge badge-pill badge-light">{% trans "Starting" %}</span>
+        {% elif session.status == choices.stopped %}
+            <span class="badge badge-pill badge-secondary">{% trans "Stopped" %}</span>
+        {% elif session.status == choices.error_deploy %}
+            <span class="badge badge-pill badge-danger">{% trans "Error during deployment" %}</span>
+        {% else %}
+            <span class="badge badge-pill badge-dark">{{session.status}}</span>
+        {% endif %}
+    </td>
+    <td>
+        {{session.started_at|date:"N j, Y, H:i" }}
+    </td>
+    <td>{{ session.api_endpoint }}</td>
+
+    <td class="td-20">
+        {% if session.status == choices.error_deploy %}
+            {{ session.error_message }}
+        {% else %}
+            <ul class="list-group">
+                {% for endpoint in session.exposedurl_set.all %}
+                    {% if endpoint.subdomain %}
+                        <li class="list-group-item">
+                            <a href="#">
+                                {{endpoint.vng_endpoint.name}}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </td>
+
+    {% if session.is_starting and session.deploy_status %}
+        <td class='starting' id='test' class='td-20' session_id='{{session.id|unlocalize}}' session_uuid='{{session.uuid}}'>
+            <div class="progress-group">
+                <div class="progress-group-header">
+                    <i class="cui-cloud progress-group-icon"></i>
+                    <div class="statuslabel"></div>
+                    <div class="ml-auto font-weight-bold progressbar-indicator" ></div>
+                </div>
+                <div class="progress-group-bars">
+                    <div class="progress progress-xs">
+                    <div class="progress-bar bg-success progressbar" role="progressbar"  aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td>
+        </td>
+    {% else %}
+        <td>
+            {{session_related.1}} <i class="cui-check"></i>
+            {{session_related.2}} <i class="cui-x-circle"></i>
+            {{session_related.3}} <i class="cui-ban"></i>
+        </td>
+        <td>
+            {% for eu in session.exposedurl_set.all %}
+                {% if eu.test_session %}
+                        {% if eu.test_session.is_success_test %}
+                            <i class="icon icon--checkmark"></i>
+                        {% else %}
+                            <i class="icon icon--cross"></i>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </td>
+    {% endif %}
+    <td>
+        {% if session.is_running %}
+            <form method="POST" action="#">
+                {% csrf_token %}
+                <input type="submit" type="button" class="btn btn-primary" value="Stop">
+            </form>
+        {% else %}
+            <table>
+            {% comment '' %}
+            {% for endpoint in session.exposedurl_set.all %}
+                <tr>
+                    <td>
+                        {% if endpoint.test_session %}
+                        <input type="button" class="btn btn-primary" value="{{endpoint.vng_endpoint.name}} Data test report" onclick="location.href = '#';">
+                        {% endif %}
+                    <td>
+                </tr>
+            {% endfor %}
+            {% endcomment %}
+            </table>
+        {% endif %}
+    </td>
+    <td>
+        <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+            <a href="#">
+                <img style='height:30px ' alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}#">
+            </a>
+        </span>
+    </td>
+</tr>
+{% endspaceless %}

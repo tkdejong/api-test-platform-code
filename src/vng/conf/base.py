@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'vng.apiAuthentication',
     'vng.servervalidation',
     'vng.postman',
+    'vng.design_rules',
     # Disabled for the moment, enable if want to use its functionalities
     # 'vng.openApiInspector',
     'vng.celery',

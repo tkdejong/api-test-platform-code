@@ -1,0 +1,44 @@
+{% extends 'master.html' %}
+{% load sniplates django_bootstrap_breadcrumbs subdomainurls i18n %}
+
+
+{% block title %}{% trans "Test consumer - list sessions view" %}{% endblock %}
+
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Consumer test-sessions for " %} <b>{{api.name}}</b>
+                    <a href="{% url 'design_rules:create' api.id %}" class="btn btn-success float-right"><i class="cui-media-play"></i> {% trans "Start session" %}</a>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        {% include 'testsession/table/header-session.html' only %}
+                        {% for session in object_list %}
+                            {% include 'design_rules/table/row-rule.html' with session=session %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="9">
+                                    {% trans "There are no sessions yet. Please start a session" %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% include 'components/pagination/pagination.html' %}
+                </div>
+            </div>
+        </div>
+
+            {% endblock %}
+
+{% block script %}
+<script>
+    window.url = window.location.origin + "/api/v1/status/"
+    window.attr_name = 'session_uuid'
+    window.status = 'deploy_status'
+    window.percentage = 'deploy_percentage'
+</script>
+{% endblock %}
