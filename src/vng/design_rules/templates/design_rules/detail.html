@@ -1,13 +1,11 @@
 {% extends 'master.html' %}
-{% load django_bootstrap_breadcrumbs %}
-{% load i18n %}
+{% load django_bootstrap_breadcrumbs i18n l10n %}
 
 {% block title %}{% trans "Test consumer - Detail session view" %}{% endblock%}
 
 {% block breadcrumb %}
-{% breadcrumb "Home" 'testsession:sessions' object.session.session_type.api.id %}
-{% breadcrumb "Log" "testsession:session_log" object.session.session_type.api.id object.session.uuid %}
-{% breadcrumb 'Detail rule' 'testsession:sessions' object.session.session_type.api.id %}
+{% breadcrumb "Home" 'design_rules:list' %}
+{% breadcrumb 'Detail rule' 'design_rules:detail' uuid=object.uuid %}
 {% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
 {% endblock %}
 
@@ -17,31 +15,51 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
-                    {% trans "Design rule tests -" %} {{ object.session }}
+                    {% trans "Design rule tests -" %} {{ object.api_endpoint }}
+                    <a href="{% url 'design_rules:session_create' object.uuid %}" class="btn btn-success float-right"><i class="cui-media-play"></i> {% trans "Start session" %}</a>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ object.date }}</h5>
-                    <p class="card-text">
-                        <strong>{% trans "Request" %}: {{ object.request_path }}</strong>
-                    </p>
-                    <table class="table table-striped">
-                        <thead>
+                    <table class="table">
+                        <tr>
+                            <th scope='col'>{% trans "Design rule UUID" %}</th>
+                            <th scope='col'>{% trans "Started at" %}</th>
+                            <th scope='col'>{% trans "Endpoint" %}</th>
+                            <th scope='col'>{% trans "Successful" %}</th>
+                            <th scope='col'>{% trans "Score" %}</th>
+                            <th scope='col'>{% trans "Badge" %}</th>
+                        </tr>
+                        {% for session in object.sessions.all %}
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">{% trans "Success" %}</th>
-                                <th scope="col">{% trans "Errors" %}</th>
+                                <td>
+                                    <a href="{% url 'design_rules:session_detail' object.uuid session.uuid %}">{{ session.uuid }}</a>
+                                </td>
+                                <td>{{session.started_at|date:"N j, Y, H:i" }}</td>
+                                <td>{{ object.api_endpoint }}</td>
+                                <td>
+                                    {% if session.successful %}
+                                        <i class="cui-check"></i>
+                                    {% else %}
+                                        <i class="cui-x-circle"></i>
+                                    {% endif %}
+                                </td>
+                                <td>{{ session.percentage_score }}%</td>
+                                <td>
+                                    <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                                        <a href="#">
+                                            <img style='height:30px ' alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:session-shield' session.id %}">
+                                        </a>
+                                    </span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for result in object.results.all %}
+                        {% empty %}
                             <tr>
-                                <th scope="row">{{ result.get_rule_type_display }}</th>
-                                <td>{{ result.success }}</td>
-                                <td>{{ result.errors }}</td>
+                                <td colspan="9">
+                                    {% trans "There are no sessions yet. Please start a session" %}
+                                </td>
                             </tr>
-                            {%endfor%}
-                        </tbody>
+                        {% endfor %}
                     </table>
+                    {% include 'components/pagination/pagination.html' %}
                 </div>
             </div>
         </div>

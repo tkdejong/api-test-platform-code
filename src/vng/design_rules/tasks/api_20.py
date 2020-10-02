@@ -1,16 +1,24 @@
 import re
-import requests
 
 from ..choices import DesignRuleChoices
-from ..models import DesignRuleResult
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 SKIPPED_METHODS = ["PARAMETERS"]
+REGEX_END_WITH_VERSION = r"\/v[\d]+$"
+REGEX_OTHER = r"\/v[\d]+[\/]?[^\w.,]"
+REGEX_MINOR_VERSION = r"(\/v[\d]+[.][\d+])"
 
 
-def run_api_20_test_rules(session):
+def run_api_20_test_rules(session, api_endpoint):
     """
+    https://docs.geostandaarden.nl/api/API-Designrules/#api-20-include-the-major-version-number-only-in-ihe-uri
+    3.13 API-20: Include the major version number only in ihe URI
+
+    The URI of an API should include the major version number only. The minor and patch version numbers
+    are in the response header of the message. Minor and patch versions have no impact on existing code,
+    but major version do.
     """
+    from ..models import DesignRuleResult
 
     # We do not want double results for the same design rule
     base_qs = session.results.filter(rule_type=DesignRuleChoices.api_20)
@@ -19,13 +27,19 @@ def run_api_20_test_rules(session):
 
     result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_20)
 
-    searches = re.search("(\/v[\d]+[\/]?[^\w.,])", session.api_endpoint)
+    searches = re.finditer(REGEX_END_WITH_VERSION, api_endpoint, re.IGNORECASE)
     if searches:
         result.success = True
         result.save()
         return result
 
-    searches = re.search("(\/v[\d]+[.][\d+])", session.api_endpoint)
+    searches = re.finditer(REGEX_OTHER, api_endpoint, re.IGNORECASE)
+    if searches:
+        result.success = True
+        result.save()
+        return result
+
+    searches = re.search(REGEX_MINOR_VERSION, api_endpoint, re.IGNORECASE)
     if searches:
         result.success = False
         result.errors = "The api endpoint contains more than the major version number in the URI"

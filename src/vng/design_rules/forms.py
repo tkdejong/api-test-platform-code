@@ -1,9 +1,9 @@
 from django import forms
 
-from .models import DesignRuleSession
+from .models import DesignRuleTestSuite
 
 
-class DesignRulesSessionForm(forms.ModelForm):
+class DesignRuleTestSuiteForm(forms.ModelForm):
     class Meta:
-        model = DesignRuleSession
+        model = DesignRuleTestSuite
         fields = ("api_endpoint", )

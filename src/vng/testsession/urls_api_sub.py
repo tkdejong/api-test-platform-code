@@ -1,13 +1,10 @@
-from django.conf.urls import include, url
-from django.contrib.auth.decorators import login_required
+from django.conf.urls import url
 
-from rest_framework import routers, serializers, viewsets
-
-from . import views
-from . import api_views, apps
+from vng.api.v1.testsession.views import RunTest
+from . import apps
 from ..base_url import base_urlpatterns
 app_name = apps.AppConfig.__name__
 
 urlpatterns = [
-    url(r'^(?P<relative_url>[-\w|/|\.]*)$', api_views.RunTest.as_view(), name='run_test'),
+    url(r'^(?P<relative_url>[-\w|/|\.]*)$', RunTest.as_view(), name='run_test'),
 ] + base_urlpatterns

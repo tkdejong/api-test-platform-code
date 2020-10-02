@@ -1,16 +1,17 @@
-import requests
-
 from ..choices import DesignRuleChoices
-from ..models import DesignRuleResult
 
 PARAMETERS = ["PARAMETERS"]
 
 
 def run_api_09_test_rules(session):
     """
-    THis test is not working yet...
-    Also I need to add the descroption and url of the rule.
+    https://docs.geostandaarden.nl/api/API-Designrules/#api-09-implement-custom-representation-if-supported
+    3.7 API-09: Implement custom representation if supported
+
+    Provide a comma-separated list of field names using the query parameter fields te retrieve a custom
+    representation. In case non-existent field names are passed, a 400 Bad Request error message is returned.
     """
+    from ..models import DesignRuleResult
 
     # We do not want double results for the same design rule
     base_qs = session.results.filter(rule_type=DesignRuleChoices.api_09)
@@ -19,11 +20,31 @@ def run_api_09_test_rules(session):
 
     result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_09)
 
-    response = requests.get(session.api_endpoint)
-    json_spec = response.json()
-    paths = json_spec.get("paths")
-    wrong_paths_with_method = ""
+    # Only execute when there is a JSON response
+    if not session.json_result:
+        result.success = False
+        result.errors = "The API did not give a valid JSON output."
+        result.save()
+        return result
+
+    paths = session.json_result.get("paths", {})
+    errors = ""
+    found_fields = False
     for path, methods in paths.items():
         for method, options in methods.items():
             if method.upper() in PARAMETERS:
-                print(options)
+                for parameter in options:
+                    print(parameter)
+                    if parameter.get('name') == "fields":
+                        found_fields = True
+
+    if not found_fields:
+        result.success = True
+    elif errors:
+        result.success = False
+        result.errors = ["Fields found"]
+    else:
+        result.success = True
+
+    result.save()
+    return result
