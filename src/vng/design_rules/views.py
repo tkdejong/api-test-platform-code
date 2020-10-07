@@ -27,7 +27,7 @@ class DesignRulesCreateView(CreateView):
         return response
 
     def get_success_url(self) -> str:
-        return reverse("design_rules:list", kwargs={"api_id": self.kwargs['api_id']})
+        return reverse("design_rules:list")
 
 
 class DesignRulesDetailView(DetailView):
@@ -48,7 +48,7 @@ class DesignRuleSessionCreateView(SingleObjectMixin, RedirectView):
         return super().get(*args, **kwargs)
 
     def get_redirect_url(self, **kwargs) -> str:
-        return reverse("design_rules:detail", kwargs={"api_id": self.kwargs['api_id'], "uuid": self.object.uuid})
+        return reverse("design_rules:detail", kwargs={"uuid": self.object.uuid})
 
 
 class DesignRuleSessionDetailView(DetailView):
