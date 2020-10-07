@@ -4,7 +4,6 @@ import logging
 import requests
 
 from urllib import parse
-from zds_client import ClientAuth
 from subdomains.utils import reverse as reverse_sub
 from django.shortcuts import get_object_or_404
 from django.views import View
@@ -17,27 +16,27 @@ from django.http import (
 
 from rest_framework import generics, permissions, viewsets, views, mixins
 from rest_framework.authentication import (
-    SessionAuthentication, TokenAuthentication
+    SessionAuthentication
 )
 from drf_yasg.utils import swagger_auto_schema
 
-from .models import (
+from vng.testsession.models import (
     ScenarioCase, Session, SessionLog, SessionType, ExposedUrl, Report,
     QueryParamsScenario, InjectHeader
 )
 
-from ..servervalidation.serializers import ServerRunResultShield
-from ..utils import choices
-from ..utils.views import CSRFExemptMixin
+from vng.servervalidation.serializers import ServerRunResultShield
+from vng.utils import choices
+from vng.utils.views import CSRFExemptMixin
 
-from .permission import IsOwner
+from vng.testsession.permission import IsOwner
 from .serializers import (
     SessionSerializer, SessionTypesSerializer, ExposedUrlSerializer, ScenarioCaseSerializer,
     SessionStatusSerializer
 )
-from .views import bootstrap_session
-from .task import run_tests, stop_session
-from ..utils.auth import get_jwt
+from vng.testsession.views import bootstrap_session
+from vng.testsession.task import run_tests, stop_session
+from vng.utils.auth import get_jwt
 
 from vng.apiAuthentication.authentication import CustomTokenAuthentication
 

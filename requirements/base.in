@@ -21,7 +21,7 @@ django-countries
 djangorestframework-filters
 django-solo
 django-dynamic-raw-id
-djangorestframework
+djangorestframework<3.11.0
 google-api-python-client
 oauth2client
 easy-thumbnails
@@ -56,4 +56,5 @@ elastic-apm
 mobetta
 django-mathfilters
 openpyxl>=2.5.11
+drf-spectacular==0.9.14
 -e git+https://github.com/maykinmedia/django-subdomains.git@d1a88358569f522a81f1b9b3659aa429e55f22ea#egg=django_subdomains

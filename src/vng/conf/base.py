@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'captcha',
     'filer',
     'mptt',
-    'drf_yasg',
+    # 'drf_yasg',
     'hijack',
     'tinymce',
     'compat',  # Part of hijack
@@ -77,14 +77,17 @@ INSTALLED_APPS = [
     'vng.apiAuthentication',
     'vng.servervalidation',
     'vng.postman',
+    'vng.design_rules',
     # Disabled for the moment, enable if want to use its functionalities
     # 'vng.openApiInspector',
     'vng.celery',
     'vng.k8s_manager',
+    'vng.api',
     'vng',
 
     # Rest Framework
     'rest_framework',
+    'drf_spectacular',
     'rest_auth',
     # 'rest_framework.authtoken',
 ]
@@ -103,7 +106,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 'rest_framework.authentication.TokenAuthentication',
         'vng.apiAuthentication.authentication.CustomTokenAuthentication',
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SITE_ID = 1
@@ -432,3 +436,12 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 REST_AUTH_TOKEN_CREATOR = 'vng.apiAuthentication.utils.create_token'
 
 SHIELDS_URL = 'https://shields.api-test.nl'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API test platform API',
+    'VERSION': '1.0.1',
+    'DESCRIPTION': "This is the API for the API test platform. So you can test if your api's validate to the dutch government standards",
+    'PREPROCESSING_HOOKS': [
+        "vng.utils.preprocess_exclude_paths.preprocess_exclude_admin_path",
+    ],
+}

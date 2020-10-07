@@ -113,6 +113,8 @@ ELASTIC_APM = {
     'DEBUG': True
 }
 
+ADMIN_INDEX_AUTO_CREATE_APP_GROUP = True
+
 # Override settings with local settings.
 try:
     from .local import *  # noqa

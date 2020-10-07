@@ -1,9 +1,8 @@
 from rest_framework import serializers
-from django.urls import reverse
 from django.conf import settings
 from subdomains.utils import reverse as reverse_sub
 
-from .models import SessionType, ExposedUrl, Session, ScenarioCase
+from vng.testsession.models import SessionType, ExposedUrl, Session, ScenarioCase
 
 
 class SessionTypesSerializer(serializers.ModelSerializer):
@@ -94,4 +93,3 @@ class ScenarioCaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScenarioCase
         fields = ['url', 'http_method', 'collection']
-
