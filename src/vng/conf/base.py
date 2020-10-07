@@ -441,7 +441,8 @@ SHIELDS_URL = 'https://shields.api-test.nl'
 
 
 DRF_YASG_EXCLUDE_PATHS = [
-    '/admin/mobetta/'
+    '/admin/mobetta/',
+    '/admin/mobettaapi/'
 ]
 SWAGGER_SETTINGS = BASE_SWAGGER_SETTINGS.copy()
 SWAGGER_SETTINGS.update(
@@ -449,22 +450,5 @@ SWAGGER_SETTINGS.update(
         "DEFAULT_INFO": "vng.api.v1.schema.info",
         "DEFAULT_AUTO_SCHEMA_CLASS": "vng.api.v1.inspectors.AutoSchema",
         "DEFAULT_GENERATOR_CLASS": "vng.api.v1.generators.CustomOpenAPISchemaGenerator",
-        # "SECURITY_DEFINITIONS": {
-        #     SECURITY_DEFINITION_NAME: {
-        #         # OAS 3.0
-        #         "type": "http",
-        #         "scheme": "bearer",
-        #         "bearerFormat": "JWT",
-        #         # not official...
-        #         # 'scopes': {},  # TODO: set up registry that's filled in later...
-        #         # Swagger 2.0
-        #         # 'name': 'Authorization',
-        #         # 'in': 'header'
-        #         # 'type': 'apiKey',
-        #     }
-        # },
-        # "DEFAULT_FIELD_INSPECTORS": (
-        #     "vng_api_common.inspectors.geojson.GeometryFieldInspector",
-        # )
     }
 )

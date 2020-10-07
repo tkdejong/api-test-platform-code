@@ -2,8 +2,6 @@ import re
 
 from ..choices import DesignRuleChoices
 
-VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-SKIPPED_METHODS = ["PARAMETERS"]
 REGEX_END_WITH_VERSION = r"\/v[\d]+$"
 REGEX_OTHER = r"\/v[\d]+[\/]?[^\w.,]"
 REGEX_MINOR_VERSION = r"(\/v[\d]+[.][\d+])"
@@ -27,19 +25,19 @@ def run_api_20_test_rules(session, api_endpoint):
 
     result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_20)
 
-    searches = re.finditer(REGEX_END_WITH_VERSION, api_endpoint, re.IGNORECASE)
+    searches = re.findall(REGEX_END_WITH_VERSION, api_endpoint, re.IGNORECASE)
     if searches:
         result.success = True
         result.save()
         return result
 
-    searches = re.finditer(REGEX_OTHER, api_endpoint, re.IGNORECASE)
+    searches = re.findall(REGEX_OTHER, api_endpoint, re.IGNORECASE)
     if searches:
         result.success = True
         result.save()
         return result
 
-    searches = re.search(REGEX_MINOR_VERSION, api_endpoint, re.IGNORECASE)
+    searches = re.findall(REGEX_MINOR_VERSION, api_endpoint, re.IGNORECASE)
     if searches:
         result.success = False
         result.errors = "The api endpoint contains more than the major version number in the URI"

@@ -12,8 +12,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='postmantest',
-            name='_validation_file',
-        ),
+        # migrations.RemoveField(
+        #     model_name='postmantest',
+        #     name='_validation_file',
+        # ),
     ]

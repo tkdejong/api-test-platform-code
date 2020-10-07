@@ -46,11 +46,11 @@ class Migration(migrations.Migration):
             name='test_scenario',
             field=models.ForeignKey(help_text='The name of the test scenario to which this Postman test is linked', on_delete=django.db.models.deletion.PROTECT, to='servervalidation.TestScenario'),
         ),
-        migrations.AlterField(
-            model_name='postmantest',
-            name='validation_file',
-            field=filer.fields.file.FilerFileField(blank=True, default=None, help_text='The actual file containing the Postman collection', null=True, on_delete=django.db.models.deletion.SET_NULL, to='filer.File'),
-        ),
+        # migrations.AlterField(
+        #     model_name='postmantest',
+        #     name='validation_file',
+        #     field=filer.fields.file.FilerFileField(blank=True, default=None, help_text='The actual file containing the Postman collection', null=True, on_delete=django.db.models.deletion.SET_NULL, to='filer.File'),
+        # ),
         migrations.AlterField(
             model_name='postmantest',
             name='version',

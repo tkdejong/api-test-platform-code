@@ -36,3 +36,5 @@ vng.db-journal
 src/celerybeat-schedule
 src/celerybeat.pid
 vng.db*
+.coverage
+coverage.xml

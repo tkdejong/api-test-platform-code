@@ -1,6 +1,35 @@
+import os
+
+from django.conf import settings
 from django.urls import include, path
 
-from vng_api_common.schema import SchemaView
+from vng_api_common.schema import OpenAPIV3RendererMixin, SchemaView as _SchemaView
+
+from drf_yasg.renderers import SwaggerJSONRenderer
+from .generators import CustomOpenAPISchemaGenerator
+
+
+SPEC_RENDERERS = (
+    type("SwaggerJSONRenderer", (OpenAPIV3RendererMixin, SwaggerJSONRenderer), {}),
+)
+
+
+class SchemaView(_SchemaView):
+    generator_class = CustomOpenAPISchemaGenerator
+
+    @property
+    def _is_openapi_v2(self) -> bool:
+        return False
+
+    def get_renderers(self):
+        if self._is_openapi_v2:
+            return super().get_renderers()
+        return [renderer() for renderer in SPEC_RENDERERS]
+
+    def get_schema_path(self) -> str:
+        return self.schema_path or os.path.join(
+            settings.BASE_DIR, "src", "openapi.json"
+        )
 
 
 urlpatterns = [

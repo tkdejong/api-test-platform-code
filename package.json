@@ -8,7 +8,7 @@
     },
     "scripts": {
         "test": "gulp test",
-        "convert": "swagger2openapi src/swagger2.0.json -o src/openapi.yaml"
+        "convert": "swagger2openapi src/swagger2.0.json -o src/openapi.json"
     },
     "repository": {
         "type": "git",

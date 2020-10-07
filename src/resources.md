@@ -4,29 +4,6 @@ Dit document beschrijft de (RGBZ-)objecttypen die als resources ontsloten
 worden met de beschikbare attributen.
 
 
-## MessageComment
-
-Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/objecttype/messagecomment)
-
-| Attribuut | Omschrijving | Type | Verplicht | CRUD* |
-| --- | --- | --- | --- | --- |
-| msghash |  | string | ja | C​R​U​D |
-| translation_file |  | integer | ja | C​R​U​D |
-| body |  | string | ja | C​R​U​D |
-| created |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
-| comment_count |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
-| user_name |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
-
-## TranslationFile
-
-Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/objecttype/translationfile)
-
-| Attribuut | Omschrijving | Type | Verplicht | CRUD* |
-| --- | --- | --- | --- | --- |
-| name |  | string | ja | C​R​U​D |
-| filepath |  | string | ja | C​R​U​D |
-| language_code |  | string | ja | C​R​U​D |
-
 ## DesignRuleResult
 
 Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/objecttype/designruleresult)

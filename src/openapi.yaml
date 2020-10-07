@@ -7,1701 +7,9 @@ info:
 security:
 - Basic: []
 paths:
-  /admin/mobettaapi/comments/:
-    get:
-      operationId: admin_mobettaapi_comments_list
-      description: ViewSet for fetching/posting `MessageComment`s
-      responses:
-        '200':
-          description: OK
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MessageComment'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
+  /auth/login:
     post:
-      operationId: admin_mobettaapi_comments_create
-      description: ViewSet for fetching/posting `MessageComment`s
-      parameters:
-      - name: Content-Type
-        in: header
-        description: Content type of the request body.
-        required: true
-        schema:
-          type: string
-          enum:
-          - application/json
-      requestBody:
-        $ref: '#/components/requestBodies/MessageComment'
-      responses:
-        '201':
-          description: Created
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-            Location:
-              schema:
-                type: string
-                format: uri
-              description: URL waar de resource leeft.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MessageComment'
-        '400':
-          description: Bad request
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ValidatieFout'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    parameters: []
-  /admin/mobettaapi/comments/{id}/:
-    get:
-      operationId: admin_mobettaapi_comments_read
-      description: ViewSet for fetching/posting `MessageComment`s
-      parameters:
-      - name: If-None-Match
-        in: header
-        description: Perform conditional requests. This header should contain one
-          or multiple ETag values of resources the client has cached. If the current
-          resource ETag value is in this set, then an HTTP 304 empty body will be
-          returned. See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)
-          for details.
-        required: false
-        examples:
-          oneValue:
-            summary: One ETag value
-            value: '"79054025255fb1a26e4bc422aef54eb4"'
-          multipleValues:
-            summary: Multiple ETag values
-            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
-        schema:
-          type: string
-      responses:
-        '200':
-          description: OK
-          headers:
-            ETag:
-              description: De ETag berekend op de response body JSON. Indien twee
-                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
-                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
-              schema:
-                type: string
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MessageComment'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    put:
-      operationId: admin_mobettaapi_comments_update
-      description: ViewSet for fetching/posting `MessageComment`s
-      parameters:
-      - name: Content-Type
-        in: header
-        description: Content type of the request body.
-        required: true
-        schema:
-          type: string
-          enum:
-          - application/json
-      requestBody:
-        $ref: '#/components/requestBodies/MessageComment'
-      responses:
-        '200':
-          description: OK
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MessageComment'
-        '400':
-          description: Bad request
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ValidatieFout'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    patch:
-      operationId: admin_mobettaapi_comments_partial_update
-      description: ViewSet for fetching/posting `MessageComment`s
-      parameters:
-      - name: Content-Type
-        in: header
-        description: Content type of the request body.
-        required: true
-        schema:
-          type: string
-          enum:
-          - application/json
-      requestBody:
-        $ref: '#/components/requestBodies/MessageComment'
-      responses:
-        '200':
-          description: OK
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MessageComment'
-        '400':
-          description: Bad request
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ValidatieFout'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    delete:
-      operationId: admin_mobettaapi_comments_delete
-      description: ViewSet for fetching/posting `MessageComment`s
-      responses:
-        '204':
-          description: No content
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    parameters:
-    - name: id
-      in: path
-      description: A unique integer value identifying this message comment.
-      required: true
-      schema:
-        type: integer
-  /admin/mobettaapi/files/:
-    get:
-      operationId: admin_mobettaapi_files_list
-      description: ViewSet for fetching info about a translation file.
-      responses:
-        '200':
-          description: OK
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TranslationFile'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    post:
-      operationId: admin_mobettaapi_files_create
-      description: ViewSet for fetching info about a translation file.
-      parameters:
-      - name: Content-Type
-        in: header
-        description: Content type of the request body.
-        required: true
-        schema:
-          type: string
-          enum:
-          - application/json
-      requestBody:
-        $ref: '#/components/requestBodies/TranslationFile'
-      responses:
-        '201':
-          description: Created
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-            Location:
-              schema:
-                type: string
-                format: uri
-              description: URL waar de resource leeft.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TranslationFile'
-        '400':
-          description: Bad request
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ValidatieFout'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    parameters: []
-  /admin/mobettaapi/files/{id}/:
-    get:
-      operationId: admin_mobettaapi_files_read
-      description: ViewSet for fetching info about a translation file.
-      parameters:
-      - name: If-None-Match
-        in: header
-        description: Perform conditional requests. This header should contain one
-          or multiple ETag values of resources the client has cached. If the current
-          resource ETag value is in this set, then an HTTP 304 empty body will be
-          returned. See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)
-          for details.
-        required: false
-        examples:
-          oneValue:
-            summary: One ETag value
-            value: '"79054025255fb1a26e4bc422aef54eb4"'
-          multipleValues:
-            summary: Multiple ETag values
-            value: '"79054025255fb1a26e4bc422aef54eb4", "e4d909c290d0fb1ca068ffaddf22cbd0"'
-        schema:
-          type: string
-      responses:
-        '200':
-          description: OK
-          headers:
-            ETag:
-              description: De ETag berekend op de response body JSON. Indien twee
-                resources exact dezelfde ETag hebben, dan zijn deze resources identiek
-                aan elkaar. Je kan de ETag gebruiken om caching te implementeren.
-              schema:
-                type: string
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TranslationFile'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    put:
-      operationId: admin_mobettaapi_files_update
-      description: ViewSet for fetching info about a translation file.
-      parameters:
-      - name: Content-Type
-        in: header
-        description: Content type of the request body.
-        required: true
-        schema:
-          type: string
-          enum:
-          - application/json
-      requestBody:
-        $ref: '#/components/requestBodies/TranslationFile'
-      responses:
-        '200':
-          description: OK
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TranslationFile'
-        '400':
-          description: Bad request
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ValidatieFout'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    patch:
-      operationId: admin_mobettaapi_files_partial_update
-      description: ViewSet for fetching info about a translation file.
-      parameters:
-      - name: Content-Type
-        in: header
-        description: Content type of the request body.
-        required: true
-        schema:
-          type: string
-          enum:
-          - application/json
-      requestBody:
-        $ref: '#/components/requestBodies/TranslationFile'
-      responses:
-        '200':
-          description: OK
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TranslationFile'
-        '400':
-          description: Bad request
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ValidatieFout'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    delete:
-      operationId: admin_mobettaapi_files_delete
-      description: ViewSet for fetching info about a translation file.
-      responses:
-        '204':
-          description: No content
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-        '401':
-          description: Unauthorized
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '403':
-          description: Forbidden
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '404':
-          description: Not found
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '406':
-          description: Not acceptable
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '409':
-          description: Conflict
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '410':
-          description: Gone
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '415':
-          description: Unsupported media type
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '429':
-          description: Too many requests
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-        '500':
-          description: Internal server error
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Fout'
-      tags:
-      - admin
-    parameters:
-    - name: id
-      in: path
-      description: A unique integer value identifying this translation file.
-      required: true
-      schema:
-        type: integer
-  /admin/mobettaapi/suggestion/:
-    get:
-      operationId: admin_mobettaapi_suggestion_list
-      description: View for fetching translation suggestions using MS Translate.
-      responses:
-        '200':
-          description: OK
-          headers:
-            API-version:
-              schema:
-                type: string
-              description: 'Geeft een specifieke API-versie aan in de context van
-                een specifieke aanroep. Voorbeeld: 1.2.1.'
-      tags:
-      - admin
-    parameters: []
-  /api/v1/auth/login:
-    post:
-      operationId: api_v1_auth_login_create
+      operationId: auth_login_create
       description: ''
       parameters:
       - name: Content-Type
@@ -1737,11 +45,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Login'
       tags:
-      - api
+      - auth
     parameters: []
-  /api/v1/auth/logout:
+  /auth/logout:
     get:
-      operationId: api_v1_auth_logout_list
+      operationId: auth_logout_list
       description: ''
       responses:
         '200':
@@ -1753,9 +61,9 @@ paths:
               description: 'Geeft een specifieke API-versie aan in de context van
                 een specifieke aanroep. Voorbeeld: 1.2.1.'
       tags:
-      - api
+      - auth
     post:
-      operationId: api_v1_auth_logout_create
+      operationId: auth_logout_create
       description: ''
       parameters:
       - name: Content-Type
@@ -1781,11 +89,11 @@ paths:
                 format: uri
               description: URL waar de resource leeft.
       tags:
-      - api
+      - auth
     parameters: []
-  /api/v1/auth/password/change:
+  /auth/password/change:
     post:
-      operationId: api_v1_auth_password_change_create
+      operationId: auth_password_change_create
       summary: Calls Django Auth SetPasswordForm save method.
       description: 'Accepts the following POST parameters: new_password1, new_password2
 
@@ -1824,11 +132,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/PasswordChange'
       tags:
-      - api
+      - auth
     parameters: []
-  /api/v1/auth/password/reset:
+  /auth/password/reset:
     post:
-      operationId: api_v1_auth_password_reset_create
+      operationId: auth_password_reset_create
       summary: Calls Django Auth PasswordResetForm save method.
       description: 'Accepts the following POST parameters: email
 
@@ -1867,11 +175,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/PasswordReset'
       tags:
-      - api
+      - auth
     parameters: []
-  /api/v1/auth/password/reset/confirm:
+  /auth/password/reset/confirm:
     post:
-      operationId: api_v1_auth_password_reset_confirm_create
+      operationId: auth_password_reset_confirm_create
       summary: 'Password reset e-mail link is confirmed, therefore
 
         this resets the user''s password.'
@@ -1911,11 +219,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/PasswordResetConfirm'
       tags:
-      - api
+      - auth
     parameters: []
-  /api/v1/auth/user:
+  /auth/user:
     get:
-      operationId: api_v1_auth_user_read
+      operationId: auth_user_read
       summary: 'Reads and updates UserModel fields
 
         Accepts GET, PUT, PATCH methods.'
@@ -1965,9 +273,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserDetails'
       tags:
-      - api
+      - auth
     put:
-      operationId: api_v1_auth_user_update
+      operationId: auth_user_update
       summary: 'Reads and updates UserModel fields
 
         Accepts GET, PUT, PATCH methods.'
@@ -2004,9 +312,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserDetails'
       tags:
-      - api
+      - auth
     patch:
-      operationId: api_v1_auth_user_partial_update
+      operationId: auth_user_partial_update
       summary: 'Reads and updates UserModel fields
 
         Accepts GET, PUT, PATCH methods.'
@@ -2043,11 +351,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserDetails'
       tags:
-      - api
+      - auth
     parameters: []
-  /api/v1/designrule-session:
+  /designrule-session:
     get:
-      operationId: api_v1_designrule-session_list
+      operationId: designrule-session_list
       description: ''
       responses:
         '200':
@@ -2161,11 +469,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - designrule-session
     parameters: []
-  /api/v1/designrule-session/{id}:
+  /designrule-session/{id}:
     get:
-      operationId: api_v1_designrule-session_read
+      operationId: designrule-session_read
       description: ''
       parameters:
       - name: If-None-Match
@@ -2313,7 +621,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - designrule-session
     parameters:
     - name: id
       in: path
@@ -2321,9 +629,9 @@ paths:
       required: true
       schema:
         type: integer
-  /api/v1/designrule-session/{id}/shield:
+  /designrule-session/{id}/shield:
     get:
-      operationId: api_v1_designrule-session_shield
+      operationId: designrule-session_shield
       description: ''
       parameters:
       - name: If-None-Match
@@ -2357,7 +665,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServerRunResultShield'
       tags:
-      - api
+      - designrule-session
     parameters:
     - name: id
       in: path
@@ -2365,9 +673,9 @@ paths:
       required: true
       schema:
         type: integer
-  /api/v1/designrule-testsuite:
+  /designrule-testsuite:
     get:
-      operationId: api_v1_designrule-testsuite_list
+      operationId: designrule-testsuite_list
       description: ''
       responses:
         '200':
@@ -2481,9 +789,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - designrule-testsuite
     post:
-      operationId: api_v1_designrule-testsuite_create
+      operationId: designrule-testsuite_create
       description: ''
       parameters:
       - name: Content-Type
@@ -2623,11 +931,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - designrule-testsuite
     parameters: []
-  /api/v1/designrule-testsuite/{id}:
+  /designrule-testsuite/{id}:
     get:
-      operationId: api_v1_designrule-testsuite_read
+      operationId: designrule-testsuite_read
       description: ''
       parameters:
       - name: If-None-Match
@@ -2775,7 +1083,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - designrule-testsuite
     parameters:
     - name: id
       in: path
@@ -2783,9 +1091,9 @@ paths:
       required: true
       schema:
         type: integer
-  /api/v1/designrule-testsuite/{id}/start_session:
+  /designrule-testsuite/{id}/start_session:
     post:
-      operationId: api_v1_designrule-testsuite_start_session
+      operationId: designrule-testsuite_start_session
       description: ''
       parameters:
       - name: Content-Type
@@ -2817,7 +1125,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DesignRuleTestSuite'
       tags:
-      - api
+      - designrule-testsuite
     parameters:
     - name: id
       in: path
@@ -2825,9 +1133,9 @@ paths:
       required: true
       schema:
         type: integer
-  /api/v1/exposed_url:
+  /exposed_url:
     get:
-      operationId: api_v1_exposed_url_list
+      operationId: exposed_url_list
       summary: Exposed url list
       description: Return a list of all the exposed url of a certain session.
       responses:
@@ -2942,11 +1250,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - exposed_url
     parameters: []
-  /api/v1/openAPIinspector:
+  /openAPIinspector:
     post:
-      operationId: api_v1_openAPIinspector_create
+      operationId: openAPIinspector_create
       summary: OpenAPI inspector
       description: Checks whether a URL to an API specification conforms to OAS 2.0
         or higher
@@ -2979,11 +1287,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/OpenApiInspectionResponse'
       tags:
-      - api
+      - openAPIinspector
     parameters: []
-  /api/v1/postman-test:
+  /postman-test:
     get:
-      operationId: api_v1_postman-test_list
+      operationId: postman-test_list
       summary: Postman test list
       description: Return a list of all the existing Postman tests
       responses:
@@ -3098,11 +1406,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - postman-test
     parameters: []
-  /api/v1/postman-test/get_version/{name}/{version}:
+  /postman-test/get_version/{name}/{version}:
     get:
-      operationId: api_v1_postman-test_get_specific_version
+      operationId: postman-test_get_specific_version
       summary: Retrieve a specific version of a Postman test
       description: Return the Postman test collection that has the given name and
         version
@@ -3122,7 +1430,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PostmanTest'
       tags:
-      - api
+      - postman-test
     parameters:
     - name: name
       in: path
@@ -3137,9 +1445,9 @@ paths:
       required: true
       schema:
         type: string
-  /api/v1/postman-test/get_versions/{name}:
+  /postman-test/get_versions/{name}:
     get:
-      operationId: api_v1_postman-test_get_all_versions
+      operationId: postman-test_get_all_versions
       summary: Retrieve all versions of a Postman test
       description: Return all the possible versions of a Postman test
       responses:
@@ -3158,7 +1466,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PostmanTest'
       tags:
-      - api
+      - postman-test
     parameters:
     - name: name
       in: path
@@ -3166,9 +1474,9 @@ paths:
       required: true
       schema:
         type: string
-  /api/v1/postman-test/{id}:
+  /postman-test/{id}:
     get:
-      operationId: api_v1_postman-test_read
+      operationId: postman-test_read
       summary: Postman test detail
       description: Return a specific Postman test
       parameters:
@@ -3317,7 +1625,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - postman-test
     parameters:
     - name: id
       in: path
@@ -3325,9 +1633,9 @@ paths:
       required: true
       schema:
         type: integer
-  /api/v1/provider-latest-badge/{uuid}:
+  /provider-latest-badge/{uuid}:
     get:
-      operationId: api_v1_provider-latest-badge_read
+      operationId: provider-latest-badge_read
       summary: Retrieve the latest badge for a specific environment
       description: Return the badge information of the latest provider run for a specific
         environment
@@ -3352,16 +1660,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServerRunResultShield'
       tags:
-      - api
+      - provider-latest-badge
     parameters:
     - name: uuid
       in: path
       required: true
       schema:
         type: string
-  /api/v1/provider-run:
+  /provider-run:
     get:
-      operationId: api_v1_provider-run_list
+      operationId: provider-run_list
       summary: Provider-run list.
       description: Return a list of all the existing provider-run.
       responses:
@@ -3476,9 +1784,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - provider-run
     post:
-      operationId: api_v1_provider-run_create
+      operationId: provider-run_create
       summary: Create a provider-run.
       description: Create a new provider-run instance.
       parameters:
@@ -3623,11 +1931,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - provider-run
     parameters: []
-  /api/v1/provider-run-shield/{uuid}:
+  /provider-run-shield/{uuid}:
     get:
-      operationId: api_v1_provider-run-shield_read
+      operationId: provider-run-shield_read
       summary: Provider run badge detail
       description: Return the badge information of a specific provider run
       responses:
@@ -3644,16 +1952,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServerRunResultShield'
       tags:
-      - api
+      - provider-run-shield
     parameters:
     - name: uuid
       in: path
       required: true
       schema:
         type: string
-  /api/v1/provider-run/{uuid}:
+  /provider-run/{uuid}:
     get:
-      operationId: api_v1_provider-run_read
+      operationId: provider-run_read
       summary: Provider-run detail.
       description: Return the given provider-run.
       parameters:
@@ -3802,16 +2110,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - provider-run
     parameters:
     - name: uuid
       in: path
       required: true
       schema:
         type: string
-  /api/v1/provider-run/{uuid}/result:
+  /provider-run/{uuid}/result:
     get:
-      operationId: api_v1_provider-run_result_list
+      operationId: provider-run_result_list
       summary: Result of a Session
       description: Return for each scenario case related to the session, if that call
         has been performed and the global outcome.
@@ -3825,16 +2133,16 @@ paths:
               description: 'Geeft een specifieke API-versie aan in de context van
                 een specifieke aanroep. Voorbeeld: 1.2.1.'
       tags:
-      - api
+      - provider-run
     parameters:
     - name: uuid
       in: path
       required: true
       schema:
         type: string
-  /api/v1/sessiontypes:
+  /sessiontypes:
     get:
-      operationId: api_v1_sessiontypes_list
+      operationId: sessiontypes_list
       summary: Session types
       description: Return all the session types
       responses:
@@ -3949,11 +2257,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - sessiontypes
     parameters: []
-  /api/v1/status/{uuid}:
+  /status/{uuid}:
     get:
-      operationId: api_v1_status_read
+      operationId: status_read
       summary: Session status detail
       description: Return the status details of a specific session
       parameters:
@@ -4102,7 +2410,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - status
     parameters:
     - name: uuid
       in: path
@@ -4112,9 +2420,9 @@ paths:
       schema:
         type: string
         format: uuid
-  /api/v1/testsession-run-shield/{uuid}:
+  /testsession-run-shield/{uuid}:
     get:
-      operationId: api_v1_testsession-run-shield_read
+      operationId: testsession-run-shield_read
       summary: Session badge detail
       description: Return the badge information of a specific session
       responses:
@@ -4131,16 +2439,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServerRunResultShield'
       tags:
-      - api
+      - testsession-run-shield
     parameters:
     - name: uuid
       in: path
       required: true
       schema:
         type: string
-  /api/v1/testsessions:
+  /testsessions:
     get:
-      operationId: api_v1_testsessions_list
+      operationId: testsessions_list
       summary: Session list
       description: Return the list of all the sessions created by the user.
       responses:
@@ -4255,9 +2563,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - testsessions
     post:
-      operationId: api_v1_testsessions_create
+      operationId: testsessions_create
       summary: Session create.
       description: Create a new session instance.
       parameters:
@@ -4402,11 +2710,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - testsessions
     parameters: []
-  /api/v1/testsessions/{uuid}:
+  /testsessions/{uuid}:
     get:
-      operationId: api_v1_testsessions_read
+      operationId: testsessions_read
       summary: Session detail.
       description: Return the given session's detail.
       parameters:
@@ -4555,16 +2863,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Fout'
       tags:
-      - api
+      - testsessions
     parameters:
     - name: uuid
       in: path
       required: true
       schema:
         type: string
-  /api/v1/testsessions/{uuid}/result:
+  /testsessions/{uuid}/result:
     get:
-      operationId: api_v1_testsessions_result_list
+      operationId: testsessions_result_list
       summary: Result of a Session
       description: Return for each scenario case related to the session, if that call
         has been performed and the global outcome.
@@ -4578,16 +2886,16 @@ paths:
               description: 'Geeft een specifieke API-versie aan in de context van
                 een specifieke aanroep. Voorbeeld: 1.2.1.'
       tags:
-      - api
+      - testsessions
     parameters:
     - name: uuid
       in: path
       required: true
       schema:
         type: string
-  /api/v1/testsessions/{uuid}/stop:
+  /testsessions/{uuid}/stop:
     get:
-      operationId: api_v1_testsessions_stop_list
+      operationId: testsessions_stop_list
       summary: Stop Session
       description: Stop the session and retrieve all the scenario cases related to
         it.
@@ -4607,7 +2915,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ScenarioCase'
       tags:
-      - api
+      - testsessions
     parameters:
     - name: uuid
       in: path
@@ -4615,21 +2923,9 @@ paths:
       schema:
         type: string
 servers:
-- url: /
+- url: /api/v1
 components:
   requestBodies:
-    MessageComment:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MessageComment'
-      required: true
-    TranslationFile:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/TranslationFile'
-      required: true
     UserDetails:
       content:
         application/json:
@@ -4647,165 +2943,6 @@ components:
       type: http
       scheme: basic
   schemas:
-    MessageComment:
-      required:
-      - msghash
-      - translation_file
-      - body
-      type: object
-      properties:
-        msghash:
-          title: Msghash
-          type: string
-          maxLength: 32
-          minLength: 1
-        translation_file:
-          title: Translation file
-          type: integer
-        body:
-          title: Body
-          type: string
-          maxLength: 1024
-          minLength: 1
-        created:
-          title: Created
-          type: string
-          format: date-time
-          readOnly: true
-        comment_count:
-          title: Comment count
-          type: string
-          readOnly: true
-        user_name:
-          title: User name
-          type: string
-          readOnly: true
-    Fout:
-      required:
-      - code
-      - title
-      - status
-      - detail
-      - instance
-      type: object
-      properties:
-        type:
-          title: Type
-          description: URI referentie naar het type fout, bedoeld voor developers
-          type: string
-        code:
-          title: Code
-          description: Systeemcode die het type fout aangeeft
-          type: string
-          minLength: 1
-        title:
-          title: Title
-          description: Generieke titel voor het type fout
-          type: string
-          minLength: 1
-        status:
-          title: Status
-          description: De HTTP status code
-          type: integer
-        detail:
-          title: Detail
-          description: Extra informatie bij de fout, indien beschikbaar
-          type: string
-          minLength: 1
-        instance:
-          title: Instance
-          description: URI met referentie naar dit specifiek voorkomen van de fout.
-            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
-          type: string
-          minLength: 1
-    FieldValidationError:
-      required:
-      - name
-      - code
-      - reason
-      type: object
-      properties:
-        name:
-          title: Name
-          description: Naam van het veld met ongeldige gegevens
-          type: string
-          minLength: 1
-        code:
-          title: Code
-          description: Systeemcode die het type fout aangeeft
-          type: string
-          minLength: 1
-        reason:
-          title: Reason
-          description: Uitleg wat er precies fout is met de gegevens
-          type: string
-          minLength: 1
-    ValidatieFout:
-      required:
-      - code
-      - title
-      - status
-      - detail
-      - instance
-      - invalid_params
-      type: object
-      properties:
-        type:
-          title: Type
-          description: URI referentie naar het type fout, bedoeld voor developers
-          type: string
-        code:
-          title: Code
-          description: Systeemcode die het type fout aangeeft
-          type: string
-          minLength: 1
-        title:
-          title: Title
-          description: Generieke titel voor het type fout
-          type: string
-          minLength: 1
-        status:
-          title: Status
-          description: De HTTP status code
-          type: integer
-        detail:
-          title: Detail
-          description: Extra informatie bij de fout, indien beschikbaar
-          type: string
-          minLength: 1
-        instance:
-          title: Instance
-          description: URI met referentie naar dit specifiek voorkomen van de fout.
-            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
-          type: string
-          minLength: 1
-        invalid_params:
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldValidationError'
-    TranslationFile:
-      required:
-      - name
-      - filepath
-      - language_code
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          maxLength: 512
-          minLength: 1
-        filepath:
-          title: Filepath
-          type: string
-          maxLength: 1024
-          minLength: 1
-        language_code:
-          title: Language code
-          type: string
-          enum:
-          - en
-          - nl
     Login:
       required:
       - password
@@ -4969,6 +3106,44 @@ components:
           items:
             $ref: '#/components/schemas/DesignRuleResult'
           readOnly: true
+    Fout:
+      required:
+      - code
+      - title
+      - status
+      - detail
+      - instance
+      type: object
+      properties:
+        type:
+          title: Type
+          description: URI referentie naar het type fout, bedoeld voor developers
+          type: string
+        code:
+          title: Code
+          description: Systeemcode die het type fout aangeeft
+          type: string
+          minLength: 1
+        title:
+          title: Title
+          description: Generieke titel voor het type fout
+          type: string
+          minLength: 1
+        status:
+          title: Status
+          description: De HTTP status code
+          type: integer
+        detail:
+          title: Detail
+          description: Extra informatie bij de fout, indien beschikbaar
+          type: string
+          minLength: 1
+        instance:
+          title: Instance
+          description: URI met referentie naar dit specifiek voorkomen van de fout.
+            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
+          type: string
+          minLength: 1
     ServerRunResultShield:
       required:
       - label
@@ -5022,6 +3197,71 @@ components:
             format: uri
           readOnly: true
           uniqueItems: true
+    FieldValidationError:
+      required:
+      - name
+      - code
+      - reason
+      type: object
+      properties:
+        name:
+          title: Name
+          description: Naam van het veld met ongeldige gegevens
+          type: string
+          minLength: 1
+        code:
+          title: Code
+          description: Systeemcode die het type fout aangeeft
+          type: string
+          minLength: 1
+        reason:
+          title: Reason
+          description: Uitleg wat er precies fout is met de gegevens
+          type: string
+          minLength: 1
+    ValidatieFout:
+      required:
+      - code
+      - title
+      - status
+      - detail
+      - instance
+      - invalid_params
+      type: object
+      properties:
+        type:
+          title: Type
+          description: URI referentie naar het type fout, bedoeld voor developers
+          type: string
+        code:
+          title: Code
+          description: Systeemcode die het type fout aangeeft
+          type: string
+          minLength: 1
+        title:
+          title: Title
+          description: Generieke titel voor het type fout
+          type: string
+          minLength: 1
+        status:
+          title: Status
+          description: De HTTP status code
+          type: integer
+        detail:
+          title: Detail
+          description: Extra informatie bij de fout, indien beschikbaar
+          type: string
+          minLength: 1
+        instance:
+          title: Instance
+          description: URI met referentie naar dit specifiek voorkomen van de fout.
+            Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.
+          type: string
+          minLength: 1
+        invalid_params:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationError'
     ExposedUrl:
       required:
       - session
