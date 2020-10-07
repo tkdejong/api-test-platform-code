@@ -1,11 +1,11 @@
 from django.urls import include, path
 
-from drf_spectacular.views import SpectacularJSONAPIView, SpectacularRedocView
+from vng_api_common.schema import SchemaView
 
 
 urlpatterns = [
-    path('', SpectacularJSONAPIView.as_view(), name='schema'),
-    path('/schema', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('', SchemaView.without_ui(cache_timeout=0), name='api-root'),
+    path('/schema', SchemaView.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('/auth/', include('vng.api.v1.api_authentication.urls', namespace='apiv1_auth')),
     path('/', include('vng.api.v1.testsession.urls', namespace='apiv1session')),
     path('/', include('vng.api.v1.servervalidation.urls', namespace='apiv1server')),

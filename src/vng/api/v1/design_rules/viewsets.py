@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
 from rest_framework.decorators import action
-from drf_spectacular.utils import extend_schema
+from drf_yasg.utils import swagger_auto_schema
 
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession
 from vng.servervalidation.serializers import ServerRunResultShield
@@ -25,7 +25,7 @@ class DesignRuleSessionViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin,
     queryset = DesignRuleSession.objects.all()
     serializer_class = DesignRuleSessionSerializer
 
-    @extend_schema(responses={200: ServerRunResultShield})
+    @swagger_auto_schema(responses={200: ServerRunResultShield})
     @action(detail=True, methods=['get'], description="get the shield bagde")
     def shield(self, request, pk=None):
         session = get_object_or_404(DesignRuleSession, pk=pk)

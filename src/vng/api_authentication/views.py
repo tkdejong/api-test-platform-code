@@ -9,6 +9,7 @@ from rest_auth.views import LoginView, LogoutView
 
 from .forms import TokenForm
 
+
 class CustomLoginView(LoginView):
     token_model = CustomToken
 

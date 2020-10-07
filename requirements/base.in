@@ -5,7 +5,7 @@ pytz
 raven
 
 Django>=2.2.13
-# django-admin-tools
+vng-api-common
 django-hijack
 django-hijack-admin
 django-ckeditor

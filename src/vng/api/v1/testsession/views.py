@@ -1,9 +1,8 @@
 import json
 import re
 import logging
-import requests
-
 from urllib import parse
+
 from subdomains.utils import reverse as reverse_sub
 from django.shortcuts import get_object_or_404
 from django.views import View
@@ -14,6 +13,7 @@ from django.http import (
     Http404, HttpResponse, HttpResponseForbidden, JsonResponse
 )
 
+import requests
 from rest_framework import generics, permissions, viewsets, views, mixins
 from rest_framework.authentication import (
     SessionAuthentication
@@ -38,7 +38,7 @@ from vng.testsession.views import bootstrap_session
 from vng.testsession.task import run_tests, stop_session
 from vng.utils.auth import get_jwt
 
-from vng.apiAuthentication.authentication import CustomTokenAuthentication
+from vng.api_authentication.authentication import CustomTokenAuthentication
 
 logger = logging.getLogger(__name__)
 

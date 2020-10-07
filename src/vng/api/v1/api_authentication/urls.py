@@ -5,7 +5,7 @@ from rest_auth.views import (
     PasswordResetView, PasswordResetConfirmView
 )
 
-from vng.apiAuthentication import apps, views
+from vng.api_authentication import apps, views
 
 app_name = apps.AppConfig.__name__
 
