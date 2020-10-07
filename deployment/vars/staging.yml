@@ -13,6 +13,7 @@ pub_key_users:
   - alex
   - joeri
   - steven
+  - jorik
 
 project_repo: git@github.com:VNG-Realisatie/api-test-platform-code.git
 branch: develop
