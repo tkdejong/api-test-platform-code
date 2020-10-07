@@ -21,7 +21,7 @@ django-countries
 djangorestframework-filters
 django-solo
 django-dynamic-raw-id
-djangorestframework<3.9.5
+djangorestframework<3.11.0
 google-api-python-client
 oauth2client
 easy-thumbnails
