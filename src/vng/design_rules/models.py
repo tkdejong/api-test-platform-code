@@ -1,3 +1,4 @@
+from decimal import Decimal
 from uuid import uuid4
 
 from django.db import models
@@ -27,7 +28,7 @@ class DesignRuleTestSuite(models.Model):
     def percentage_score(self):
         if self.sessions.exists():
             return self.sessions.first().percentage_score
-        return 0
+        return Decimal("0.00")
 
 
 class DesignRuleSession(models.Model):

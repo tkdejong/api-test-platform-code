@@ -24,7 +24,7 @@ def run_api_16_test_rules(session):
         result.save()
         return result
 
-    version = session.json_result.get("openapi")
+    version = session.json_result.get("openapi", session.json_result.get("swagger"))
     if not version:
         result.success = False
         result.errors = "There is no openapi version found."
@@ -41,10 +41,10 @@ def run_api_16_test_rules(session):
             result.success = True
         else:
             result.success = False
-            result.errors = "The version ({}) is not higher than or equal to OAS 3.0"
+            result.errors = "The version ({}) is not higher than or equal to OAS 3.0.0".format(version)
     except Exception as e:
         result.success = False
-        result.errors = "This is not a valid OAS api version."
+        result.errors = "{} is not a valid OAS api version.".format(version)
     finally:
         result.save()
         return result

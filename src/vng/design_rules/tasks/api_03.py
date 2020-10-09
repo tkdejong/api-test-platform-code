@@ -1,7 +1,7 @@
 from ..choices import DesignRuleChoices
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-SKIPPED_METHODS = ["PARAMETERS"]
+SKIPPED_METHODS = ["PARAMETERS", "SUMMARY", "DESCRIPTION", "$REF", "SERVERS"]
 
 
 def run_api_03_test_rules(session):
@@ -29,19 +29,17 @@ def run_api_03_test_rules(session):
         return result
 
     paths = session.json_result.get("paths", {})
-    wrong_paths_with_method = {}
+    errors = ""
     for path, methods in paths.items():
         for method, _options in methods.items():
             if method.upper() not in VALID_METHODS and method.upper() not in SKIPPED_METHODS:
-                if path in wrong_paths_with_method:
-                    wrong_paths_with_method[path].append(method)
-                else:
-                    wrong_paths_with_method[path] = [method]
+                if errors:
+                    errors += "\n"
+                errors += "not supported method, {}, found for path {}".format(method, path)
 
-    print(wrong_paths_with_method)
-    if wrong_paths_with_method:
+    if errors:
         result.success = False
-        result.errors = wrong_paths_with_method
+        result.errors = errors
     else:
         result.success = True
     result.save()

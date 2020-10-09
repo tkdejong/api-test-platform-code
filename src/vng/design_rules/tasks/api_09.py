@@ -34,7 +34,6 @@ def run_api_09_test_rules(session):
         for method, options in methods.items():
             if method.upper() in PARAMETERS:
                 for parameter in options:
-                    print(parameter)
                     if parameter.get('name') == "fields":
                         found_fields = True
 

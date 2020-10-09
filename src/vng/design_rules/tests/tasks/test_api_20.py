@@ -2,11 +2,20 @@ from django.test import TestCase
 
 from vng.design_rules.tasks.api_20 import run_api_20_test_rules
 
-from ..factories import DesignRuleSessionFactory
+from ..factories import DesignRuleResultFactory, DesignRuleSessionFactory
+from ...choices import DesignRuleChoices
 from ...models import DesignRuleResult
 
 
 class Api20Tests(TestCase):
+    def test_design_rule_already_exists(self):
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
+        pre_result = DesignRuleResultFactory(design_rule=session, rule_type=DesignRuleChoices.api_20)
+
+        result = run_api_20_test_rules(session, "https://maykinmedia.nl/")
+        self.assertEqual(DesignRuleResult.objects.count(), 1)
+        self.assertEqual(pre_result.pk, result.pk)
+
     def test_no_version(self):
         session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
 

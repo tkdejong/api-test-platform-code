@@ -42,7 +42,6 @@ def run_api_51_test_rules(session, api_endpoint):
     parsed_endpoint = urlparse(api_endpoint)
     paths = session.json_result.get("paths", {})
     for path, _methods in paths.items():
-        print(path, parsed_endpoint.path)
         if path == parsed_endpoint.path:
             has_match = True
             break
