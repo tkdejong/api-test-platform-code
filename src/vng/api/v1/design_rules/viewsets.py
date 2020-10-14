@@ -8,13 +8,27 @@ from drf_yasg.utils import swagger_auto_schema
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession
 from vng.servervalidation.serializers import ServerRunResultShield
 
-from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer
+from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer, NoneSerializer
+
+
+START_SESSION_DESCRIPTION = "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again."
 
 
 class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    """
+    list:
+    Get all the Design rule Test suites that are registered.
+    create:
+    Create a new Design rule Test suite.
+    - This will start a Design rule session. The session is returned in the session list.
+    read:
+    Get a single Design rule Test suite.
+    """
     queryset = DesignRuleTestSuite.objects.all()
     serializer_class = DesignRuleTestSuiteSerializer
+    lookup_field = 'uuid'
 
+    @swagger_auto_schema(operation_description=START_SESSION_DESCRIPTION, request_body=NoneSerializer, responses={201: DesignRuleSessionSerializer})
     @action(detail=True, methods=['post'], description="Start a new session for the test suite")
     def start_session(self, request, pk=None):
         obj = self.get_object()
@@ -22,10 +36,17 @@ class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMi
 
 
 class DesignRuleSessionViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    """
+    list:
+    Get all the Design rule sessions that are registered.
+    read:
+    Get a single Design rule session.
+    """
     queryset = DesignRuleSession.objects.all()
     serializer_class = DesignRuleSessionSerializer
+    lookup_field = 'uuid'
 
-    @swagger_auto_schema(responses={200: ServerRunResultShield})
+    @swagger_auto_schema(operation_description="Get the shields.io badge for a session.", responses={200: ServerRunResultShield})
     @action(detail=True, methods=['get'], description="get the shield bagde")
     def shield(self, request, pk=None):
         session = get_object_or_404(DesignRuleSession, pk=pk)
@@ -46,4 +67,3 @@ class DesignRuleSessionViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin,
         }
 
         return JsonResponse(result)
-

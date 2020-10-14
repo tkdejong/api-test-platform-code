@@ -3,21 +3,28 @@ from rest_framework import serializers
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult
 
 
+class NoneSerializer(serializers.Serializer):
+    pass
+
+
 class DesignRuleResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = DesignRuleResult
-        fields = ("uuid", "design_rule", "rule_type", "success", "errors")
-        read_only_fields = ("uuid", "design_rule", "rule_type", "success", "errors")
+        fields = ("rule_type", "success", "errors")
+        read_only_fields = ("rule_type", "success", "errors")
 
 
 class DesignRuleSessionSerializer(serializers.ModelSerializer):
-    test_suite = serializers.HyperlinkedRelatedField(read_only=True, view_name="api_v1_design_rules:test_suite-detail")
     results = DesignRuleResultSerializer(many=True, read_only=True)
+    # success = serializers.SerializerMethodField(read_only=True, source="successful")
 
     class Meta:
         model = DesignRuleSession
-        fields = ("uuid", "test_suite", "started_at", "json_result", "percentage_score", "results")
-        read_only_fields = ("uuid", "test_suite", "started_at", "json_result", "percentage_score")
+        fields = ("uuid", "started_at", "percentage_score", "results")
+        read_only_fields = ("uuid", "started_at", "percentage_score")
+
+    # def get_success(self, obj):
+    #     return obj.successful()
 
 
 class DesignRuleTestSuiteSerializer(serializers.ModelSerializer):

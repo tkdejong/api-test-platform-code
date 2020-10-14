@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from ..choices import DesignRuleChoices
 
 PARAMETERS = ["PARAMETERS"]
@@ -23,7 +25,7 @@ def run_api_09_test_rules(session):
     # Only execute when there is a JSON response
     if not session.json_result:
         result.success = False
-        result.errors = "The API did not give a valid JSON output."
+        result.errors = _("The API did not give a valid JSON output.")
         result.save()
         return result
 
@@ -41,7 +43,7 @@ def run_api_09_test_rules(session):
         result.success = True
     elif errors:
         result.success = False
-        result.errors = ["Fields found"]
+        result.errors = _("Fields found")
     else:
         result.success = True
 

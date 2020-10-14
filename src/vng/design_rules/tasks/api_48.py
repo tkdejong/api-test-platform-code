@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from ..choices import DesignRuleChoices
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
@@ -24,21 +26,26 @@ def run_api_48_test_rules(session):
     # Only execute when there is a JSON response
     if not session.json_result:
         result.success = False
-        result.errors = "The API did not give a valid JSON output."
+        result.errors = _("The API did not give a valid JSON output.")
         result.save()
         return result
 
     paths = session.json_result.get("paths", {})
-    wrong_paths_with_method = ""
+    paths_found = False
+    errors = ""
     for path, _methods in paths.items():
+        paths_found = True
         if path.endswith('/'):
-            if wrong_paths_with_method:
-                wrong_paths_with_method += "\n"
-            wrong_paths_with_method += "Path: {} ends with a slash".format(path)
+            if errors:
+                errors += "\n"
+            errors += _("Path: {} ends with a slash").format(path)
 
-    if wrong_paths_with_method:
+    if not paths_found:
         result.success = False
-        result.errors = wrong_paths_with_method
+        result.errors = _("There are no paths found")
+    elif errors:
+        result.success = False
+        result.errors = errors
     else:
         result.success = True
     result.save()

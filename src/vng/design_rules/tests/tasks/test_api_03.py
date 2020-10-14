@@ -2,6 +2,7 @@ import os
 import json
 
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from vng.design_rules.tasks.api_03 import run_api_03_test_rules
 
@@ -25,7 +26,7 @@ class Api03Tests(TestCase):
         result = run_api_03_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, "The API did not give a valid JSON output.")
+        self.assertEqual(result.errors, _("The API did not give a valid JSON output."))
 
     def test_successful_methods(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -43,9 +44,12 @@ class Api03Tests(TestCase):
             session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", json_result=json.loads(json_file.read()))
 
         result = run_api_03_test_rules(session)
+        errors = _("not supported method, {}, found for path {}").format("method", "/auth/login")
+        errors += "\n"
+        errors += _("not supported method, {}, found for path {}").format("getget", "/auth/logout")
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, "not supported method, method, found for path /auth/login\nnot supported method, getget, found for path /auth/logout")
+        self.assertEqual(result.errors, errors)
 
     def test_no_methods(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -54,5 +58,5 @@ class Api03Tests(TestCase):
 
         result = run_api_03_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
-        self.assertTrue(result.success)
-        self.assertEqual(result.errors, "")
+        self.assertFalse(result.success)
+        self.assertEqual(result.errors, _("There are no methods found."))

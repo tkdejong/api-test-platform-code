@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from ..choices import DesignRuleChoices
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
@@ -24,20 +26,25 @@ def run_api_03_test_rules(session):
     # Only execute when there is a JSON response
     if not session.json_result:
         result.success = False
-        result.errors = "The API did not give a valid JSON output."
+        result.errors = _("The API did not give a valid JSON output.")
         result.save()
         return result
 
     paths = session.json_result.get("paths", {})
+    methods_found = False
     errors = ""
     for path, methods in paths.items():
         for method, _options in methods.items():
+            methods_found = True
             if method.upper() not in VALID_METHODS and method.upper() not in SKIPPED_METHODS:
                 if errors:
                     errors += "\n"
-                errors += "not supported method, {}, found for path {}".format(method, path)
+                errors += _("not supported method, {}, found for path {}").format(method, path)
 
-    if errors:
+    if not methods_found:
+        result.success = False
+        result.errors = _("There are no methods found.")
+    elif errors:
         result.success = False
         result.errors = errors
     else:
