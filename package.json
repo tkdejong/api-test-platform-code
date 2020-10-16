@@ -7,7 +7,8 @@
         "doc": "doc"
     },
     "scripts": {
-        "test": "gulp test"
+        "test": "gulp test",
+        "convert": "swagger2openapi src/swagger2.0.json -o src/openapi.json"
     },
     "repository": {
         "type": "git",
@@ -41,6 +42,7 @@
         "perfect-scrollbar": "^1.4.0",
         "popper.js": "^1.15.0",
         "postcss-selector-lint": "^1.0.0",
+        "swagger2openapi": "^7.0.2",
         "underscore.string": "^3.3.5",
         "ws": ">=1.1.5"
     },

@@ -5,7 +5,7 @@ pytz
 raven
 
 Django>=2.2.13
-# django-admin-tools
+vng-api-common
 django-hijack
 django-hijack-admin
 django-ckeditor
@@ -21,7 +21,7 @@ django-countries
 djangorestframework-filters
 django-solo
 django-dynamic-raw-id
-djangorestframework
+djangorestframework<3.11.0
 google-api-python-client
 oauth2client
 easy-thumbnails

@@ -4,6 +4,7 @@ import os
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
+from vng_api_common.conf.api import *  # noqa - imports white-listed
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 DJANGO_PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
@@ -59,7 +60,6 @@ INSTALLED_APPS = [
     'captcha',
     'filer',
     'mptt',
-    'drf_yasg',
     'hijack',
     'tinymce',
     'compat',  # Part of hijack
@@ -70,23 +70,28 @@ INSTALLED_APPS = [
     'mobetta',
     'crispy_forms',
 
+    # Rest Framework
+    # 'vng_api_common',  # before drf_yasg to override the management command
+    # 'vng_api_common.authorizations',
+    'drf_yasg',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+
     # Project applications.
     'vng.accounts',
     'vng.utils',
     'vng.testsession',
-    'vng.apiAuthentication',
+    'vng.api_authentication',
     'vng.servervalidation',
     'vng.postman',
+    'vng.design_rules',
     # Disabled for the moment, enable if want to use its functionalities
     # 'vng.openApiInspector',
     'vng.celery',
     'vng.k8s_manager',
+    'vng.api',
     'vng',
-
-    # Rest Framework
-    'rest_framework',
-    'rest_auth',
-    # 'rest_framework.authtoken',
 ]
 
 TINYMCE_DEFAULT_CONFIG = {
@@ -101,9 +106,8 @@ TINYMCE_DEFAULT_CONFIG = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.TokenAuthentication',
-        'vng.apiAuthentication.authentication.CustomTokenAuthentication',
-    ]
+        'vng.api_authentication.authentication.CustomTokenAuthentication',
+    ],
 }
 
 SITE_ID = 1
@@ -120,8 +124,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'vng_api_common.middleware.AuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'vng_api_common.middleware.APIVersionHeaderMiddleware',
 ]
 
 ROOT_URLCONF = 'vng.urls'
@@ -429,6 +435,20 @@ ELASTIC_APM = {
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Custom token creation to support multiple API tokens
-REST_AUTH_TOKEN_CREATOR = 'vng.apiAuthentication.utils.create_token'
+REST_AUTH_TOKEN_CREATOR = 'vng.api_authentication.utils.create_token'
 
 SHIELDS_URL = 'https://shields.api-test.nl'
+
+
+DRF_YASG_EXCLUDE_PATHS = [
+    '/admin/mobetta/',
+    '/admin/mobettaapi/'
+]
+SWAGGER_SETTINGS = BASE_SWAGGER_SETTINGS.copy()
+SWAGGER_SETTINGS.update(
+    {
+        "DEFAULT_INFO": "vng.api.v1.schema.info",
+        "DEFAULT_AUTO_SCHEMA_CLASS": "vng.api.v1.inspectors.AutoSchema",
+        "DEFAULT_GENERATOR_CLASS": "vng.api.v1.generators.CustomOpenAPISchemaGenerator",
+    }
+)

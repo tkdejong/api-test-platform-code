@@ -1,0 +1,897 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API test platform API",
+        "description": "This is the API for the API test platform. So you can test if your api's validate to the dutch government standards",
+        "version": "1.0.0-rc1"
+    },
+    "security": [{ "Basic": [] }],
+    "servers": [{ "url": "http://localhost:8000/api/v1" }],
+    "components": {
+        "requestBodies": {
+            "UserDetails": {
+                "content": {
+                    "application/json": {
+                        "schema": { "$ref": "#/components/schemas/UserDetails" }
+                    }
+                },
+                "required": true
+            },
+            "DesignRuleTestSuite": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/DesignRuleTestSuite"
+                        }
+                    }
+                },
+                "required": true
+            }
+        },
+        "securitySchemes": { "Basic": { "type": "http", "scheme": "basic" } },
+        "schemas": {
+            "Login": {
+                "required": ["password"],
+                "type": "object",
+                "properties": {
+                    "username": { "title": "Username", "type": "string" },
+                    "email": {
+                        "title": "Email",
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "title": "Password",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "PasswordChange": {
+                "required": ["new_password1", "new_password2"],
+                "type": "object",
+                "properties": {
+                    "new_password1": {
+                        "title": "New password1",
+                        "type": "string",
+                        "maxLength": 128,
+                        "minLength": 1
+                    },
+                    "new_password2": {
+                        "title": "New password2",
+                        "type": "string",
+                        "maxLength": 128,
+                        "minLength": 1
+                    }
+                }
+            },
+            "PasswordReset": {
+                "required": ["email"],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "title": "Email",
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 1
+                    }
+                }
+            },
+            "PasswordResetConfirm": {
+                "required": ["new_password1", "new_password2", "uid", "token"],
+                "type": "object",
+                "properties": {
+                    "new_password1": {
+                        "title": "New password1",
+                        "type": "string",
+                        "maxLength": 128,
+                        "minLength": 1
+                    },
+                    "new_password2": {
+                        "title": "New password2",
+                        "type": "string",
+                        "maxLength": 128,
+                        "minLength": 1
+                    },
+                    "uid": { "title": "Uid", "type": "string", "minLength": 1 },
+                    "token": {
+                        "title": "Token",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "UserDetails": {
+                "required": ["username"],
+                "type": "object",
+                "properties": {
+                    "pk": {
+                        "title": "ID",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "username": {
+                        "title": "Username",
+                        "description": "Maximum 150 characters.",
+                        "type": "string",
+                        "maxLength": 150,
+                        "minLength": 1
+                    },
+                    "email": {
+                        "title": "Email address",
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": true,
+                        "minLength": 1
+                    },
+                    "first_name": {
+                        "title": "First name",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "last_name": {
+                        "title": "Last name",
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                }
+            },
+            "DesignRuleResult": {
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "design_rule": {
+                        "title": "Design rule",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "rule_type": {
+                        "title": "Rule type",
+                        "type": "string",
+                        "enum": [
+                            "api_03",
+                            "api_09",
+                            "api_16",
+                            "api_20",
+                            "api_48",
+                            "api_51"
+                        ],
+                        "readOnly": true
+                    },
+                    "success": {
+                        "title": "Success",
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "errors": {
+                        "title": "Errors",
+                        "type": "string",
+                        "readOnly": true,
+                        "minLength": 1
+                    }
+                }
+            },
+            "DesignRuleSession": {
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "test_suite": {
+                        "title": "Test suite",
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true
+                    },
+                    "started_at": {
+                        "title": "Started at",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "json_result": {
+                        "title": "Json result",
+                        "description": "This is the downloaded api spec",
+                        "type": "string",
+                        "readOnly": true,
+                        "minLength": 1
+                    },
+                    "percentage_score": {
+                        "title": "Percentage score",
+                        "type": "string",
+                        "format": "decimal",
+                        "readOnly": true
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DesignRuleResult"
+                        },
+                        "readOnly": true
+                    }
+                }
+            },
+            "Fout": {
+                "required": ["code", "title", "status", "detail", "instance"],
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "title": "Type",
+                        "description": "URI referentie naar het type fout, bedoeld voor developers",
+                        "type": "string"
+                    },
+                    "code": {
+                        "title": "Code",
+                        "description": "Systeemcode die het type fout aangeeft",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "title": {
+                        "title": "Title",
+                        "description": "Generieke titel voor het type fout",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "De HTTP status code",
+                        "type": "integer"
+                    },
+                    "detail": {
+                        "title": "Detail",
+                        "description": "Extra informatie bij de fout, indien beschikbaar",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "instance": {
+                        "title": "Instance",
+                        "description": "URI met referentie naar dit specifiek voorkomen van de fout. Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "ServerRunResultShield": {
+                "required": ["label", "message", "color", "isError"],
+                "type": "object",
+                "properties": {
+                    "schemaVersion": {
+                        "title": "Schemaversion",
+                        "type": "integer",
+                        "default": 1
+                    },
+                    "label": {
+                        "title": "Label",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1
+                    },
+                    "message": {
+                        "title": "Message",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1
+                    },
+                    "color": {
+                        "title": "Color",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1
+                    },
+                    "isError": { "title": "Iserror", "type": "boolean" }
+                }
+            },
+            "DesignRuleTestSuite": {
+                "required": ["api_endpoint"],
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "title": "Uuid",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "api_endpoint": {
+                        "title": "Api endpoint",
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 200,
+                        "minLength": 1
+                    },
+                    "sessions": {
+                        "type": "array",
+                        "items": { "type": "string", "format": "uri" },
+                        "readOnly": true,
+                        "uniqueItems": true
+                    }
+                }
+            },
+            "FieldValidationError": {
+                "required": ["name", "code", "reason"],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Naam van het veld met ongeldige gegevens",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "code": {
+                        "title": "Code",
+                        "description": "Systeemcode die het type fout aangeeft",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "reason": {
+                        "title": "Reason",
+                        "description": "Uitleg wat er precies fout is met de gegevens",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "ValidatieFout": {
+                "required": [
+                    "code",
+                    "title",
+                    "status",
+                    "detail",
+                    "instance",
+                    "invalid_params"
+                ],
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "title": "Type",
+                        "description": "URI referentie naar het type fout, bedoeld voor developers",
+                        "type": "string"
+                    },
+                    "code": {
+                        "title": "Code",
+                        "description": "Systeemcode die het type fout aangeeft",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "title": {
+                        "title": "Title",
+                        "description": "Generieke titel voor het type fout",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "De HTTP status code",
+                        "type": "integer"
+                    },
+                    "detail": {
+                        "title": "Detail",
+                        "description": "Extra informatie bij de fout, indien beschikbaar",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "instance": {
+                        "title": "Instance",
+                        "description": "URI met referentie naar dit specifiek voorkomen van de fout. Deze kan gebruikt worden in combinatie met server logs, bijvoorbeeld.",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "invalid_params": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FieldValidationError"
+                        }
+                    }
+                }
+            },
+            "ExposedUrl": {
+                "required": ["session"],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "subdomain": {
+                        "title": "Subdomain",
+                        "description": "The subdomain under which the service has been exposed",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "nullable": true
+                    },
+                    "session": {
+                        "title": "Session",
+                        "description": "The session to which this exposed URL belongs",
+                        "type": "integer"
+                    },
+                    "vng_endpoint": {
+                        "title": "Vng endpoint",
+                        "type": "string",
+                        "pattern": "^[^ ]*$",
+                        "readOnly": true
+                    }
+                }
+            },
+            "OpenApiInspection": {
+                "required": ["url"],
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "format": "uri",
+                        "minLength": 1
+                    }
+                }
+            },
+            "OpenApiInspectionResponse": {
+                "required": ["version", "satisfied"],
+                "type": "object",
+                "properties": {
+                    "version": { "title": "Version", "type": "integer" },
+                    "satisfied": { "title": "Satisfied", "type": "boolean" }
+                }
+            },
+            "PostmanTest": {
+                "required": ["name", "test_scenario"],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "The name of the Postman test suite",
+                        "type": "string",
+                        "maxLength": 150,
+                        "minLength": 1
+                    },
+                    "version": {
+                        "title": "Version",
+                        "description": "Indicates the version of the Postman test suite, allowing for different\n        versions under the same name\n        ",
+                        "type": "string",
+                        "default": "1.0.0",
+                        "maxLength": 20,
+                        "minLength": 1
+                    },
+                    "test_scenario": {
+                        "title": "Test scenario",
+                        "description": "The name of the test scenario to which this Postman test is linked",
+                        "type": "integer"
+                    },
+                    "validation_file": {
+                        "title": "Validation file",
+                        "type": "string",
+                        "readOnly": true,
+                        "format": "uri"
+                    }
+                }
+            },
+            "Endpoint": {
+                "required": ["name", "value"],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "The name of the variable",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "title": "Value",
+                        "description": "The value of the variable",
+                        "type": "string",
+                        "minLength": 1
+                    }
+                }
+            },
+            "Environment": {
+                "title": "Environment",
+                "required": ["name"],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "The name of this environment",
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 1
+                    },
+                    "uuid": {
+                        "title": "Uuid",
+                        "description": "The universally unique identifier of this environment",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "endpoints": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/Endpoint" }
+                    }
+                }
+            },
+            "ServerRun": {
+                "required": ["test_scenario", "environment"],
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "title": "Uuid",
+                        "description": "The universally unique identifier of this provider run, needed to retrieve the badge",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "test_scenario": {
+                        "title": "Test scenario",
+                        "type": "string"
+                    },
+                    "started": {
+                        "title": "Started at",
+                        "description": "The time at which the provider run was started",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "stopped": {
+                        "title": "Stopped at",
+                        "description": "The time at which the provider run was stopped",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "environment": {
+                        "$ref": "#/components/schemas/Environment"
+                    },
+                    "build_version": {
+                        "title": "Build version",
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "client_id": {
+                        "title": "Client id",
+                        "description": "If the test scenario requires JWT authentication, this field will be used to construct a JWT",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "secret": {
+                        "title": "Secret",
+                        "description": "If the test scenario requires JWT authentication, this field will be used to construct a JWT",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Indicates the status of this provider run",
+                        "type": "string",
+                        "enum": [
+                            "starting",
+                            "running",
+                            "shutting down",
+                            "stopped",
+                            "Error deployment",
+                            "Scheduled"
+                        ],
+                        "readOnly": true
+                    },
+                    "percentage_exec": {
+                        "title": "Percentage exec",
+                        "description": "Indicates what percentage of the provider run has been executed",
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": -2147483648,
+                        "nullable": true
+                    },
+                    "status_exec": {
+                        "title": "Status exec",
+                        "description": "Indicates the status of execution of the provider run",
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
+            "ServerRunPayloadExample": {
+                "required": ["test_scenario", "environment"],
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "title": "Uuid",
+                        "description": "The universally unique identifier of this provider run, needed to retrieve the badge",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "test_scenario": {
+                        "title": "Test scenario",
+                        "type": "string"
+                    },
+                    "started": {
+                        "title": "Started at",
+                        "description": "The time at which the provider run was started",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "stopped": {
+                        "title": "Stopped at",
+                        "description": "The time at which the provider run was stopped",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "environment": {
+                        "$ref": "#/components/schemas/Environment"
+                    },
+                    "build_version": {
+                        "title": "Build version",
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "client_id": {
+                        "title": "Client id",
+                        "description": "If the test scenario requires JWT authentication, this field will be used to construct a JWT",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "secret": {
+                        "title": "Secret",
+                        "description": "If the test scenario requires JWT authentication, this field will be used to construct a JWT",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Indicates the status of this provider run",
+                        "type": "string",
+                        "enum": [
+                            "starting",
+                            "running",
+                            "shutting down",
+                            "stopped",
+                            "Error deployment",
+                            "Scheduled"
+                        ],
+                        "readOnly": true
+                    },
+                    "percentage_exec": {
+                        "title": "Percentage exec",
+                        "description": "Indicates what percentage of the provider run has been executed",
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": -2147483648,
+                        "nullable": true
+                    },
+                    "status_exec": {
+                        "title": "Status exec",
+                        "description": "Indicates the status of execution of the provider run",
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "example": {
+                    "test_scenario": "ZDS 2.0 verification test",
+                    "client_id": "test-api-s694H3mpvZpd",
+                    "secret": "JKzXwzfQvQlYpcnvMwIbdLsmymzzpFvC",
+                    "endpoints": [
+                        {
+                            "url": "https://ref.tst.vng.cloud/drc/",
+                            "test_scenario_url": { "name": "DRC" }
+                        },
+                        {
+                            "url": "https://ref.tst.vng.cloud/ztc/",
+                            "test_scenario_url": { "name": "ZTC" }
+                        },
+                        {
+                            "url": "https://ref.tst.vng.cloud/zrc/",
+                            "test_scenario_url": { "name": "ZRC" }
+                        }
+                    ]
+                },
+                "response": { "trt": 1 }
+            },
+            "SessionTypes": {
+                "required": ["name"],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "title": "Name",
+                        "description": "The name of this session type",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1
+                    },
+                    "standard": {
+                        "title": "Standard",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "nullable": true
+                    },
+                    "role": {
+                        "title": "Role",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "nullable": true
+                    },
+                    "application": {
+                        "title": "Application",
+                        "description": "The application for which this session type is relevant",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "nullable": true
+                    },
+                    "version": {
+                        "title": "Version",
+                        "description": "The version of this session type",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "nullable": true
+                    },
+                    "authentication": {
+                        "title": "Authentication",
+                        "description": "The type of authentication that is used for this session type",
+                        "type": "string",
+                        "enum": [
+                            "JWT",
+                            "Authorization header",
+                            "No Authorization"
+                        ]
+                    }
+                }
+            },
+            "SessionStatus": {
+                "required": ["session_type"],
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "title": "Uuid",
+                        "description": "The universally unique identifier of this session, needed to retrieve the badge",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "session_type": {
+                        "title": "Session type",
+                        "description": "The session type of this session",
+                        "type": "integer"
+                    },
+                    "started": {
+                        "title": "Started at",
+                        "description": "The time at which the session was started",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "stopped": {
+                        "title": "Stopped at",
+                        "description": "The time at which the session was stopped",
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Indicates the status of this session",
+                        "type": "string",
+                        "enum": [
+                            "starting",
+                            "running",
+                            "shutting down",
+                            "stopped",
+                            "Error deployment"
+                        ]
+                    },
+                    "deploy_status": {
+                        "title": "Deploy status",
+                        "description": "Indicates the status of deployment of the session",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "deploy_percentage": {
+                        "title": "Deploy percentage",
+                        "description": "Indicates what percentage of the deployment is finished",
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": -2147483648,
+                        "nullable": true
+                    }
+                }
+            },
+            "Session": {
+                "required": ["session_type"],
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "title": "Uuid",
+                        "description": "The universally unique identifier of this session, needed to retrieve the badge",
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "session_type": {
+                        "title": "Session type",
+                        "type": "string"
+                    },
+                    "started": {
+                        "title": "Started at",
+                        "description": "The time at which the session was started",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "stopped": {
+                        "title": "Stopped at",
+                        "description": "The time at which the session was stopped",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Indicates the status of this session",
+                        "type": "string",
+                        "enum": [
+                            "starting",
+                            "running",
+                            "shutting down",
+                            "stopped",
+                            "Error deployment"
+                        ],
+                        "readOnly": true
+                    },
+                    "exposedurl_set": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/ExposedUrl" },
+                        "readOnly": true
+                    },
+                    "build_version": {
+                        "title": "Build version",
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "sandbox": {
+                        "title": "Sandbox",
+                        "description": "If enabled, whenever multiple calls are made to the same path, the result of the call is overridden every time",
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ScenarioCase": {
+                "required": ["url", "collection"],
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "description": "\n    URL pattern that will be compared\n    with the request and eventually matched.\n    Wildcards can be added, e.g. '/test/{uuid}/stop'\n    will match the URL '/test/c5429dcc-6955-4e22-9832-08d52205f633/stop'.\n    ",
+                        "type": "string",
+                        "maxLength": 200,
+                        "minLength": 1
+                    },
+                    "http_method": {
+                        "title": "Http method",
+                        "description": "The HTTP method that must be tested for this scenario case",
+                        "type": "string",
+                        "enum": ["POST", "GET", "PUT", "DELETE", "PATCH"]
+                    },
+                    "collection": {
+                        "title": "Collection",
+                        "description": "The collection of scenario cases to which this scenario case belongs",
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

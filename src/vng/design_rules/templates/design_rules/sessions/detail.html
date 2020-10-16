@@ -1,0 +1,95 @@
+{% extends 'master.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load i18n %}
+
+{% block title %}{% trans "Test consumer - Detail session view" %}{% endblock%}
+
+{% block breadcrumb %}
+{% breadcrumb "Home" 'design_rules:list' %}
+{% breadcrumb 'Detail rule' 'design_rules:detail' uuid=object.test_suite.uuid %}
+{% breadcrumb 'Session log' 'design_rules:session_detail' uuid_test_suite=object.test_suite.uuid uuid=object.uuid %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Design rule session log -" %} {{ object.started_at }}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ object.date }}</h5>
+                    <p class="card-text">
+                        <strong>{% trans "Tests" %}: {{ object.test_suite.api_endpoint }}</strong>
+                    </p>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">{% trans "Design rule" %}</th>
+                                <th scope="col">{% trans "Success" %}</th>
+                                <th scope="col">{% trans "Errors" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in object.results.all %}
+                            <tr>
+                                <th scope="row">{{ result.get_rule_type_display }}</th>
+                                <td>
+                                    {% if result.success %}
+                                        <i class="cui-check"></i>
+                                    {% else %}
+                                        <i class="cui-x-circle"></i>
+                                    {% endif %}
+                                </td>
+                                <td>{{ result.errors|linebreaksbr }}</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if object.request_body %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Request body" %}
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        {{ object.request_body }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endif%}
+    {% if object.response_body %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Response status:" %} {{ object.response_status }}
+                </div>
+                <div class="card-body">
+                    <p class="card-text" id="translate"></p>
+                    <p class="card-text" id="json-content" hidden="true">
+                        {{ object.response_body|safe  }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endif%}
+    {% endblock %}
+
+
+    {% block script%}
+    <script>
+    </script
+
+    {% endblock %}

@@ -21,7 +21,7 @@ from drf_yasg.utils import swagger_auto_schema
 import vng.postman.utils as ptm
 from vng.postman.choices import ResultChoices
 
-from vng.apiAuthentication.authentication import CustomTokenAuthentication
+from vng.api_authentication.authentication import CustomTokenAuthentication
 
 from .serializers import ServerRunSerializer, ServerRunPayloadExample, ServerRunResultShield, PostmanTestSerializer
 from .models import ServerRun, PostmanTestResult, PostmanTest

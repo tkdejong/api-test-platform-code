@@ -1,0 +1,43 @@
+{% extends 'master.html' %}
+{% load sniplates %}
+{% load i18n %}
+
+{% block title %}{% trans "Start Design rule-session" %}{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <form class="" method="post">{% csrf_token %}
+                <div class="card">
+                    <div class="card-header">
+                        {% trans "Test consumer" %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{% trans "Start a new design rule test session for: " %} {{ api.name }}</h5>
+                        {% load_widgets form='forms.html' %}
+
+                        {% for field in form %}
+                            {% form_field field %}
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <button class="btn btn-sm btn-primary" type="submit">
+                                    <i class="fa fa-dot-circle-o"></i>{% trans "Start" %}</button>
+                            </div>
+                            <div class="col-auto">
+                                </div>
+                                    <button class="btn btn-sm btn-danger" type="reset">
+                                        <i class="fa fa-ban"></i>{% trans "Reset" %}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endblock %}
+

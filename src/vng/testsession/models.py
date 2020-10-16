@@ -34,6 +34,7 @@ from vng.servervalidation.models import API
 from ..utils import choices
 from ..utils.auth import get_jwt
 
+
 class SessionType(models.Model):
 
     name = models.CharField(_('Name'), max_length=200, unique=True, help_text=_(

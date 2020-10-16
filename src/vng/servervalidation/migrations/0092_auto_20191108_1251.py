@@ -12,9 +12,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='postmantest',
-            old_name='validation_file',
-            new_name='_validation_file',
-        ),
+        # migrations.RenameField(
+        #     model_name='postmantest',
+        #     old_name='validation_file',
+        #     new_name='_validation_file',
+        # ),
     ]
