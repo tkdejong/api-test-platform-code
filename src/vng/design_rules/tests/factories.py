@@ -4,6 +4,8 @@ from ..models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult
 
 
 class DesignRuleTestSuiteFactory(factory.django.DjangoModelFactory):
+    api_endpoint = "https://maykinmedia.nl/"
+
     class Meta:
         model = DesignRuleTestSuite
 

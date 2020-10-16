@@ -1,7 +1,7 @@
-import requests
 from json import JSONDecodeError
 from decimal import Decimal
 
+import requests
 from celery.utils.log import get_task_logger
 
 from .api_03 import run_api_03_test_rules

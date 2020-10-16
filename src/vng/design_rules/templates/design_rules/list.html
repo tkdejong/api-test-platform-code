@@ -23,24 +23,24 @@
                             <th scope='col'>{% trans "Score" %}</th>
                             <th scope='col'>{% trans "Badge" %}</th>
                         </tr>
-                        {% for session in object_list %}
+                        {% for test_suite in object_list %}
                             <tr>
                                 <td>
-                                    <a href="{% url 'design_rules:detail' session.uuid %}">#{{ session.id|unlocalize }}</a>
+                                    <a href="{% url 'design_rules:detail' test_suite.uuid %}">{{ test_suite.uuid|unlocalize }}</a>
                                 </td>
-                                <td>{{ session.api_endpoint }}</td>
+                                <td>{{ test_suite.api_endpoint }}</td>
                                 <td>
-                                    {% if session.successful %}
+                                    {% if test_suite.successful %}
                                         <i class="cui-check"></i>
                                     {% else %}
                                         <i class="cui-x-circle"></i>
                                     {% endif %}
                                 </td>
-                                <td>{{ session.percentage_score }}%</td>
+                                <td>{{ test_suite.percentage_score }}%</td>
                                 <td>
                                     <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
                                         <a href="#">
-                                            <img style='height:30px ' alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:session-shield' session.id %}">
+                                            <img style='height:30px ' alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:session-shield' test_suite.get_latest_session.uuid %}">
                                         </a>
                                     </span>
                                 </td>
@@ -48,7 +48,7 @@
                         {% empty %}
                             <tr>
                                 <td colspan="9">
-                                    {% trans "There are no sessions yet. Please start a session" %}
+                                    {% trans "There are no test suites yet. Please create a test suite" %}
                                 </td>
                             </tr>
                         {% endfor %}

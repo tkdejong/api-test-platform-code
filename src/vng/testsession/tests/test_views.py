@@ -20,7 +20,7 @@ from django_webtest import WebTest
 from vng.accounts.models import User
 
 from ..task import run_tests, align_sessions_data, purge_sessions
-from ..api_views import RunTest
+from vng.api.v1.testsession.views import RunTest
 from ..models import (
     Session, SessionType, SessionLog, Report,
     ScenarioCase, VNGEndpoint, ExposedUrl, TestSession, InjectHeader

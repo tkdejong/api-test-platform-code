@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from django.urls import include, path
+from django.urls import path
 
 from vng.testsession import apps
 from .views import SessionViewSet, SessionTypesViewSet, ExposedUrlView, SessionViewStatusSet, ResultSessionView, ResultTestsessionViewShield, StopSessionView

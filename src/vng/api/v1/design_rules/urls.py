@@ -1,6 +1,8 @@
+from django.urls import path
+
 from rest_framework import routers
 
-from .viewsets import DesignRuleSessionViewSet, DesignRuleTestSuiteViewSet
+from .viewsets import DesignRuleSessionViewSet, DesignRuleTestSuiteViewSet, DesignRuleSessionShieldView
 
 
 app_name = "design_rules_api"
@@ -12,6 +14,8 @@ router.register('designrule-session', DesignRuleSessionViewSet, 'session')
 # router.register('designrule-result', DesignRuleResultViewSet, 'result')
 
 
-urlpatterns = router.urls
+urlpatterns = router.urls + [
+    path('designrule-session/shield/<uuid:uuid>', DesignRuleSessionShieldView.as_view(), name='design_rule-shield'),
+]
 # api_v1_design_rules:session-detail
 

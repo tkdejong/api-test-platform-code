@@ -20,14 +20,21 @@ class DesignRuleTestSuite(models.Model):
         session.start_tests(self.api_endpoint)
         return session
 
-    def successful(self):
+    def get_latest_session(self):
         if self.sessions.exists():
-            return self.sessions.first().successful()
+            return self.sessions.first()
+        return None
+
+    def successful(self):
+        session = self.get_latest_session()
+        if session:
+            return session.successful()
         return False
 
     def percentage_score(self):
-        if self.sessions.exists():
-            return self.sessions.first().percentage_score
+        session = self.get_latest_session()
+        if session:
+            return session.percentage_score
         return Decimal("0.00")
 
 

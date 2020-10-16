@@ -1,10 +1,17 @@
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+
 from rest_framework.viewsets import GenericViewSet
-from rest_framework import mixins
+from rest_framework import mixins, permissions
 from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.authentication import (
+    SessionAuthentication
+)
 from drf_yasg.utils import swagger_auto_schema
 
+from vng.api_authentication.authentication import CustomTokenAuthentication
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession
 from vng.servervalidation.serializers import ServerRunResultShield
 
@@ -24,15 +31,20 @@ class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMi
     read:
     Get a single Design rule Test suite.
     """
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated, )
     queryset = DesignRuleTestSuite.objects.all()
     serializer_class = DesignRuleTestSuiteSerializer
     lookup_field = 'uuid'
 
     @swagger_auto_schema(operation_description=START_SESSION_DESCRIPTION, request_body=NoneSerializer, responses={201: DesignRuleSessionSerializer})
     @action(detail=True, methods=['post'], description="Start a new session for the test suite")
-    def start_session(self, request, pk=None):
+    def start_session(self, request, uuid=None):
         obj = self.get_object()
         obj.start_session()
+
+        serializer = DesignRuleSessionSerializer(instance=obj.get_latest_session())
+        return Response(serializer.data, status=201)
 
 
 class DesignRuleSessionViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
@@ -42,14 +54,24 @@ class DesignRuleSessionViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin,
     read:
     Get a single Design rule session.
     """
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated, )
+    queryset = DesignRuleSession.objects.all()
+    serializer_class = DesignRuleSessionSerializer
+    lookup_field = 'uuid'
+
+
+class DesignRuleSessionShieldView(APIView):
     queryset = DesignRuleSession.objects.all()
     serializer_class = DesignRuleSessionSerializer
     lookup_field = 'uuid'
 
     @swagger_auto_schema(operation_description="Get the shields.io badge for a session.", responses={200: ServerRunResultShield})
-    @action(detail=True, methods=['get'], description="get the shield bagde")
-    def shield(self, request, pk=None):
-        session = get_object_or_404(DesignRuleSession, pk=pk)
+    def get(self, request, uuid=None):
+        """
+        Get the shield badge to display on a website.
+        """
+        session = get_object_or_404(DesignRuleSession, uuid=uuid)
 
         if session.percentage_score == 100:
             color = 'green'

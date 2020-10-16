@@ -5,7 +5,8 @@ from django.urls import include, path, re_path
 
 from vng_api_common.schema import OpenAPIV3RendererMixin, SchemaView as _SchemaView
 
-from drf_yasg.renderers import SwaggerJSONRenderer
+from drf_yasg.renderers import SwaggerJSONRenderer, ReDocRenderer
+from drf_yasg.views import UI_RENDERERS
 from .generators import CustomOpenAPISchemaGenerator
 
 
@@ -19,6 +20,8 @@ class SchemaView(_SchemaView):
 
     @property
     def _is_openapi_v2(self) -> bool:
+        if ReDocRenderer in self.renderer_classes:
+            return True
         return False
 
     def get_renderers(self):

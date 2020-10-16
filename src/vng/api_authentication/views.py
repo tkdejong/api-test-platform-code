@@ -2,12 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
-from .models import CustomToken
-from .serializers import CustomTokenSerializer
 
+from drf_yasg.utils import swagger_auto_schema
 from rest_auth.views import LoginView, LogoutView
 
 from .forms import TokenForm
+from .models import CustomToken
+from .serializers import CustomTokenSerializer
 
 
 class CustomLoginView(LoginView):

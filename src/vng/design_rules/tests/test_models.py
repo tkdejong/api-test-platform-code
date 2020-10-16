@@ -6,7 +6,7 @@ from django.test import TestCase
 
 import requests_mock
 
-from .factories import DesignRuleTestSuiteFactory
+from .factories import DesignRuleSessionFactory, DesignRuleTestSuiteFactory, DesignRuleResultFactory
 from ..models import DesignRuleSession, DesignRuleResult
 
 
@@ -64,5 +64,17 @@ class DesignRuleTestSuiteTests(TestCase):
 
 
 class DesignRuleSessionTests(TestCase):
-    # TODO: Write the tests
-    pass
+    def test_design_rule_session_no_resutls(self):
+        session = DesignRuleSessionFactory()
+        self.assertFalse(session.successful())
+
+    def test_design_rule_session_all_success(self):
+        session = DesignRuleSessionFactory()
+        DesignRuleResultFactory(success=True, design_rule=session)
+        DesignRuleResultFactory(success=True, design_rule=session)
+        self.assertTrue(session.successful())
+
+    def test_design_rule_session_all_not_success(self):
+        session = DesignRuleSessionFactory()
+        DesignRuleResultFactory(success=False, design_rule=session)
+        self.assertFalse(session.successful())
