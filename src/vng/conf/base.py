@@ -71,8 +71,8 @@ INSTALLED_APPS = [
     'crispy_forms',
 
     # Rest Framework
-    # 'vng_api_common',  # before drf_yasg to override the management command
-    # 'vng_api_common.authorizations',
+    'vng_api_common',  # before drf_yasg to override the management command
+    'vng_api_common.authorizations',
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
@@ -124,10 +124,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # 'vng_api_common.middleware.AuthMiddleware',
+    'vng_api_common.middleware.AuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'vng_api_common.middleware.APIVersionHeaderMiddleware',
+    'vng_api_common.middleware.APIVersionHeaderMiddleware',
 ]
 
 ROOT_URLCONF = 'vng.urls'
