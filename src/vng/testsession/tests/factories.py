@@ -58,7 +58,7 @@ class VNGEndpointFactory(Dmf):
         model = VNGEndpoint
 
     name = factory.Sequence(lambda n: 'name{}'.format(n))
-    url = 'https://ref.tst.vng.cloud/drc/api/v1'
+    url = 'https://test.openzaak.nl/documenten/api/v1'
     session_type = factory.SubFactory(SessionTypeFactory)
     test_file = factory.SubFactory(FilerField)
     scenario_collection = factory.SubFactory(ScenarioCaseCollectionFactory)

@@ -10,6 +10,7 @@ from rest_framework.authentication import (
     SessionAuthentication
 )
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from vng.api_authentication.authentication import CustomTokenAuthentication
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession
@@ -19,6 +20,7 @@ from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSeriali
 
 
 START_SESSION_DESCRIPTION = "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again."
+test_param = openapi.Parameter('fields', openapi.IN_QUERY, description="give a list of fields that need to be returned", type=openapi.TYPE_STRING, enum=["uuid", "api_endpoint", "sessions"])
 
 
 class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
@@ -36,6 +38,10 @@ class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMi
     queryset = DesignRuleTestSuite.objects.all()
     serializer_class = DesignRuleTestSuiteSerializer
     lookup_field = 'uuid'
+
+    @swagger_auto_schema(manual_parameters=[test_param])
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(operation_description=START_SESSION_DESCRIPTION, request_body=NoneSerializer, responses={201: DesignRuleSessionSerializer})
     @action(detail=True, methods=['post'], description="Start a new session for the test suite")

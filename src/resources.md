@@ -10,8 +10,6 @@ Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/o
 
 | Attribuut | Omschrijving | Type | Verplicht | CRUD* |
 | --- | --- | --- | --- | --- |
-| uuid |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
-| design_rule |  | integer | nee | ~~C~~​R​~~U~~​~~D~~ |
 | rule_type |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | success |  | boolean | nee | ~~C~~​R​~~U~~​~~D~~ |
 | errors |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
@@ -23,9 +21,7 @@ Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/o
 | Attribuut | Omschrijving | Type | Verplicht | CRUD* |
 | --- | --- | --- | --- | --- |
 | uuid |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
-| test_suite |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | started_at |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
-| json_result | This is the downloaded api spec | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | percentage_score |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | results |  | array | nee | ~~C~~​R​~~U~~​~~D~~ |
 

@@ -503,6 +503,7 @@ class TestUrlMatchingPatterns(WebTest):
         self.assertEqual(len(report_list), len(Report.objects.all()))
 
         # Call the url without further padding
+        print(resp.json['exposedurl_set'][0]['subdomain'] + 'test')
         self.app.get(resp.json['exposedurl_set'][0]['subdomain'] + 'test',
                      extra_environ={'HTTP_HOST': '{}-example.com'.format(http_host)}, expect_errors=True)
         # Check if the report has been created

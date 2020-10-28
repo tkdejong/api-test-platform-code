@@ -442,7 +442,7 @@
         "/designrule-session": {
             "get": {
                 "operationId": "designrule-session_list",
-                "description": "",
+                "description": "Get all the Design rule sessions that are registered.",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -581,10 +581,45 @@
             },
             "parameters": []
         },
-        "/designrule-session/{id}": {
+        "/designrule-session/shield/{uuid}": {
+            "get": {
+                "operationId": "designrule-session_shield_read",
+                "description": "Get the shields.io badge for a session.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ServerRunResultShield"
+                        },
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "designrule-session"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "uuid",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        },
+        "/designrule-session/{uuid}": {
             "get": {
                 "operationId": "designrule-session_read",
-                "description": "",
+                "description": "Get a single Design rule session.",
                 "parameters": [
                     {
                         "name": "If-None-Match",
@@ -756,71 +791,18 @@
             },
             "parameters": [
                 {
-                    "name": "id",
+                    "name": "uuid",
                     "in": "path",
-                    "description": "A unique integer value identifying this design rule session.",
                     "required": true,
-                    "type": "integer"
-                }
-            ]
-        },
-        "/designrule-session/{id}/shield": {
-            "get": {
-                "operationId": "designrule-session_shield",
-                "description": "",
-                "parameters": [
-                    {
-                        "name": "If-None-Match",
-                        "in": "header",
-                        "description": "Perform conditional requests. This header should contain one or multiple ETag values of resources the client has cached. If the current resource ETag value is in this set, then an HTTP 304 empty body will be returned. See [MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match) for details.",
-                        "required": false,
-                        "type": "string",
-                        "examples": {
-                            "oneValue": {
-                                "summary": "One ETag value",
-                                "value": "\"79054025255fb1a26e4bc422aef54eb4\""
-                            },
-                            "multipleValues": {
-                                "summary": "Multiple ETag values",
-                                "value": "\"79054025255fb1a26e4bc422aef54eb4\", \"e4d909c290d0fb1ca068ffaddf22cbd0\""
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/ServerRunResultShield"
-                        },
-                        "headers": {
-                            "API-version": {
-                                "schema": {
-                                    "type": "string"
-                                },
-                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "designrule-session"
-                ]
-            },
-            "parameters": [
-                {
-                    "name": "id",
-                    "in": "path",
-                    "description": "A unique integer value identifying this design rule session.",
-                    "required": true,
-                    "type": "integer"
+                    "type": "string",
+                    "format": "uuid"
                 }
             ]
         },
         "/designrule-testsuite": {
             "get": {
                 "operationId": "designrule-testsuite_list",
-                "description": "",
+                "description": "Get all the Design rule Test suites that are registered.",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -959,7 +941,7 @@
             },
             "post": {
                 "operationId": "designrule-testsuite_create",
-                "description": "",
+                "description": "Create a new Design rule Test suite.\n- This will start a Design rule session. The session is returned in the session list.",
                 "parameters": [
                     {
                         "name": "Content-Type",
@@ -1135,11 +1117,22 @@
             },
             "parameters": []
         },
-        "/designrule-testsuite/{id}": {
+        "/designrule-testsuite/{uuid}": {
             "get": {
                 "operationId": "designrule-testsuite_read",
-                "description": "",
+                "description": "Get a single Design rule Test suite.",
                 "parameters": [
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "give a list of fields that need to be returned",
+                        "type": "string",
+                        "enum": [
+                            "uuid",
+                            "api_endpoint",
+                            "sessions"
+                        ]
+                    },
                     {
                         "name": "If-None-Match",
                         "in": "header",
@@ -1310,18 +1303,18 @@
             },
             "parameters": [
                 {
-                    "name": "id",
+                    "name": "uuid",
                     "in": "path",
-                    "description": "A unique integer value identifying this design rule test suite.",
                     "required": true,
-                    "type": "integer"
+                    "type": "string",
+                    "format": "uuid"
                 }
             ]
         },
-        "/designrule-testsuite/{id}/start_session": {
+        "/designrule-testsuite/{uuid}/start_session": {
             "post": {
                 "operationId": "designrule-testsuite_start_session",
-                "description": "",
+                "description": "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again.",
                 "parameters": [
                     {
                         "name": "Content-Type",
@@ -1338,15 +1331,15 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/DesignRuleTestSuite"
+                            "$ref": "#/definitions/None"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "",
                         "schema": {
-                            "$ref": "#/definitions/DesignRuleTestSuite"
+                            "$ref": "#/definitions/DesignRuleSession"
                         },
                         "headers": {
                             "API-version": {
@@ -1371,11 +1364,11 @@
             },
             "parameters": [
                 {
-                    "name": "id",
+                    "name": "uuid",
                     "in": "path",
-                    "description": "A unique integer value identifying this design rule test suite.",
                     "required": true,
-                    "type": "integer"
+                    "type": "string",
+                    "format": "uuid"
                 }
             ]
         },
@@ -3662,17 +3655,6 @@
         "DesignRuleResult": {
             "type": "object",
             "properties": {
-                "uuid": {
-                    "title": "Uuid",
-                    "type": "string",
-                    "format": "uuid",
-                    "readOnly": true
-                },
-                "design_rule": {
-                    "title": "Design rule",
-                    "type": "integer",
-                    "readOnly": true
-                },
                 "rule_type": {
                     "title": "Rule type",
                     "type": "string",
@@ -3708,24 +3690,11 @@
                     "format": "uuid",
                     "readOnly": true
                 },
-                "test_suite": {
-                    "title": "Test suite",
-                    "type": "string",
-                    "format": "uri",
-                    "readOnly": true
-                },
                 "started_at": {
                     "title": "Started at",
                     "type": "string",
                     "format": "date-time",
                     "readOnly": true
-                },
-                "json_result": {
-                    "title": "Json result",
-                    "description": "This is the downloaded api spec",
-                    "type": "string",
-                    "readOnly": true,
-                    "minLength": 1
                 },
                 "percentage_score": {
                     "title": "Percentage score",
@@ -3936,6 +3905,10 @@
                     }
                 }
             }
+        },
+        "None": {
+            "type": "object",
+            "properties": {}
         },
         "ExposedUrl": {
             "required": [
