@@ -1,11 +1,13 @@
 from django.utils.translation import ugettext_lazy as _
 
+import requests
+
 from ..choices import DesignRuleChoices
 
 PARAMETERS = "PARAMETERS"
 
 
-def run_api_09_test_rules(session):
+def run_api_09_test_rules(session, api_endpoint, token="efa36f1f00c7081ae8eb0f1aafd01985b1f6fa76"):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-09-implement-custom-representation-if-supported
     3.7 API-09: Implement custom representation if supported
@@ -53,6 +55,19 @@ def run_api_09_test_rules(session):
                                 if errors:
                                     errors += "\n"
                                 errors += "there are no field options found for path: {}, method: {}".format(path, method)
+                                continue
+
+                            # Make api request test
+                            if method.upper() == "GET":
+                                url = "{}{}?fields=this_field_should_not_exist".format(api_endpoint, path)
+                                headers = {'Authorization': 'Token 1519eba39c5828ff9a3f28a552f57740bb69df69'}
+                                response = requests.get(url=url, headers=headers)
+                                print("===========================================================")
+                                print(response.status_code)
+                                print(dir(response))
+                                print(response.text)
+                                if response.status_code != 400:
+                                    errors += "Failed with status: {}. The status should be 400".format(response.status_code)
 
     if not found_fields:
         result.success = True

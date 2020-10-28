@@ -27,7 +27,7 @@ def run_tests(session, api_endpoint):
     result_16 = run_api_16_test_rules(session=session)
     result_03 = run_api_03_test_rules(session=session)
     result_48 = run_api_48_test_rules(session=session)
-    result_09 = run_api_09_test_rules(session=session)
+    result_09 = run_api_09_test_rules(session=session, api_endpoint=api_endpoint)
 
     count_score = 0
     max_score = Decimal(6)
