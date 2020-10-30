@@ -12,7 +12,7 @@ router.register('postman-test', api_views.PostmanTestViewset, base_name='api_pos
 
 
 urlpatterns = router.urls + [
-    path('provider-run-shield/<uuid:uuid>', api_views.ResultServerViewShield.as_view(), name='api_server-run-shield'),
-    path('provider-latest-badge/<uuid:uuid>', api_views.ServerRunLatestResultView.as_view(), name='latest-badge'),
+    path('provider-run-shield/<uuid:uuid>/', api_views.ResultServerViewShield.as_view(), name='api_server-run-shield'),
+    path('provider-latest-badge/<uuid:uuid>/', api_views.ServerRunLatestResultView.as_view(), name='latest-badge'),
     path('provider-run/<uuid:uuid>/result', api_views.ResultServerView.as_view(), name='provider_result'),
 ]
