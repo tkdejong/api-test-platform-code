@@ -1,3 +1,5 @@
+from django.urls.base import reverse_lazy
+from django.views.generic.base import RedirectView
 from rest_framework import routers
 
 from django.urls import path
@@ -17,7 +19,8 @@ router.register('status', SessionViewStatusSet, 'test_session-status')
 
 
 urlpatterns = router.urls + [
-    path('testsession-run-shield/<uuid:uuid>/?', ResultTestsessionViewShield.as_view(), name='testsession-shield'),
+    path('testsession-run-shield/<uuid:uuid>', ResultTestsessionViewShield.as_view(), name='testsession-shield'),
+    path('testsession-run-shield/<uuid:uuid>/', RedirectView.as_view(url=reverse_lazy("apiv1session:testsession-shield")), name='testsession-shield-with-slash'),
     path('testsessions/<uuid:uuid>/stop', StopSessionView.as_view(), name='stop_session'),
     path('testsessions/<uuid:uuid>/result', ResultSessionView.as_view(), name='result_session'),
 ]

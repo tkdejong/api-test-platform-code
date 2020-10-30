@@ -1,3 +1,5 @@
+from django.urls.base import reverse_lazy
+from django.views.generic.base import RedirectView
 from rest_framework import routers
 from django.urls import path, include
 
@@ -12,7 +14,9 @@ router.register('postman-test', api_views.PostmanTestViewset, base_name='api_pos
 
 
 urlpatterns = router.urls + [
-    path('provider-run-shield/<uuid:uuid>/?', api_views.ResultServerViewShield.as_view(), name='api_server-run-shield'),
-    path('provider-latest-badge/<uuid:uuid>/?', api_views.ServerRunLatestResultView.as_view(), name='latest-badge'),
+    path('provider-run-shield/<uuid:uuid>', api_views.ResultServerViewShield.as_view(), name='api_server-run-shield'),
+    path('provider-run-shield/<uuid:uuid>/', RedirectView.as_view(url=reverse_lazy("apiv1server:api_server-run-shield")), name='api_server-run-shield-with-slash'),
+    path('provider-latest-badge/<uuid:uuid>', api_views.ServerRunLatestResultView.as_view(), name='latest-badge'),
+    path('provider-latest-badge/<uuid:uuid>/', RedirectView.as_view(url=reverse_lazy("apiv1server:latest-badge")), name='latest-badge-with-slash'),
     path('provider-run/<uuid:uuid>/result', api_views.ResultServerView.as_view(), name='provider_result'),
 ]
