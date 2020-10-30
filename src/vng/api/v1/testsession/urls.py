@@ -17,7 +17,7 @@ router.register('status', SessionViewStatusSet, 'test_session-status')
 
 
 urlpatterns = router.urls + [
-    path('testsession-run-shield/<uuid:uuid>/', ResultTestsessionViewShield.as_view(), name='testsession-shield'),
+    path('testsession-run-shield/<uuid:uuid>/?', ResultTestsessionViewShield.as_view(), name='testsession-shield'),
     path('testsessions/<uuid:uuid>/stop', StopSessionView.as_view(), name='stop_session'),
     path('testsessions/<uuid:uuid>/result', ResultSessionView.as_view(), name='result_session'),
 ]
