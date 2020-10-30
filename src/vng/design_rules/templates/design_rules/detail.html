@@ -28,7 +28,7 @@
                             <th scope='col'>{% trans "Score" %}</th>
                             <th scope='col'>{% trans "Badge" %}</th>
                         </tr>
-                        {% for session in object.sessions.all %}
+                        {% for session in object_list %}
                             <tr>
                                 <td>
                                     <a href="{% url 'design_rules:session_detail' object.uuid session.uuid %}">{{ session.uuid }}</a>
