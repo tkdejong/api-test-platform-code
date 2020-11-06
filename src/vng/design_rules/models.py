@@ -21,7 +21,7 @@ class DesignRuleTestVersion(models.Model):
 
 class DesignRuleTestOption(OrderedModel):
     test_version = models.ForeignKey(DesignRuleTestVersion, null=True, on_delete=models.CASCADE, related_name="test_rules")
-    rule_type = models.CharField(max_length=50, default="", choices=DesignRuleChoices.choices)
+    rule_type = models.CharField(max_length=50, default="", choices=DesignRuleChoices.choices, blank=True)
 
     order_with_respect_to = 'test_version'
 

@@ -27,7 +27,7 @@ class DesignRuleTestOptionInlineAdmin(OrderedTabularInline):
     model = DesignRuleTestOption
     fields = ('rule_type', 'order', 'move_up_down_links',)
     readonly_fields = ('order', 'move_up_down_links',)
-    extra = 2
+    extra = 1
     ordering = ('order',)
 
 
@@ -40,4 +40,3 @@ class DesignRuleTestVersionAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin)
 @admin.register(DesignRuleTestOption)
 class DesignRuleTestOptionAdmin(admin.ModelAdmin):
     list_display = ('test_version', 'rule_type')
-
