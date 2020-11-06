@@ -4,13 +4,13 @@ from django.http.response import Http404
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView
-from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView, SingleObjectMixin
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, FormView
+from django.shortcuts import redirect
 
 from vng.servervalidation.models import API
 
-from .forms import DesignRuleTestSuiteForm
+from .forms import DesignRuleTestSuiteForm, DesignRuleSessionStart
 from .models import DesignRuleTestSuite, DesignRuleSession
 
 
@@ -27,8 +27,8 @@ class DesignRulesCreateView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        self.object.start_session()
-        return response
+        url = reverse("design_rules:detail", kwargs={"uuid": self.object.uuid})
+        return redirect(url)
 
     def get_success_url(self) -> str:
         return reverse("design_rules:list")
@@ -82,17 +82,25 @@ class DesignRulesDetailView(DetailView):
             allow_empty_first_page=allow_empty_first_page, **kwargs)
 
 
-class DesignRuleSessionCreateView(SingleObjectMixin, RedirectView):
+class DesignRuleSessionCreateView(SingleObjectMixin, FormView):
+    template_name = "design_rules/sessions/create.html"
     model = DesignRuleTestSuite
+    form_class = DesignRuleSessionStart
     slug_url_kwarg = 'uuid'
     slug_field = 'uuid'
 
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.start_session()
-        return super().get(*args, **kwargs)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
-    def get_redirect_url(self, **kwargs) -> str:
+    def form_valid(self, form):
+        test_version = form.cleaned_data.get("test_version")
+        self.object = self.get_object()
+        self.object.start_session(test_version)
+        return super().form_valid(form)
+
+    def get_success_url(self, **kwargs) -> str:
         return reverse("design_rules:detail", kwargs={"uuid": self.object.uuid})
 
 

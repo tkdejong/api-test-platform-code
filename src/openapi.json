@@ -1577,7 +1577,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/None"
+                                "$ref": "#/components/schemas/StartSession"
                             }
                         }
                     },
@@ -1625,6 +1625,183 @@
                     }
                 }
             ]
+        },
+        "/designrule-testversion": {
+            "get": {
+                "operationId": "designrule-testversion_list",
+                "description": "Get all the Design rule Test versions that are active.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/DesignRuleTestVersion"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Not acceptable",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    },
+                    "410": {
+                        "description": "Gone",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported media type",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "headers": {
+                            "API-version": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "description": "Geeft een specifieke API-versie aan in de context van een specifieke aanroep. Voorbeeld: 1.2.1."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Fout"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "designrule-testversion"
+                ]
+            },
+            "parameters": []
         },
         "/exposed_url": {
             "get": {
@@ -2364,7 +2541,7 @@
                 }
             ]
         },
-        "/provider-latest-badge/{uuid}": {
+        "/provider-latest-badge/{uuid}/": {
             "get": {
                 "operationId": "provider-latest-badge_read",
                 "summary": "Retrieve the latest badge for a specific environment",
@@ -2814,7 +2991,7 @@
             },
             "parameters": []
         },
-        "/provider-run-shield/{uuid}": {
+        "/provider-run-shield/{uuid}/": {
             "get": {
                 "operationId": "provider-run-shield_read",
                 "summary": "Provider run badge detail",
@@ -3525,7 +3702,7 @@
                 }
             ]
         },
-        "/testsession-run-shield/{uuid}": {
+        "/testsession-run-shield/{uuid}/": {
             "get": {
                 "operationId": "testsession-run-shield_read",
                 "summary": "Session badge detail",
@@ -4676,9 +4853,64 @@
                     }
                 }
             },
-            "None": {
+            "StartSession": {
+                "required": [
+                    "test_version"
+                ],
                 "type": "object",
-                "properties": {}
+                "properties": {
+                    "test_version": {
+                        "title": "Test version",
+                        "type": "string"
+                    }
+                }
+            },
+            "DesignRuleTestOption": {
+                "type": "object",
+                "properties": {
+                    "rule_type": {
+                        "title": "Rule type",
+                        "type": "string",
+                        "enum": [
+                            "api_03",
+                            "api_09",
+                            "api_16",
+                            "api_20",
+                            "api_48",
+                            "api_51"
+                        ],
+                        "readOnly": true
+                    }
+                }
+            },
+            "DesignRuleTestVersion": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "ID",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "version": {
+                        "title": "Version",
+                        "type": "string",
+                        "readOnly": true,
+                        "minLength": 1
+                    },
+                    "name": {
+                        "title": "Name",
+                        "type": "string",
+                        "readOnly": true,
+                        "minLength": 1
+                    },
+                    "test_rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DesignRuleTestOption"
+                        },
+                        "readOnly": true
+                    }
+                }
             },
             "ExposedUrl": {
                 "required": [

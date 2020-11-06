@@ -1,21 +1,30 @@
 from decimal import Decimal
 import os
 import json
-from unittest.case import expectedFailure
 
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 import requests_mock
+from vng.design_rules.choices import DesignRuleChoices
 from vng.design_rules.tasks.base import run_tests
 
-from ..factories import DesignRuleSessionFactory
+from ..factories import DesignRuleSessionFactory, DesignRuleTestOptionFactory, DesignRuleTestVersionFactory
 from ...models import DesignRuleResult
 
 
 class BaseAPITests(TestCase):
+    def setUp(self):
+        self.test_version = DesignRuleTestVersionFactory()
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_03)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_09)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_16)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_20)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_48)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_51)
+
     def test_no_json_response(self):
-        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", test_version=self.test_version)
 
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -28,7 +37,7 @@ class BaseAPITests(TestCase):
         self.assertEqual(session.percentage_score, Decimal("0"))
 
     def test_all_success(self):
-        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", test_version=self.test_version)
 
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -42,7 +51,7 @@ class BaseAPITests(TestCase):
         self.assertEqual(session.percentage_score, Decimal("100"))
 
     def test_some_success(self):
-        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", test_version=self.test_version)
 
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -55,9 +64,8 @@ class BaseAPITests(TestCase):
         self.assertFalse(session.successful())
         self.assertEqual(session.percentage_score, Decimal("66.67"))
 
-    @expectedFailure
     def test_none_success(self):
-        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", test_version=self.test_version)
 
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))

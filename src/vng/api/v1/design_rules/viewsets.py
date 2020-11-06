@@ -13,14 +13,25 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from vng.api_authentication.authentication import CustomTokenAuthentication
-from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession
+from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleTestVersion
 from vng.servervalidation.serializers import ServerRunResultShield
 
-from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer, NoneSerializer
+from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer, NoneSerializer, DesignRuleTestVersionSerializer, StartSessionSerializer
 
 
 START_SESSION_DESCRIPTION = "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again."
 test_param = openapi.Parameter('fields', openapi.IN_QUERY, description="give a list of fields that need to be returned", type=openapi.TYPE_STRING, enum=["uuid", "api_endpoint", "sessions"])
+
+
+class DesignRuleTestVersionViewSet(mixins.ListModelMixin, GenericViewSet):
+    """
+    list:
+    Get all the Design rule Test versions that are active.
+    """
+    authentication_classes = (CustomTokenAuthentication, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated, )
+    queryset = DesignRuleTestVersion.objects.filter(is_active=True)
+    serializer_class = DesignRuleTestVersionSerializer
 
 
 class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
@@ -43,11 +54,13 @@ class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMi
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-    @swagger_auto_schema(operation_description=START_SESSION_DESCRIPTION, request_body=NoneSerializer, responses={201: DesignRuleSessionSerializer})
+    @swagger_auto_schema(operation_description=START_SESSION_DESCRIPTION, request_body=StartSessionSerializer, responses={201: DesignRuleSessionSerializer})
     @action(detail=True, methods=['post'], description="Start a new session for the test suite")
     def start_session(self, request, uuid=None):
+        serializer = StartSessionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         obj = self.get_object()
-        obj.start_session()
+        obj.start_session(serializer.data.get("test_version"))
 
         serializer = DesignRuleSessionSerializer(instance=obj.get_latest_session())
         return Response(serializer.data, status=201)

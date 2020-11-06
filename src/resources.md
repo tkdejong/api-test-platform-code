@@ -35,6 +35,25 @@ Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/o
 | api_endpoint |  | string | ja | C​R​U​D |
 | sessions |  | array | nee | ~~C~~​R​~~U~~​~~D~~ |
 
+## DesignRuleTestOption
+
+Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/objecttype/designruletestoption)
+
+| Attribuut | Omschrijving | Type | Verplicht | CRUD* |
+| --- | --- | --- | --- | --- |
+| rule_type |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
+
+## DesignRuleTestVersion
+
+Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/objecttype/designruletestversion)
+
+| Attribuut | Omschrijving | Type | Verplicht | CRUD* |
+| --- | --- | --- | --- | --- |
+| id |  | integer | nee | ~~C~~​R​~~U~~​~~D~~ |
+| version |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
+| name |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
+| test_rules |  | array | nee | ~~C~~​R​~~U~~​~~D~~ |
+
 ## ExposedUrl
 
 Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/objecttype/exposedurl)

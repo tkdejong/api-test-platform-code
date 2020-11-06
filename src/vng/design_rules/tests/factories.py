@@ -1,6 +1,24 @@
 import factory
 
-from ..models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult
+from ..choices import DesignRuleChoices
+from ..models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult, DesignRuleTestOption, DesignRuleTestVersion
+
+
+class DesignRuleTestVersionFactory(factory.django.DjangoModelFactory):
+    is_active = True
+    name = factory.Faker("word")
+    version = factory.Faker("word")
+
+    class Meta:
+        model = DesignRuleTestVersion
+
+
+class DesignRuleTestOptionFactory(factory.django.DjangoModelFactory):
+    test_version = factory.SubFactory(DesignRuleTestVersionFactory)
+    rule_type = DesignRuleChoices.api_03
+
+    class Meta:
+        model = DesignRuleTestOption
 
 
 class DesignRuleTestSuiteFactory(factory.django.DjangoModelFactory):

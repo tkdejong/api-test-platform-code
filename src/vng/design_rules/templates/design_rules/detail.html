@@ -24,6 +24,7 @@
                             <th scope='col'>{% trans "Design rule UUID" %}</th>
                             <th scope='col'>{% trans "Started at" %}</th>
                             <th scope='col'>{% trans "Endpoint" %}</th>
+                            <th scope='col'>{% trans "Test version" %}</th>
                             <th scope='col'>{% trans "Successful" %}</th>
                             <th scope='col'>{% trans "Score" %}</th>
                             <th scope='col'>{% trans "Badge" %}</th>
@@ -35,6 +36,7 @@
                                 </td>
                                 <td>{{session.started_at|date:"N j, Y, H:i" }}</td>
                                 <td>{{ object.api_endpoint }}</td>
+                                <td>{{ session.test_version }}</td>
                                 <td>
                                     {% if session.successful %}
                                         <i class="cui-check"></i>
@@ -45,7 +47,7 @@
                                 <td>{{ session.percentage_score }}%</td>
                                 <td>
                                     <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
-                                        <a href="#">
+                                        <a href="{% url 'design_rules:detail' uuid=session.uuid %}">
                                             <img style='height:30px ' alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:design_rule-shield' session.uuid %}">
                                         </a>
                                     </span>

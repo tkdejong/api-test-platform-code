@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import DesignRuleSession, DesignRuleResult, DesignRuleTestSuite
+from ordered_model.admin import OrderedTabularInline, OrderedInlineModelAdminMixin
+
+from .models import (
+    DesignRuleSession, DesignRuleResult, DesignRuleTestSuite,
+    DesignRuleTestVersion, DesignRuleTestOption
+)
 
 
 @admin.register(DesignRuleTestSuite)
@@ -16,3 +21,23 @@ class DesignRuleSessionAdmin(admin.ModelAdmin):
 @admin.register(DesignRuleResult)
 class DesignRuleResultAdmin(admin.ModelAdmin):
     list_display = ('design_rule', 'rule_type')
+
+
+class DesignRuleTestOptionInlineAdmin(OrderedTabularInline):
+    model = DesignRuleTestOption
+    fields = ('rule_type', 'order', 'move_up_down_links',)
+    readonly_fields = ('order', 'move_up_down_links',)
+    extra = 2
+    ordering = ('order',)
+
+
+@admin.register(DesignRuleTestVersion)
+class DesignRuleTestVersionAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
+    list_display = ('version', 'name', 'is_active')
+    inlines = [DesignRuleTestOptionInlineAdmin]
+
+
+@admin.register(DesignRuleTestOption)
+class DesignRuleTestOptionAdmin(admin.ModelAdmin):
+    list_display = ('test_version', 'rule_type')
+
