@@ -108,6 +108,7 @@ class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.Mo
     sessions = serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
+        lookup_field="uuid",
         view_name='api_v1_design_rules:session-detail'
     )
 
