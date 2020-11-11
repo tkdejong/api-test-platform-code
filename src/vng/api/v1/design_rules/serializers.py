@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
+from vng.design_rules.choices import DesignRuleChoices
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult, DesignRuleTestVersion, DesignRuleTestOption
 
 
@@ -71,7 +72,7 @@ class StartSessionSerializer(serializers.Serializer):
 class DesignRuleTestOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DesignRuleTestOption
-        fields = ("rule_type", )
+        fields = ("rule_type")
         read_only_fields = ("rule_type", )
 
 
@@ -85,10 +86,21 @@ class DesignRuleTestVersionSerializer(serializers.ModelSerializer):
 
 
 class DesignRuleResultSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(read_only=True)
+    description = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = DesignRuleResult
-        fields = ("rule_type", "success", "errors")
+        fields = ("rule_type", "success", "errors", "url", "description")
         read_only_fields = ("rule_type", "success", "errors")
+
+    def get_url(self, obj):
+        choice = DesignRuleChoices.get_choice(obj.rule_type)
+        return choice.url
+
+    def get_description(self, obj):
+        choice = DesignRuleChoices.get_choice(obj.rule_type)
+        return choice.description
 
 
 class DesignRuleSessionSerializer(serializers.ModelSerializer):

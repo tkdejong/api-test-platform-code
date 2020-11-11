@@ -5,7 +5,8 @@ from vng.design_rules.choices import DesignRuleChoices
 
 from vng.utils.factories import UserFactory
 from vng.api_authentication.tests.factories import CustomTokenFactory
-from vng.design_rules.tests.factories import DesignRuleSessionFactory, DesignRuleTestOptionFactory, DesignRuleTestSuiteFactory, DesignRuleTestVersionFactory
+from vng.design_rules.choices import DesignRuleChoices
+from vng.design_rules.tests.factories import DesignRuleSessionFactory, DesignRuleTestOptionFactory, DesignRuleTestSuiteFactory, DesignRuleTestVersionFactory, DesignRuleResultFactory
 
 
 class DesignRuleTestSuiteViewSetTests(WebTest):
@@ -73,3 +74,19 @@ class DesignRuleSessionViewSetTests(WebTest):
         session = DesignRuleSessionFactory(percentage_score=100)
         url = reverse("api_v1_design_rules:design_rule-shield", kwargs={"uuid": session.uuid})
         response = self.app.get(url)
+
+    def test_retreive_session(self):
+        token = CustomTokenFactory()
+        session = DesignRuleSessionFactory(percentage_score=100)
+        DesignRuleResultFactory(success=True, design_rule=session, rule_type=DesignRuleChoices.api_03)
+
+        extra_environ = {
+            'HTTP_AUTHORIZATION': 'Token {}'.format(token.key),
+        }
+        url = reverse("api_v1_design_rules:session-detail", kwargs={"uuid": session.uuid})
+        response = self.app.get(url, extra_environ=extra_environ)
+        self.assertEqual(response.json['results'], [{
+            'errors': '', 'rule_type': 'api_03', 'success': True,
+            "url": "https://docs.geostandaarden.nl/api/API-Designrules/#api-03-only-apply-default-http-operations",
+            "description": "A RESTful API is an application programming interface that supports the default HTTP operations GET, PUT, POST, PATCH and DELETE."
+        }])

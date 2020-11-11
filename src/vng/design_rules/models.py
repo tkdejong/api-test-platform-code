@@ -13,6 +13,7 @@ from .tasks.base import run_tests
 class DesignRuleTestVersion(models.Model):
     version = models.CharField(default="", max_length=200)
     name = models.CharField(default="", max_length=200)
+    url = models.URLField(null=True)
     is_active = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
