@@ -1,12 +1,14 @@
 from urllib.parse import urlparse
 
+from django.utils.translation import ugettext_lazy as _
+
 from ..choices import DesignRuleChoices
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 SKIPPED_METHODS = ["PARAMETERS"]
 
 
-def run_api_51_test_rules(session, api_endpoint):
+def run_api_51_test_rules(session, api_endpoint, is_json=False):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-51-publish-oas-at-the-base-uri-in-json-format
 
@@ -34,7 +36,13 @@ def run_api_51_test_rules(session, api_endpoint):
     # Only execute when there is a JSON response
     if not session.json_result:
         result.success = False
-        result.errors = "The API did not give a valid JSON output."
+        result.errors = [_("The API did not give a valid JSON output.")]
+        result.save()
+        return result
+
+    if not is_json:
+        result.success = False
+        result.errors = [_("The API did not give a valid JSON output. It most likely was YAML")]
         result.save()
         return result
 
@@ -55,7 +63,7 @@ def run_api_51_test_rules(session, api_endpoint):
         result.success = True
     else:
         result.success = False
-        result.errors = "The endpoint does not seems to be the root endpoint"
+        result.errors = [_("The endpoint does not seems to be the root endpoint")]
 
     result.save()
     return result

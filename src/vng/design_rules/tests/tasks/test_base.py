@@ -23,14 +23,27 @@ class BaseAPITests(TestCase):
         DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_48)
         DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_51)
 
-    def test_no_json_response(self):
+    def test_yaml_response(self):
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", test_version=self.test_version)
+
+        with requests_mock.Mocker() as mock:
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            with open(os.path.join(dir_path, "files", "openapi.yaml")) as html_file:
+                mock.get('https://maykinmedia.nl/', text=html_file.read())
+            run_tests(session, "https://maykinmedia.nl/")
+        self.assertEqual(DesignRuleResult.objects.count(), 6)
+        session.refresh_from_db()
+        self.assertFalse(session.successful())
+        self.assertEqual(session.percentage_score, Decimal("66.67"))
+
+    def test_no_json_or_yaml_response(self):
         session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", test_version=self.test_version)
 
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "files", "website.html")) as html_file:
                 mock.get('https://maykinmedia.nl/', text=html_file.read())
-            result = run_tests(session, "https://maykinmedia.nl/")
+            run_tests(session, "https://maykinmedia.nl/")
         self.assertEqual(DesignRuleResult.objects.count(), 6)
         session.refresh_from_db()
         self.assertFalse(session.successful())
@@ -43,7 +56,7 @@ class BaseAPITests(TestCase):
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "files", "good.json")) as json_file:
                 mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()))
-            result = run_tests(session, "http://localhost:8000/api/v1")
+            run_tests(session, "http://localhost:8000/api/v1")
 
         self.assertEqual(DesignRuleResult.objects.count(), 6)
         session.refresh_from_db()
@@ -57,7 +70,7 @@ class BaseAPITests(TestCase):
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "files", "good.json")) as json_file:
                 mock.get('https://maykinmedia.nl/', json=json.loads(json_file.read()))
-            result = run_tests(session, "https://maykinmedia.nl/")
+            run_tests(session, "https://maykinmedia.nl/")
 
         self.assertEqual(DesignRuleResult.objects.count(), 6)
         session.refresh_from_db()
@@ -71,7 +84,7 @@ class BaseAPITests(TestCase):
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "files", "wrong.json")) as json_file:
                 mock.get('https://maykinmedia.nl/', json=json.loads(json_file.read()))
-            result = run_tests(session, "https://maykinmedia.nl/")
+            run_tests(session, "https://maykinmedia.nl/")
 
         self.assertEqual(DesignRuleResult.objects.count(), 6)
         session.refresh_from_db()

@@ -43,7 +43,7 @@
                                         <i class="cui-x-circle"></i>
                                     {% endif %}
                                 </td>
-                                <td>{{ result.errors|linebreaksbr }}</td>
+                                <td>{{ result.get_errors|linebreaksbr }}</td>
                             </tr>
                             {%endfor%}
                         </tbody>

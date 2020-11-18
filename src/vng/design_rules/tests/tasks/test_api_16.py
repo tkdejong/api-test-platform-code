@@ -2,6 +2,7 @@ import os
 import json
 
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from vng.design_rules.tasks.api_16 import run_api_16_test_rules
 
@@ -25,7 +26,7 @@ class Api16Tests(TestCase):
         result = run_api_16_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, "The API did not give a valid JSON output.")
+        self.assertEqual(result.errors, [_("The API did not give a valid JSON output.")])
 
     def test_successful_version(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -35,7 +36,7 @@ class Api16Tests(TestCase):
         result = run_api_16_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertTrue(result.success)
-        self.assertEqual(result.errors, "")
+        self.assertEqual(result.errors, None)
 
     def test_version_to_low(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -45,7 +46,7 @@ class Api16Tests(TestCase):
         result = run_api_16_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, "The version (2.9.9) is not higher than or equal to OAS 3.0.0")
+        self.assertEqual(result.errors, [_("The version (2.9.9) is not higher than or equal to OAS 3.0.0")])
 
     def test_no_version(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -55,7 +56,7 @@ class Api16Tests(TestCase):
         result = run_api_16_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, "There is no openapi version found.")
+        self.assertEqual(result.errors, [_("There is no openapi version found.")])
 
     def test_swagger_version(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -65,7 +66,7 @@ class Api16Tests(TestCase):
         result = run_api_16_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, "The version (2.0.0) is not higher than or equal to OAS 3.0.0")
+        self.assertEqual(result.errors, [_("The version (2.0.0) is not higher than or equal to OAS 3.0.0")])
 
     def test_invalid_version(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -75,4 +76,4 @@ class Api16Tests(TestCase):
         result = run_api_16_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, "3 is not a valid OAS api version.")
+        self.assertEqual(result.errors, [_("3 is not a valid OAS api version.")])

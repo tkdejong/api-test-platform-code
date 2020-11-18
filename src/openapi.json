@@ -1321,14 +1321,18 @@
                     {
                         "name": "fields",
                         "in": "query",
-                        "description": "give a list of fields that need to be returned",
+                        "description": "give a list of fields that need to be returned, the field is comma separated",
+                        "style": "form",
+                        "explode": false,
                         "schema": {
-                            "type": "string",
-                            "enum": [
-                                "uuid",
-                                "api_endpoint",
-                                "sessions"
-                            ]
+                            "type": "array",
+                            "items": {
+                                "anyOf": [
+                                    "uuid",
+                                    "api_endpoint",
+                                    "sessions"
+                                ]
+                            }
                         }
                     },
                     {
@@ -4621,10 +4625,23 @@
                         "readOnly": true
                     },
                     "errors": {
-                        "title": "Errors",
+                        "type": "array",
+                        "items": {
+                            "title": "Errors",
+                            "type": "string",
+                            "maxLength": 500
+                        },
+                        "readOnly": true
+                    },
+                    "url": {
+                        "title": "Url",
                         "type": "string",
-                        "readOnly": true,
-                        "minLength": 1
+                        "readOnly": true
+                    },
+                    "description": {
+                        "title": "Description",
+                        "type": "string",
+                        "readOnly": true
                     }
                 }
             },

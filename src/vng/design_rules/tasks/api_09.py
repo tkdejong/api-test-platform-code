@@ -25,12 +25,12 @@ def run_api_09_test_rules(session):
     # Only execute when there is a JSON response
     if not session.json_result:
         result.success = False
-        result.errors = _("The API did not give a valid JSON output.")
+        result.errors = [_("The API did not give a valid JSON output.")]
         result.save()
         return result
 
     paths = session.json_result.get("paths", {})
-    errors = ""
+    errors = []
     found_fields = False
     for path, methods in paths.items():
         for method, options in methods.items():
@@ -44,15 +44,17 @@ def run_api_09_test_rules(session):
                             found_fields = True
                             schema = parameter.get('schema')
                             if not schema:
-                                if errors:
-                                    errors += "\n"
-                                errors += "there is no schema for the field parameter found for path: {}, method: {}".format(path, method)
+                                errors.append(_("there is no schema for the field parameter found for path: {}, method: {}").format(path, method))
                                 continue
-                            enum = schema.get('enum')
-                            if not enum:
-                                if errors:
-                                    errors += "\n"
-                                errors += "there are no field options found for path: {}, method: {}".format(path, method)
+                            items = schema.get('items')
+                            if not items:
+                                errors.append(_("there are no field options found for path: {}, method: {}").format(path, method))
+                                continue
+
+                            any_of = items.get('anyOf')
+                            if not any_of:
+                                errors.append(_("there are no field options found for path: {}, method: {}").format(path, method))
+                                continue
 
     if not found_fields:
         result.success = True

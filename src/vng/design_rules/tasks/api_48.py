@@ -26,23 +26,21 @@ def run_api_48_test_rules(session):
     # Only execute when there is a JSON response
     if not session.json_result:
         result.success = False
-        result.errors = _("The API did not give a valid JSON output.")
+        result.errors = [_("The API did not give a valid JSON output.")]
         result.save()
         return result
 
     paths = session.json_result.get("paths", {})
     paths_found = False
-    errors = ""
+    errors = []
     for path, _methods in paths.items():
         paths_found = True
         if path.endswith('/'):
-            if errors:
-                errors += "\n"
-            errors += _("Path: {} ends with a slash").format(path)
+            errors.append(_("Path: {} ends with a slash").format(path))
 
     if not paths_found:
         result.success = False
-        result.errors = _("There are no paths found")
+        result.errors = [_("There are no paths found")]
     elif errors:
         result.success = False
         result.errors = errors

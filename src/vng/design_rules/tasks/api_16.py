@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from ..choices import DesignRuleChoices
 
 
@@ -20,14 +22,14 @@ def run_api_16_test_rules(session):
     # Only execute when there is a JSON response
     if not session.json_result:
         result.success = False
-        result.errors = "The API did not give a valid JSON output."
+        result.errors = [_("The API did not give a valid JSON output.")]
         result.save()
         return result
 
     version = session.json_result.get("openapi", session.json_result.get("swagger"))
     if not version:
         result.success = False
-        result.errors = "There is no openapi version found."
+        result.errors = [_("There is no openapi version found.")]
         result.save()
         return result
 
@@ -41,10 +43,10 @@ def run_api_16_test_rules(session):
             result.success = True
         else:
             result.success = False
-            result.errors = "The version ({}) is not higher than or equal to OAS 3.0.0".format(version)
+            result.errors = [_("The version ({}) is not higher than or equal to OAS 3.0.0").format(version)]
     except Exception as e:
         result.success = False
-        result.errors = "{} is not a valid OAS api version.".format(version)
+        result.errors = [_("{} is not a valid OAS api version.").format(version)]
     finally:
         result.save()
         return result

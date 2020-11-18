@@ -1,12 +1,11 @@
 import os
 
 from django.conf import settings
-from django.urls import include, path, re_path
+from django.urls import include, path
 
 from vng_api_common.schema import OpenAPIV3RendererMixin, SchemaView as _SchemaView
 
 from drf_yasg.renderers import SwaggerJSONRenderer, ReDocRenderer
-from drf_yasg.views import UI_RENDERERS
 from .generators import CustomOpenAPISchemaGenerator
 
 

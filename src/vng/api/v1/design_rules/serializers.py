@@ -72,7 +72,7 @@ class StartSessionSerializer(serializers.Serializer):
 class DesignRuleTestOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DesignRuleTestOption
-        fields = ("rule_type")
+        fields = ("rule_type", )
         read_only_fields = ("rule_type", )
 
 

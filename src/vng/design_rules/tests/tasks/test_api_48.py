@@ -26,7 +26,7 @@ class Api48Tests(TestCase):
         result = run_api_48_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, _("The API did not give a valid JSON output."))
+        self.assertEqual(result.errors, [_("The API did not give a valid JSON output.")])
 
     def test_no_trailing_slashes(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -36,7 +36,7 @@ class Api48Tests(TestCase):
         result = run_api_48_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertTrue(result.success)
-        self.assertEqual(result.errors, "")
+        self.assertEqual(result.errors, None)
 
     def test_with_trailing_slashes(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -44,9 +44,10 @@ class Api48Tests(TestCase):
             session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/", json_result=json.loads(json_file.read()))
 
         result = run_api_48_test_rules(session)
-        errors = _("Path: {} ends with a slash").format("/auth/login/")
-        errors += "\n"
-        errors += _("Path: {} ends with a slash").format("/auth/logout/")
+        errors = [
+            _("Path: {} ends with a slash").format("/auth/login/"),
+            _("Path: {} ends with a slash").format("/auth/logout/"),
+        ]
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
         self.assertEqual(result.errors, errors)
@@ -59,4 +60,4 @@ class Api48Tests(TestCase):
         result = run_api_48_test_rules(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertFalse(result.success)
-        self.assertEqual(result.errors, _("There are no paths found"))
+        self.assertEqual(result.errors, [_("There are no paths found")])

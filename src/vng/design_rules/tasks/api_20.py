@@ -1,5 +1,7 @@
 import re
 
+from django.utils.translation import ugettext_lazy as _
+
 from ..choices import DesignRuleChoices
 
 REGEX_END_WITH_VERSION = r"\/v[\d]+$"
@@ -40,9 +42,9 @@ def run_api_20_test_rules(session, api_endpoint):
     searches = re.findall(REGEX_MINOR_VERSION, api_endpoint, re.IGNORECASE)
     if searches:
         result.success = False
-        result.errors = "The api endpoint contains more than the major version number in the URI"
+        result.errors = [_("The api endpoint contains more than the major version number in the URI")]
     else:
         result.success = False
-        result.errors = "The api endpoint does not contain a 'v*' in the url"
+        result.errors = [_("The api endpoint does not contain a 'v*' in the url")]
     result.save()
     return result

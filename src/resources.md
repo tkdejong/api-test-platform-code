@@ -12,7 +12,9 @@ Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/o
 | --- | --- | --- | --- | --- |
 | rule_type |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | success |  | boolean | nee | ~~C~~​R​~~U~~​~~D~~ |
-| errors |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
+| errors |  | array | nee | ~~C~~​R​~~U~~​~~D~~ |
+| url |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
+| description |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 
 ## DesignRuleSession
 

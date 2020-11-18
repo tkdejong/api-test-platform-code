@@ -2,6 +2,7 @@ from json import JSONDecodeError
 from decimal import Decimal
 
 import requests
+import yaml
 from celery.utils.log import get_task_logger
 
 from ..choices import DesignRuleChoices
@@ -17,10 +18,14 @@ logger = get_task_logger(__name__)
 
 def run_tests(session, api_endpoint):
     response = requests.get(api_endpoint)
+    is_json = False
     try:
         session.json_result = response.json()
+        is_json = True
     except JSONDecodeError:
-        pass
+        yaml_dict = yaml.safe_load(response.text)
+        if isinstance(yaml_dict, dict):
+            session.json_result = yaml_dict
 
     success_count = 0
     for test_option in session.test_version.test_rules.all():
@@ -45,7 +50,7 @@ def run_tests(session, api_endpoint):
             if result.success:
                 success_count += 1
         if test_option.rule_type == DesignRuleChoices.api_51:
-            result = run_api_51_test_rules(session=session, api_endpoint=api_endpoint)
+            result = run_api_51_test_rules(session=session, api_endpoint=api_endpoint, is_json=is_json)
             if result.success:
                 success_count += 1
 

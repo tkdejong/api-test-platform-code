@@ -20,7 +20,12 @@ from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSeriali
 
 
 START_SESSION_DESCRIPTION = "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again."
-test_param = openapi.Parameter('fields', openapi.IN_QUERY, description="give a list of fields that need to be returned", type=openapi.TYPE_STRING, enum=["uuid", "api_endpoint", "sessions"])
+# test_param = openapi.Parameter('fields', openapi.IN_QUERY, description="give a list of fields that need to be returned", type=openapi.TYPE_STRING, enum=["uuid", "api_endpoint", "sessions"])
+test_param = openapi.Parameter(
+    name='fields', in_=openapi.IN_QUERY,
+    description="give a list of fields that need to be returned, the field is comma separated",
+    type=openapi.TYPE_ARRAY, items=("uuid", "api_endpoint", "sessions")
+)
 
 
 class DesignRuleTestVersionViewSet(mixins.ListModelMixin, GenericViewSet):

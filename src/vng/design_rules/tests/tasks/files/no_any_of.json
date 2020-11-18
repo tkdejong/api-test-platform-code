@@ -1149,11 +1149,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "anyOf": [
-                                    "uuid",
-                                    "api_endpoint",
-                                    "sessions"
-                                ]
+                                "anyOf": []
                             }
                         }
                     },

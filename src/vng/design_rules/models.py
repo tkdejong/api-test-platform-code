@@ -1,6 +1,7 @@
 from decimal import Decimal
 from uuid import uuid4
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -83,7 +84,14 @@ class DesignRuleResult(models.Model):
     design_rule = models.ForeignKey(DesignRuleSession, on_delete=models.CASCADE, related_name="results")
     rule_type = models.CharField(max_length=50, default="", choices=DesignRuleChoices.choices)
     success = models.BooleanField(default=False, blank=True)
-    errors = models.TextField(default="")
+    errors = ArrayField(
+        models.CharField(max_length=500, blank=True), null=True, blank=True
+    )
 
     class Meta:
         ordering = ('design_rule', )
+
+    def get_errors(self):
+        if self.errors:
+            return "\n".join(self.errors)
+        return ""
