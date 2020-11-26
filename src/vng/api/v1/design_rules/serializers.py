@@ -135,5 +135,5 @@ class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.Mo
         read_only_fields = ("uuid", )
 
     def create(self, validated_data):
-        instance, _ = DesignRuleTestSuite.objects.get_or_create(**validated_data)
+        instance, _ = DesignRuleTestSuite.objects.get_or_create(api_endpoint=validated_data.get("api_endpoint"))
         return instance
