@@ -4,6 +4,7 @@ from decimal import Decimal
 import requests
 import yaml
 from celery.utils.log import get_task_logger
+from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
 from ..choices import DesignRuleChoices
@@ -28,7 +29,7 @@ def run_tests(session, api_endpoint):
             yaml_dict = yaml.safe_load(response.text)
             if isinstance(yaml_dict, dict):
                 session.json_result = yaml_dict
-        except ScannerError:
+        except ScannerError, ParserError:
             pass
 
     success_count = 0
