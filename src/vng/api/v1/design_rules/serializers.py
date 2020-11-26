@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from vng.design_rules.choices import DesignRuleChoices
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult, DesignRuleTestVersion, DesignRuleTestOption
@@ -134,25 +134,11 @@ class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.Mo
         fields = ("uuid", "api_endpoint", "sessions")
         read_only_fields = ("uuid", )
 
-    def is_valid(self, raise_exception=False):
-        if hasattr(self, 'initial_data'):
-            # If we are instantiating with data={something}
-            try:
-                # Try to get the object in question
-                obj = DesignRuleTestSuite.objects.get(**self.initial_data)
-            except (ObjectDoesNotExist, MultipleObjectsReturned):
-                # Except not finding the object or the data being ambiguous
-                # for defining it. Then validate the data as usual
-                return super().is_valid(raise_exception)
-            else:
-                # If the object is found add it to the serializer. Then
-                # validate the data as usual
-                self.instance = obj
-                return super().is_valid(raise_exception)
-        else:
-            # If the Serializer was instantiated with just an object, and no
-            # data={something} proceed as usual
-            return super().is_valid(raise_exception)
+    def run_validators(self, value):
+        for validator in self.validators:
+            if isinstance(validator, validators.UniqueValidator):
+                self.validators.remove(validator)
+        super().run_validators(value)
 
     def create(self, validated_data):
         instance, _ = DesignRuleTestSuite.objects.get_or_create(api_endpoint=validated_data.get("api_endpoint"))
