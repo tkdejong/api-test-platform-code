@@ -29,7 +29,9 @@ def run_tests(session, api_endpoint):
             yaml_dict = yaml.safe_load(response.text)
             if isinstance(yaml_dict, dict):
                 session.json_result = yaml_dict
-        except ScannerError, ParserError:
+        except ScannerError:
+            pass
+        except ParserError:
             pass
 
     success_count = 0
