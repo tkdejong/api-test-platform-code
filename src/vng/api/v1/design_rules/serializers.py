@@ -1,6 +1,6 @@
 from copy import copy
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.validators import URLValidator
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers, validators
@@ -130,17 +130,12 @@ class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.Mo
         lookup_field="uuid",
         view_name='api_v1_design_rules:session-detail'
     )
+    api_endpoint = serializers.URLField(validators=[URLValidator(message=_('Enter a valid URL.'))])
 
     class Meta:
         model = DesignRuleTestSuite
         fields = ("uuid", "api_endpoint", "sessions")
         read_only_fields = ("uuid", )
-
-    def run_validators(self, value):
-        for validator in copy(self.validators):
-            if isinstance(validator, validators.UniqueValidator):
-                self.validators.remove(validator)
-        super().run_validators(value)
 
     def create(self, validated_data):
         instance, _ = DesignRuleTestSuite.objects.get_or_create(api_endpoint=validated_data.get("api_endpoint"))
