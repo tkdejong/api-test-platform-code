@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.translation import gettext_lazy as _
 
@@ -5,6 +7,8 @@ from rest_framework import serializers, validators
 
 from vng.design_rules.choices import DesignRuleChoices
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult, DesignRuleTestVersion, DesignRuleTestOption
+
+logger = logging.getLogger(__name__)
 
 
 class TestVersionField(serializers.Field):
@@ -141,5 +145,6 @@ class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.Mo
         super().run_validators(value)
 
     def create(self, validated_data):
+        logger.info("gotten here", validated_data)
         instance, _ = DesignRuleTestSuite.objects.get_or_create(api_endpoint=validated_data.get("api_endpoint"))
         return instance

@@ -16,7 +16,7 @@ from vng.api_authentication.authentication import CustomTokenAuthentication
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleTestVersion
 from vng.servervalidation.serializers import ServerRunResultShield
 
-from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer, NoneSerializer, DesignRuleTestVersionSerializer, StartSessionSerializer
+from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer, DesignRuleTestVersionSerializer, StartSessionSerializer
 
 
 START_SESSION_DESCRIPTION = "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again."
