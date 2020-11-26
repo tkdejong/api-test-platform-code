@@ -4,6 +4,7 @@ from decimal import Decimal
 import requests
 import yaml
 from celery.utils.log import get_task_logger
+from requests.exceptions import SSLError
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
@@ -19,20 +20,27 @@ logger = get_task_logger(__name__)
 
 
 def run_tests(session, api_endpoint):
-    response = requests.get(api_endpoint)
-    is_json = False
     try:
-        session.json_result = response.json()
-        is_json = True
-    except JSONDecodeError:
+        response = requests.get(api_endpoint)
+    except SSLError:
+        response = None
+    except Exception:
+        response = None
+    is_json = False
+
+    if response:
         try:
-            yaml_dict = yaml.safe_load(response.text)
-            if isinstance(yaml_dict, dict):
-                session.json_result = yaml_dict
-        except ScannerError:
-            pass
-        except ParserError:
-            pass
+            session.json_result = response.json()
+            is_json = True
+        except JSONDecodeError:
+            try:
+                yaml_dict = yaml.safe_load(response.text)
+                if isinstance(yaml_dict, dict):
+                    session.json_result = yaml_dict
+            except ScannerError:
+                pass
+            except ParserError:
+                pass
 
     success_count = 0
     for test_option in session.test_version.test_rules.all():
