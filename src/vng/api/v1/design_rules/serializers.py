@@ -139,9 +139,11 @@ class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.Mo
         read_only_fields = ("uuid", )
 
     def run_validators(self, value):
+        logger.info("gotten here", self.validators)
         for validator in self.validators:
             if isinstance(validator, validators.UniqueValidator):
                 self.validators.remove(validator)
+        logger.info("closing?", self.validators)
         super().run_validators(value)
 
     def create(self, validated_data):
