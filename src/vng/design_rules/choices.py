@@ -42,7 +42,7 @@ class DesignRuleChoices(DjangoChoices):
     # api_19 = ChoiceItem("api_19", _("API-19: Allow for a maximum 1 year transition period to a new API version"))
     api_20 = ChoiceItem(
         "api_20",
-        _("API-20: Include the major version number only in ihe URI"),
+        _("API-20: Include the major version number only in the URI"),
         url="https://docs.geostandaarden.nl/api/API-Designrules/#api-20-include-the-major-version-number-only-in-ihe-uri",
         description=api_20_description,
     )
