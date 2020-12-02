@@ -25,6 +25,7 @@ Objecttype op [GEMMA Online](https://www.gemmaonline.nl/index.php/Rgbz_2.0/doc/o
 | uuid |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | started_at |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | percentage_score |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
+| test_version |  | string | nee | ~~C~~​R​~~U~~​~~D~~ |
 | results |  | array | nee | ~~C~~​R​~~U~~​~~D~~ |
 
 ## DesignRuleTestSuite

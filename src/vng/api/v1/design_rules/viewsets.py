@@ -39,7 +39,7 @@ class DesignRuleTestVersionViewSet(mixins.ListModelMixin, GenericViewSet):
     serializer_class = DesignRuleTestVersionSerializer
 
 
-class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     """
     list:
     Get all the Design rule Test suites that are registered.
