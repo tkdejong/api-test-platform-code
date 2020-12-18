@@ -1,12 +1,14 @@
 from django.utils.translation import ugettext_lazy as _
 
-from ..choices import DesignRuleChoices
+import requests
+
+from ...choices import DesignRuleChoices
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 SKIPPED_METHODS = ["PARAMETERS"]
 
 
-def run_api_48_test_rules(session):
+def run_20200709_api_48(session, api_endpoint):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-48-leave-off-trailing-slashes-from-api-endpoints
     3.14 API-48: Leave off trailing slashes from API endpoints
@@ -14,14 +16,14 @@ def run_api_48_test_rules(session):
     URIs to retrieve collections of resources or individual resources don't include a trailing slash.
     A resource is only available at one endpoint/path. Resource paths end without a slash.
     """
-    from ..models import DesignRuleResult
+    from ...models import DesignRuleResult
 
     # We do not want double results for the same design rule
-    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_48)
+    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_48_20200709)
     if base_qs.exists():
         return base_qs.first()
 
-    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_48)
+    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_48_20200709)
 
     # Only execute when there is a JSON response
     if not session.json_result:
@@ -37,6 +39,22 @@ def run_api_48_test_rules(session):
         paths_found = True
         if path.endswith('/'):
             errors.append(_("Path: {} ends with a slash").format(path))
+        else:
+            for method, _oparations in _methods.items():
+                # print(method)
+                if method == "get":
+                    response = requests.get("{}{}/".format(api_endpoint, path))
+                elif method == "post":
+                    response = requests.post("{}{}/".format(api_endpoint, path))
+                elif method == "put":
+                    response = requests.put("{}{}/".format(api_endpoint, path))
+                elif method == "delete":
+                    response = requests.delete("{}{}/".format(api_endpoint, path))
+                else:
+                    response = None
+
+                if response and response.status_code != 404:
+                    errors.append(_("Path: {}/ with a slash at the end did not result in a 404. it resulted in a {}").format(path, response.status_code))
 
     if not paths_found:
         result.success = False

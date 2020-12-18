@@ -1,7 +1,9 @@
-from django.core.exceptions import ObjectDoesNotExist
+from copy import copy
+
+from django.core.validators import URLValidator
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from vng.design_rules.choices import DesignRuleChoices
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleResult, DesignRuleTestVersion, DesignRuleTestOption
@@ -88,11 +90,15 @@ class DesignRuleTestVersionSerializer(serializers.ModelSerializer):
 class DesignRuleResultSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField(read_only=True)
     description = serializers.SerializerMethodField(read_only=True)
+    rule_type = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = DesignRuleResult
         fields = ("rule_type", "success", "errors", "url", "description")
         read_only_fields = ("rule_type", "success", "errors")
+
+    def get_rule_type(self, obj):
+        return obj.get_rule_type_display()
 
     def get_url(self, obj):
         choice = DesignRuleChoices.get_choice(obj.rule_type)
@@ -105,15 +111,16 @@ class DesignRuleResultSerializer(serializers.ModelSerializer):
 
 class DesignRuleSessionSerializer(serializers.ModelSerializer):
     results = DesignRuleResultSerializer(many=True, read_only=True)
+    test_version = serializers.SerializerMethodField()
     # success = serializers.SerializerMethodField(read_only=True, source="successful")
 
     class Meta:
         model = DesignRuleSession
-        fields = ("uuid", "started_at", "percentage_score", "results")
+        fields = ("uuid", "started_at", "percentage_score", "test_version", "results")
         read_only_fields = ("uuid", "started_at", "percentage_score")
 
-    # def get_success(self, obj):
-    #     return obj.successful()
+    def get_test_version(self, obj):
+        return obj.test_version.version
 
 
 class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.ModelSerializer):
@@ -123,8 +130,13 @@ class DesignRuleTestSuiteSerializer(DynamicFieldsModelSerializer, serializers.Mo
         lookup_field="uuid",
         view_name='api_v1_design_rules:session-detail'
     )
+    api_endpoint = serializers.URLField(validators=[URLValidator(message=_('Enter a valid URL.'))])
 
     class Meta:
         model = DesignRuleTestSuite
         fields = ("uuid", "api_endpoint", "sessions")
         read_only_fields = ("uuid", )
+
+    def create(self, validated_data):
+        instance, _ = DesignRuleTestSuite.objects.get_or_create(api_endpoint=validated_data.get("api_endpoint"))
+        return instance

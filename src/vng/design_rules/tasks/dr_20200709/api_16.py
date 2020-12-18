@@ -1,23 +1,23 @@
 from django.utils.translation import ugettext_lazy as _
 
-from ..choices import DesignRuleChoices
+from ...choices import DesignRuleChoices
 
 
-def run_api_16_test_rules(session):
+def run_20200709_api_16(session):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-16-use-oas-3-0-for-documentation
     3.9 API-16: Use OAS 3.0 for documentation
 
     Publish specifications (documentation) as Open API Specification (OAS) 3.0 or higher.
     """
-    from ..models import DesignRuleResult
+    from ...models import DesignRuleResult
 
     # We do not want double results for the same design rule
-    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_16)
+    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_16_20200709)
     if base_qs.exists():
         return base_qs.first()
 
-    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_16)
+    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_16_20200709)
 
     # Only execute when there is a JSON response
     if not session.json_result:

@@ -1,12 +1,12 @@
 from django.utils.translation import ugettext_lazy as _
 
-from ..choices import DesignRuleChoices
+from ...choices import DesignRuleChoices
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 SKIPPED_METHODS = ["PARAMETERS", "SUMMARY", "DESCRIPTION", "$REF", "SERVERS"]
 
 
-def run_api_03_test_rules(session):
+def run_20200709_api_03(session):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-03-only-apply-default-http-operations
     3.3 API-03: Only apply default HTTP operations
@@ -14,14 +14,14 @@ def run_api_03_test_rules(session):
     A RESTful API is an application programming interface that supports the default HTTP operations
     GET, PUT, POST, PATCH and DELETE.
     """
-    from ..models import DesignRuleResult
+    from ...models import DesignRuleResult
 
     # We do not want double results for the same design rule
-    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_03)
+    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_03_20200709)
     if base_qs.exists():
         return base_qs.first()
 
-    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_03)
+    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_03_20200709)
 
     # Only execute when there is a JSON response
     if not session.json_result:

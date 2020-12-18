@@ -33,7 +33,7 @@ class DesignRuleTestOption(OrderedModel):
 
 class DesignRuleTestSuite(models.Model):
     uuid = models.UUIDField(default=uuid4)
-    api_endpoint = models.URLField()
+    api_endpoint = models.URLField(unique=True)
 
     def start_session(self, test_version):
         session = self.sessions.create(test_version=test_version)
@@ -85,6 +85,9 @@ class DesignRuleResult(models.Model):
     rule_type = models.CharField(max_length=50, default="", choices=DesignRuleChoices.choices)
     success = models.BooleanField(default=False, blank=True)
     errors = ArrayField(
+        models.CharField(max_length=500, blank=True), null=True, blank=True
+    )
+    warnings = ArrayField(
         models.CharField(max_length=500, blank=True), null=True, blank=True
     )
 

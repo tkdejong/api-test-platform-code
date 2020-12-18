@@ -1,22 +1,20 @@
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 
-from rest_framework.viewsets import GenericViewSet
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authentication import (
-    SessionAuthentication
-)
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.views import APIView
 
 from vng.api_authentication.authentication import CustomTokenAuthentication
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleTestVersion
 from vng.servervalidation.serializers import ServerRunResultShield
 
-from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer, NoneSerializer, DesignRuleTestVersionSerializer, StartSessionSerializer
+from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSerializer, DesignRuleTestVersionSerializer, StartSessionSerializer
 
 
 START_SESSION_DESCRIPTION = "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again."
@@ -39,7 +37,7 @@ class DesignRuleTestVersionViewSet(mixins.ListModelMixin, GenericViewSet):
     serializer_class = DesignRuleTestVersionSerializer
 
 
-class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     """
     list:
     Get all the Design rule Test suites that are registered.

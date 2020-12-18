@@ -98,6 +98,7 @@ requests-mock==1.7.0      # via -r requirements/base.in
 requests==2.20.1          # via -r requirements/base.in, coreapi, django-rosetta, gemma-zds-client, requests-mock, vng-api-common
 rsa==4.0                  # via google-auth, oauth2client
 ruamel.yaml==0.15.88      # via drf-yasg
+semver==2.13.0            # via -r requirements/base.in
 six==1.11.0               # via django-background-tasks, django-bootstrap-breadcrumbs, django-compat, django-dynamic-raw-id, django-rest-auth, django-rosetta, drf-yasg, google-api-python-client, google-auth, html5lib, isodate, oauth2client, requests-mock
 sqlparse==0.2.4           # via django
 tablib==0.12.1            # via django-import-export

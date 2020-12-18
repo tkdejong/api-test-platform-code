@@ -14,12 +14,12 @@ from ..models import DesignRuleSession, DesignRuleResult
 class DesignRuleTestSuiteTests(TestCase):
     def setUp(self):
         self.test_version = DesignRuleTestVersionFactory()
-        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_03)
-        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_09)
-        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_16)
-        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_20)
-        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_48)
-        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_51)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_03_20200709)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_09_20200117)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_16_20200709)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_20_20200709)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_48_20200709)
+        DesignRuleTestOptionFactory(test_version=self.test_version, rule_type=DesignRuleChoices.api_51_20200709)
 
     def test_start_session(self):
         test_suite = DesignRuleTestSuiteFactory(api_endpoint="http://localhost:8000/api/v1")
@@ -30,6 +30,14 @@ class DesignRuleTestSuiteTests(TestCase):
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "tasks", "files", "good.json")) as json_file:
                 mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()))
+                mock.get('http://localhost:8000/api/v1/designrule-session/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/shield/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/', status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-session/", status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-testsuite/", status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/start_session/", status_code=404)
             test_suite.start_session(self.test_version)
         self.assertEqual(DesignRuleSession.objects.count(), 1)
         self.assertEqual(DesignRuleResult.objects.count(), 6)
@@ -42,9 +50,18 @@ class DesignRuleTestSuiteTests(TestCase):
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "tasks", "files", "good.json")) as json_file:
-                mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()))
+                mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()), headers={"Access-Control-Allow-Origin": "http://foo.example"})
+                mock.get('http://localhost:8000/api/v1/designrule-session/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/shield/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/', status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-session/", status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-testsuite/", status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/start_session/", status_code=404)
             test_suite.start_session(self.test_version)
         self.assertTrue(test_suite.successful())
+        self.assertEqual(test_suite.percentage_score(), Decimal("100.00"))
 
     def test_successful_no_sessions(self):
         test_suite = DesignRuleTestSuiteFactory(api_endpoint="http://localhost:8000/api/v1")
@@ -61,7 +78,15 @@ class DesignRuleTestSuiteTests(TestCase):
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "tasks", "files", "good.json")) as json_file:
-                mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()))
+                mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()), headers={"Access-Control-Allow-Origin": "http://foo.example"})
+                mock.get('http://localhost:8000/api/v1/designrule-session/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/shield/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/', status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-session/", status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-testsuite/", status_code=404)
+                mock.post("http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/start_session/", status_code=404)
             test_suite.start_session(self.test_version)
         self.assertEqual(test_suite.percentage_score(), Decimal("100.00"))
 

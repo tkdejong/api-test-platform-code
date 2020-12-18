@@ -15,7 +15,7 @@ class DesignRuleTestVersionFactory(factory.django.DjangoModelFactory):
 
 class DesignRuleTestOptionFactory(factory.django.DjangoModelFactory):
     test_version = factory.SubFactory(DesignRuleTestVersionFactory)
-    rule_type = DesignRuleChoices.api_03
+    rule_type = DesignRuleChoices.api_03_20200709
 
     class Meta:
         model = DesignRuleTestOption
