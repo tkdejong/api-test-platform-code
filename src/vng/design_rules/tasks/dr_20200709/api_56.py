@@ -17,11 +17,11 @@ def run_20200709_api_56(session):
     from ...models import DesignRuleResult
 
     # We do not want double results for the same design rule
-    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_51_20200709)
+    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_56_20200709)
     if base_qs.exists():
         return base_qs.first()
 
-    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_51_20200709)
+    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_56_20200709)
 
     # Only execute when there is a JSON response
     if not session.json_result:
