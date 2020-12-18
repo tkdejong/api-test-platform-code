@@ -87,6 +87,9 @@ class DesignRuleResult(models.Model):
     errors = ArrayField(
         models.CharField(max_length=500, blank=True), null=True, blank=True
     )
+    warnings = ArrayField(
+        models.CharField(max_length=500, blank=True), null=True, blank=True
+    )
 
     class Meta:
         ordering = ('design_rule', )

@@ -2,13 +2,13 @@ from urllib.parse import urlparse
 
 from django.utils.translation import ugettext_lazy as _
 
-from ..choices import DesignRuleChoices
+from ...choices import DesignRuleChoices
 
 VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 SKIPPED_METHODS = ["PARAMETERS"]
 
 
-def run_api_51_test_rules(session, api_endpoint, is_json=False):
+def run_20200117_api_51(session, api_endpoint, is_json=False):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-51-publish-oas-at-the-base-uri-in-json-format
 
@@ -24,14 +24,14 @@ def run_api_51_test_rules(session, api_endpoint, is_json=False):
     Thus, the up-to-date documentation is linked to a unique location (that is always concurrent with
     the features available in the API).
     """
-    from ..models import DesignRuleResult
+    from ...models import DesignRuleResult
 
     # We do not want double results for the same design rule
-    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_51)
+    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_51_20200117)
     if base_qs.exists():
         return base_qs.first()
 
-    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_51)
+    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_51_20200117)
 
     # Only execute when there is a JSON response
     if not session.json_result:

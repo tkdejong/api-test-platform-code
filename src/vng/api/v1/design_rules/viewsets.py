@@ -1,16 +1,14 @@
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 
-from rest_framework.viewsets import GenericViewSet
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authentication import (
-    SessionAuthentication
-)
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.views import APIView
 
 from vng.api_authentication.authentication import CustomTokenAuthentication
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleTestVersion

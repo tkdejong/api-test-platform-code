@@ -1,11 +1,11 @@
 from django.utils.translation import ugettext_lazy as _
 
-from ..choices import DesignRuleChoices
+from ...choices import DesignRuleChoices
 
 PARAMETERS = "PARAMETERS"
 
 
-def run_api_09_test_rules(session):
+def run_20200117_api_09(session):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-09-implement-custom-representation-if-supported
     3.7 API-09: Implement custom representation if supported
@@ -13,14 +13,14 @@ def run_api_09_test_rules(session):
     Provide a comma-separated list of field names using the query parameter fields te retrieve a custom
     representation. In case non-existent field names are passed, a 400 Bad Request error message is returned.
     """
-    from ..models import DesignRuleResult
+    from ...models import DesignRuleResult
 
     # We do not want double results for the same design rule
-    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_09)
+    base_qs = session.results.filter(rule_type=DesignRuleChoices.api_09_20200117)
     if base_qs.exists():
         return base_qs.first()
 
-    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_09)
+    result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_09_20200117)
 
     # Only execute when there is a JSON response
     if not session.json_result:
