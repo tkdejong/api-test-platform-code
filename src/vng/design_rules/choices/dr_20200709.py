@@ -58,18 +58,18 @@ api_51_20200709 = ChoiceItem(
     "api_51_20200709", _("API-51 V-09-07-2020: Publish OAS document at a standard location in JSON-format"),
     description=API_51_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-51",
 )
-api_53_20200709 = ChoiceItem(
-    "api_53_20200709", _("API-53 V-09-07-2020: Hide irrelevant implementation details"),
-    description=API_53_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-53",
-)
-api_54_20200709 = ChoiceItem(
-    "api_54_20200709", _("API-54 V-09-07-2020: Use plural nouns to name collection resources"),
-    description=API_54_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-54",
-)
-api_55_20200709 = ChoiceItem(
-    "api_55_20200709", _("API-55 V-09-07-2020: Publish a changelog for API changes between versions"),
-    description=API_55_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-55",
-)
+# api_53_20200709 = ChoiceItem(
+#     "api_53_20200709", _("API-53 V-09-07-2020: Hide irrelevant implementation details"),
+#     description=API_53_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-53",
+# )
+# api_54_20200709 = ChoiceItem(
+#     "api_54_20200709", _("API-54 V-09-07-2020: Use plural nouns to name collection resources"),
+#     description=API_54_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-54",
+# )
+# api_55_20200709 = ChoiceItem(
+#     "api_55_20200709", _("API-55 V-09-07-2020: Publish a changelog for API changes between versions"),
+#     description=API_55_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-55",
+# )
 api_56_20200709 = ChoiceItem(
     "api_56_20200709", _("API-56 V-09-07-2020: Adhere to the Semantic Versioning model when releasing API changes"),
     description=API_56_DESCRIPTION, url="https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-56",
