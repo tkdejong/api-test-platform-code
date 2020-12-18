@@ -20,7 +20,7 @@ logger = get_task_logger(__name__)
 
 def _get_endpoint(enpoint):
     try:
-        response = requests.get(enpoint)
+        response = requests.get(enpoint, verify=False)
     except SSLError:
         response = None
     except Exception:
