@@ -6,9 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from ...choices import DesignRuleChoices
 
-VALID_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-SKIPPED_METHODS = ["PARAMETERS"]
-
 
 def run_20200709_api_57(session, response):
     """

@@ -8,10 +8,6 @@ PARAMETERS = "PARAMETERS"
 def run_20200117_api_09(session):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-09-implement-custom-representation-if-supported
-    3.7 API-09: Implement custom representation if supported
-
-    Provide a comma-separated list of field names using the query parameter fields te retrieve a custom
-    representation. In case non-existent field names are passed, a 400 Bad Request error message is returned.
     """
     from ...models import DesignRuleResult
 

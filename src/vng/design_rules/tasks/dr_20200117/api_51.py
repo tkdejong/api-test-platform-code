@@ -11,18 +11,6 @@ SKIPPED_METHODS = ["PARAMETERS"]
 def run_20200117_api_51(session, api_endpoint, is_json=False):
     """
     https://docs.geostandaarden.nl/api/API-Designrules/#api-51-publish-oas-at-the-base-uri-in-json-format
-
-    3.15 API-51: Publish OAS at the base-URI in JSON-format
-
-    Publish up-to-date documentation in the Open API Specification (OAS) at the publicly accessible root
-    endpoint of the API in JSON format:
-
-    https://service.omgevingswet.overheid.nl/publiek/catalogus/api/raadplegen/v1
-
-    Makes the OAS relevant to v1 of the API available.
-
-    Thus, the up-to-date documentation is linked to a unique location (that is always concurrent with
-    the features available in the API).
     """
     from ...models import DesignRuleResult
 

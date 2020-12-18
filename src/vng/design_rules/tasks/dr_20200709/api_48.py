@@ -10,11 +10,7 @@ SKIPPED_METHODS = ["PARAMETERS"]
 
 def run_20200709_api_48(session, api_endpoint):
     """
-    https://docs.geostandaarden.nl/api/API-Designrules/#api-48-leave-off-trailing-slashes-from-api-endpoints
-    3.14 API-48: Leave off trailing slashes from API endpoints
-
-    URIs to retrieve collections of resources or individual resources don't include a trailing slash.
-    A resource is only available at one endpoint/path. Resource paths end without a slash.
+    https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-48
     """
     from ...models import DesignRuleResult
 

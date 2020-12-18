@@ -8,11 +8,7 @@ SKIPPED_METHODS = ["PARAMETERS", "SUMMARY", "DESCRIPTION", "$REF", "SERVERS"]
 
 def run_20200709_api_03(session):
     """
-    https://docs.geostandaarden.nl/api/API-Designrules/#api-03-only-apply-default-http-operations
-    3.3 API-03: Only apply default HTTP operations
-
-    A RESTful API is an application programming interface that supports the default HTTP operations
-    GET, PUT, POST, PATCH and DELETE.
+    https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-03
     """
     from ...models import DesignRuleResult
 

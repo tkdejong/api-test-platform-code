@@ -12,7 +12,7 @@ SKIPPED_METHODS = ["PARAMETERS"]
 
 def run_20200709_api_56(session):
     """
-    https://docs.geostandaarden.nl/api/API-Designrules/#api-51-publish-oas-at-the-base-uri-in-json-format
+    https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-56
     """
     from ...models import DesignRuleResult
 
