@@ -98,3 +98,16 @@ class DesignRuleResult(models.Model):
         if self.errors:
             return "\n".join(self.errors)
         return ""
+
+    def get_warnings(self):
+        if self.warnings:
+            return "\n".join(self.warnings)
+        return ""
+
+    def get_url(self):
+        choice = DesignRuleChoices.get_choice(self.rule_type)
+        return choice.url
+
+    def get_description(self):
+        choice = DesignRuleChoices.get_choice(self.rule_type)
+        return choice.description

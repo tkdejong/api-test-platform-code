@@ -26,6 +26,12 @@ Documentation
 See ``INSTALL.rst`` for installation instructions, available settings and
 commands.
 
+Design Rules
+============
+
+To see how you can add new design rules, please see the instructions in the
+``ADD_DESIGN_RULES.md`` file.
+
 
 References
 ==========

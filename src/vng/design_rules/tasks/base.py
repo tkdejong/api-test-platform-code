@@ -28,22 +28,22 @@ def _get_endpoint(enpoint):
     return response
 
 
-def _get_response(session, json_endpoint, yaml_endpoint, is_json, correct_location):
+def _get_response(session, json_endpoint, yaml_endpoint, is_json):
     response = _get_endpoint(json_endpoint)
+    print("json_endpoint", json_endpoint, response)
     if response and response.ok:
         try:
             session.json_result = response.json()
             is_json = True
-            correct_location = True
         except JSONDecodeError:
             pass
 
     if not session.json_result:
         response = _get_endpoint(yaml_endpoint)
+        print("json_endpoint", yaml_endpoint, response)
         if response and response.ok:
             try:
                 yaml_dict = yaml.safe_load(response.text)
-                correct_location = True
                 if isinstance(yaml_dict, dict):
                     session.json_result = yaml_dict
             except ScannerError:
@@ -51,20 +51,21 @@ def _get_response(session, json_endpoint, yaml_endpoint, is_json, correct_locati
             except ParserError:
                 pass
 
-    return session, response, is_json, correct_location
+    return session, response, is_json
 
 
 def run_tests(session, api_endpoint):
     json_endpoint = "{}/openapi.json".format(api_endpoint)
     yaml_endpoint = "{}/openapi.yaml".format(api_endpoint)
     is_json = False
-    correct_location = False
+    correct_location = True
 
-    session, response, is_json, correct_location = _get_response(session, json_endpoint, yaml_endpoint, is_json, correct_location)
+    session, response, is_json = _get_response(session, json_endpoint, yaml_endpoint, is_json)
 
     # Failback for getting the base endpoint
     if not session.json_result:
-        session, response, is_json, correct_location = _get_response(session, api_endpoint, api_endpoint, is_json, correct_location)
+        correct_location = False
+        session, response, is_json = _get_response(session, api_endpoint, api_endpoint, is_json)
 
     success_count = 0
     for test_option in session.test_version.test_rules.all():

@@ -109,3 +109,10 @@ class DesignRuleSessionDetailView(DetailView):
     model = DesignRuleSession
     slug_url_kwarg = 'uuid'
     slug_field = 'uuid'
+
+
+class DesignRuleShieldDetailView(DetailView):
+    template_name = "design_rules/sessions/shield.html"
+    model = DesignRuleSession
+    slug_url_kwarg = 'uuid'
+    slug_field = 'uuid'
