@@ -6,6 +6,10 @@
 
 Voor meer informatie zie [API-testplatform](https://github.com/VNG-Realisatie/api-testvoorziening)
 
+## Design rules
+
+Voor het toevoegen van meer design rules [kijk hier](ADD_DESIGN_RULES.md)
+
 ## Licentie
 Copyright © VNG Realisatie
 
