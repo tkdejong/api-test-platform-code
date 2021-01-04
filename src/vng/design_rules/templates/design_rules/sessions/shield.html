@@ -1,0 +1,124 @@
+{% extends 'master.html' %}
+{% load django_bootstrap_breadcrumbs i18n l10n %}
+
+{% block title %}{% trans "Test consumer - Detail session view" %}{% endblock%}
+
+{% block breadcrumb %}
+{% breadcrumb "Home" 'design_rules:list' %}
+{% breadcrumb object.test_suite.api_endpoint 'design_rules:detail' uuid=object.test_suite.uuid %}
+{% breadcrumb 'Session log' 'design_rules:session_detail' uuid_test_suite=object.test_suite.uuid uuid=object.uuid %}
+{% breadcrumb 'Shield badge' 'design_rules:session_shield' uuid_test_suite=object.test_suite.uuid uuid=object.uuid %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="ui-view">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    {% trans "Design rule tests -" %} {{ object.api_endpoint }}
+                    <a href="{% url 'design_rules:session_create' object.uuid %}" class="btn btn-success float-right"><i class="cui-media-play"></i> {% trans "Start session" %}</a>
+                </div>
+                {% if object %}
+                    <div class="card-body">
+                        <p id="badge-description">
+                            {% trans "Shown below is the badge of the most recent design rule session run that was started." %}
+                        </p>
+                        <p>
+                            {% blocktrans %}
+                                Note: Shields.io caches the badge result for 5 minutes. Check the <a href="{{url}}">API</a> for direct access.
+                            {% endblocktrans %}
+                        </p>
+                        <span display="block" style='width: 250px;' class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
+                            <a href="{% url 'design_rules:session_detail' object.test_suite.uuid object.uuid %}">
+                                <img id="badge" style='width:250px' alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:design_rule-shield' object.uuid %}">
+                            </a>
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        {% blocktrans %}
+                            <h5 class="card-title">Markdown snippet</h5>
+                            <p>Paste the following in your README.md to show your badge on Github.</p>
+                        {% endblocktrans %}
+                            <pre class="prettyprint" id='gitSnippet'>
+                        <xmp>
+                        </xmp>
+                        </pre>
+                        <button class="btn btn-secondary" onclick="copySnippet('gitSnippet')">Copy markdown snippet</button>
+                    </div>
+                    <div class="card-body">
+                        {% blocktrans %}
+                            <h5 class="card-title">HTML snippet</h5>
+                            <p>Paste the following in your HTML page to show your badge.</p>
+                        {% endblocktrans %}
+                            <pre class="prettyprint" id='htmlSnippet'>
+                        <xmp>
+                        </xmp>
+                        </pre>
+                        <button class="btn btn-secondary" onclick="copySnippet('htmlSnippet')">Copy HTML snippet</button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+{% if object %}
+    <script>
+        function copySnippet(snippetType) {
+            snippet = document.getElementById(snippetType);
+
+            var range = document.createRange();
+            range.selectNodeContents(snippet);
+
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            document.execCommand("copy");
+
+            sel.removeRange(range);
+        }
+
+        function htmlEscape(s) {
+            s = s.replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+            return s
+        }
+
+        function htmlReplace(s){
+            s=s.replace(
+            /&lt;script src[\s\S]*?&gt;&lt;\/script&gt;|&lt;!--\?[\s\S]*?--&gt;|&lt;pre\b[\s\S]*?&lt;\/pre&gt;/g,
+            '<span class="operative">$&<\/span>');
+            return s;
+        }
+
+        function setBadgeInfo() {
+            var gitSnippet = '[![Status badge]({{shields_url}}/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}})]({{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:design_rule-shield' object.uuid %})'
+
+            var htmlSnippet = '<span display="block" height="20px" class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">\n'
+                + '<a href="{{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:design_rule-shield' object.uuid %}">\n'
+                + '<img style="width:100%" alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&url={{changing_badge_url|urlencode}}"></span></a>'
+
+            // this page's own source code
+            gitSnippet = htmlEscape(gitSnippet);
+            gitSnippet = htmlReplace(gitSnippet);
+
+
+            htmlSnippet = htmlEscape(htmlSnippet);
+            htmlSnippet = htmlReplace(htmlSnippet);
+
+            // insert into PRE
+            document.getElementById("gitSnippet").innerHTML = PR.prettyPrintOne(gitSnippet);
+            document.getElementById("htmlSnippet").innerHTML = PR.prettyPrintOne(htmlSnippet);
+        }
+
+        document.onload = setBadgeInfo();
+    </script>
+{% endif %}
+{% endblock %}
+

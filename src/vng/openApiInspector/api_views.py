@@ -1,6 +1,6 @@
 from json.decoder import JSONDecodeError
 
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework.exceptions import APIException
 from rest_framework import views, status
 from django.utils.encoding import force_text
@@ -32,7 +32,7 @@ class OpenApiInspectionAPIView(views.APIView):
     Checks whether a URL to an API specification conforms to OAS 2.0 or higher
     """
 
-    @swagger_auto_schema(request_body=OpenApiInspectionSerializer, responses={200: OpenApiInspectionResponseSerializer})
+    @extend_schema(request=OpenApiInspectionSerializer, responses={200: OpenApiInspectionResponseSerializer})
     def post(self, request):
         serializer = OpenApiInspectionSerializer(data=request.data)
         if serializer.is_valid():

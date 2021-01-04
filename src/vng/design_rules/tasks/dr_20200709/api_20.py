@@ -11,12 +11,7 @@ REGEX_MINOR_VERSION = r"(\/v[\d]+[.][\d+])"
 
 def run_20200709_api_20(session, api_endpoint):
     """
-    https://docs.geostandaarden.nl/api/API-Designrules/#api-20-include-the-major-version-number-only-in-ihe-uri
-    3.13 API-20: Include the major version number only in ihe URI
-
-    The URI of an API should include the major version number only. The minor and patch version numbers
-    are in the response header of the message. Minor and patch versions have no impact on existing code,
-    but major version do.
+    https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-20
     """
     from ...models import DesignRuleResult
 

@@ -5,10 +5,7 @@ from ...choices import DesignRuleChoices
 
 def run_20200709_api_16(session):
     """
-    https://docs.geostandaarden.nl/api/API-Designrules/#api-16-use-oas-3-0-for-documentation
-    3.9 API-16: Use OAS 3.0 for documentation
-
-    Publish specifications (documentation) as Open API Specification (OAS) 3.0 or higher.
+    https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-16
     """
     from ...models import DesignRuleResult
 

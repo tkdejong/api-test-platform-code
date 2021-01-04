@@ -1,6 +1,9 @@
 from django.urls import path
 
-from .views import DesignRulesDetailView, DesignRulesListView, DesignRulesCreateView, DesignRuleSessionDetailView, DesignRuleSessionCreateView
+from .views import (
+    DesignRulesDetailView, DesignRulesListView, DesignRulesCreateView, DesignRuleSessionDetailView,
+    DesignRuleSessionCreateView, DesignRuleShieldDetailView
+)
 from . import apps
 
 app_name = apps.AppConfig.__name__
@@ -11,4 +14,5 @@ urlpatterns = [
     path('<uuid:uuid>/', DesignRulesDetailView.as_view(), name='detail'),
     path('<uuid:uuid>/create/', DesignRuleSessionCreateView.as_view(), name='session_create'),
     path('<uuid:uuid_test_suite>/<uuid:uuid>/', DesignRuleSessionDetailView.as_view(), name='session_detail'),
+    path('<uuid:uuid_test_suite>/<uuid:uuid>/shield/', DesignRuleShieldDetailView.as_view(), name='session_shield'),
 ]

@@ -18,7 +18,7 @@ from rest_framework import generics, permissions, viewsets, views, mixins
 from rest_framework.authentication import (
     SessionAuthentication
 )
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema
 
 from vng.testsession.models import (
     ScenarioCase, Session, SessionLog, SessionType, ExposedUrl, Report,
@@ -537,7 +537,7 @@ class ResultTestsessionViewShield(views.APIView):
     Return the badge information of a specific session
     """
 
-    @swagger_auto_schema(responses={200: ServerRunResultShield})
+    @extend_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         session = get_object_or_404(Session, uuid=uuid)
         report = list(Report.objects.filter(session_log__session=session))

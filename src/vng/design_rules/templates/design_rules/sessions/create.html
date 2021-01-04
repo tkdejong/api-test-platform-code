@@ -1,8 +1,14 @@
 {% extends 'master.html' %}
-{% load sniplates %}
-{% load i18n %}
+{% load sniplates django_bootstrap_breadcrumbs i18n %}
 
 {% block title %}{% trans "Start Design rule-session" %}{% endblock %}
+
+{% block breadcrumb %}
+{% breadcrumb "Home" 'design_rules:list' %}
+{% breadcrumb object.api_endpoint 'design_rules:detail' uuid=object.uuid %}
+{% breadcrumb 'Start session' 'design_rules:session_create' uuid=object.uuid %}
+{% render_breadcrumbs 'components/breadcrumbs/breadcrumbs.html' %}
+{% endblock %}
 
 {% block content %}
 <div id="ui-view">

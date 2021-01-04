@@ -10,11 +10,7 @@ SKIPPED_METHODS = ["PARAMETERS"]
 
 def run_20200709_api_48(session, api_endpoint):
     """
-    https://docs.geostandaarden.nl/api/API-Designrules/#api-48-leave-off-trailing-slashes-from-api-endpoints
-    3.14 API-48: Leave off trailing slashes from API endpoints
-
-    URIs to retrieve collections of resources or individual resources don't include a trailing slash.
-    A resource is only available at one endpoint/path. Resource paths end without a slash.
+    https://publicatie.centrumvoorstandaarden.nl/api/adr/#api-48
     """
     from ...models import DesignRuleResult
 
@@ -43,13 +39,13 @@ def run_20200709_api_48(session, api_endpoint):
             for method, _oparations in _methods.items():
                 # print(method)
                 if method == "get":
-                    response = requests.get("{}{}/".format(api_endpoint, path))
+                    response = requests.get("{}{}/".format(api_endpoint, path), verify=False)
                 elif method == "post":
-                    response = requests.post("{}{}/".format(api_endpoint, path))
+                    response = requests.post("{}{}/".format(api_endpoint, path), verify=False)
                 elif method == "put":
-                    response = requests.put("{}{}/".format(api_endpoint, path))
+                    response = requests.put("{}{}/".format(api_endpoint, path), verify=False)
                 elif method == "delete":
-                    response = requests.delete("{}{}/".format(api_endpoint, path))
+                    response = requests.delete("{}{}/".format(api_endpoint, path), verify=False)
                 else:
                     response = None
 

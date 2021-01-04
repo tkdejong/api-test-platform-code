@@ -15,8 +15,7 @@ from rest_framework.decorators import action
 from rest_framework.authentication import (
     SessionAuthentication, TokenAuthentication
 )
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 import vng.postman.utils as ptm
 from vng.postman.choices import ResultChoices
@@ -79,7 +78,7 @@ class ServerRunViewSet(
     serializer_class = ServerRunSerializer
     lookup_field = 'uuid'
 
-    @swagger_auto_schema(request_body=ServerRunPayloadExample)
+    @extend_schema(request=ServerRunPayloadExample)
     def create(self, *args, **kwargs):
         return super().create(*args, **kwargs)
 
@@ -115,7 +114,7 @@ class ResultServerViewShield(views.APIView):
     Return the badge information of a specific provider run
     """
 
-    @swagger_auto_schema(responses={200: ServerRunResultShield})
+    @extend_schema(responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         server = get_object_or_404(ServerRun, uuid=uuid)
         return JsonResponse(get_server_run_badge(server, 'API Test Platform'))
@@ -222,13 +221,12 @@ class ServerRunLatestResultView(views.APIView):
     Return the badge information of the latest provider run for a specific environment
     """
 
-    @swagger_auto_schema(
+    @extend_schema(
         responses={200: ServerRunResultShield},
-        manual_parameters=[
-            openapi.Parameter(
+        parameters=[
+            OpenApiParameter(
                 'uuid',
-                openapi.IN_PATH,
-                type=openapi.TYPE_STRING,
+                location=OpenApiParameter.PATH,
                 description='UUID of the environment'
             ),
         ])

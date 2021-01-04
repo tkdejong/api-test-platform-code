@@ -3,7 +3,6 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
 
-from drf_yasg.utils import swagger_auto_schema
 from rest_auth.views import LoginView, LogoutView
 
 from .forms import TokenForm

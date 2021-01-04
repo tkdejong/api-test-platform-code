@@ -15,6 +15,9 @@
                     <a href="{% url 'design_rules:create' %}" class="btn btn-success float-right"><i class="cui-media-play"></i> {% trans "Create new test" %}</a>
                 </div>
                 <div class="card-body">
+                    {% trans "Click on the badges to see the copy screen." %}
+                </div>
+                <div class="card-body">
                     <table class="table">
                         <tr>
                             <th scope='col'>{% trans "Design rule ID" %}</th>
@@ -40,7 +43,7 @@
                                 <td>
                                     <span display="block"  class="common__BadgeWrapper-sc-16zh6vt-3 fagfmg">
                                         {% if test_suite.get_latest_session %}
-                                            <a href="{% url 'design_rules:detail' uuid=test_suite.get_latest_session.uuid %}">
+                                            <a href="{% url 'design_rules:session_shield' uuid_test_suite=test_suite.uuid uuid=test_suite.get_latest_session.uuid %}">
                                                 <img style='height:30px ' alt="" src="{{shields_url}}/endpoint.svg?style=for-the-badge&amp;url={{request.scheme}}://{{request.get_host}}{% url 'api_v1_design_rules:design_rule-shield' test_suite.get_latest_session.uuid %}">
                                             </a>
                                         {% endif %}
