@@ -20,7 +20,10 @@ def run_20200709_api_57(session, response):
 
     result = DesignRuleResult(design_rule=session, rule_type=DesignRuleChoices.api_57_20200709)
 
-    if "API-Version" not in response.headers:
+    if not response:
+        result.success = False
+        result.error = [_("Unable to obtain valid response from API.")]
+    elif "API-Version" not in response.headers:
         result.success = False
         result.errors = [_("The headers is missing. Make sure that the 'API-Version' is given.")]
     else:
