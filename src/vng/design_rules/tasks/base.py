@@ -7,6 +7,7 @@ from celery.utils.log import get_task_logger
 from requests.exceptions import SSLError
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
+from yaml.reader import ReaderError
 
 from ..choices import DesignRuleChoices
 from .dr_20200117 import run_20200117_api_09, run_20200117_api_51
@@ -50,6 +51,10 @@ def _get_response(session, json_endpoint, yaml_endpoint, is_json):
                 pass
             except ParserError:
                 pass
+            except ReaderError:
+                pass
+            except:
+                logger.exception()
 
     return session, response, is_json
 
