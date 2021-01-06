@@ -17,12 +17,12 @@ class DesignRuleTestSuiteViewSetTests(WebTest):
 
     def test_start_session(self):
         test_version = DesignRuleTestVersionFactory()
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_03)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_09)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_16)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_20)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_48)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_51)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_03_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_09_20200117)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_16_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_20_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_48_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_51_20200709)
 
         token = CustomTokenFactory()
         test_suite = DesignRuleTestSuiteFactory()
@@ -46,12 +46,12 @@ class DesignRuleTestSuiteViewSetTests(WebTest):
 
     def test_start_session_test_version_not_active(self):
         test_version = DesignRuleTestVersionFactory(is_active=False)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_03)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_09)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_16)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_20)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_48)
-        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_51)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_03_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_09_20200117)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_16_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_20_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_48_20200709)
+        DesignRuleTestOptionFactory(test_version=test_version, rule_type=DesignRuleChoices.api_51_20200709)
 
         token = CustomTokenFactory()
         test_suite = DesignRuleTestSuiteFactory()
@@ -78,7 +78,7 @@ class DesignRuleSessionViewSetTests(WebTest):
     def test_retreive_session(self):
         token = CustomTokenFactory()
         session = DesignRuleSessionFactory(percentage_score=100)
-        DesignRuleResultFactory(success=True, design_rule=session, rule_type=DesignRuleChoices.api_03)
+        DesignRuleResultFactory(success=True, design_rule=session, rule_type=DesignRuleChoices.api_03_20200709)
 
         extra_environ = {
             'HTTP_AUTHORIZATION': 'Token {}'.format(token.key),

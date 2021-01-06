@@ -4,7 +4,6 @@ import os
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
-from vng_api_common.conf.api import *  # noqa - imports white-listed
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 DJANGO_PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
@@ -71,12 +70,11 @@ INSTALLED_APPS = [
     'crispy_forms',
 
     # Rest Framework
-    'vng_api_common',  # before drf_yasg to override the management command
-    'vng_api_common.authorizations',
-    'drf_yasg',
+    'drf_spectacular',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
+    'corsheaders',
 
     # Project applications.
     'vng.accounts',
@@ -105,6 +103,7 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'vng.api_authentication.authentication.CustomTokenAuthentication',
     ],
@@ -121,13 +120,13 @@ MIDDLEWARE = [
     # 'django.middleware.locale.LocaleMiddleware',
     'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # 'vng_api_common.middleware.AuthMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'vng_api_common.middleware.APIVersionHeaderMiddleware',
+    'vng.utils.middleware.APIVersionHeaderMiddleware',
 ]
 
 ROOT_URLCONF = 'vng.urls'
@@ -398,12 +397,6 @@ HIJACK_REGISTER_ADMIN = False
 # See: http://django-hijack.readthedocs.io/en/latest/configuration/#allowing-get-method-for-hijack-views
 HIJACK_ALLOW_GET_REQUESTS = True
 
-# API Documentation configuration
-SWAGGER_SETTINGS = {
-    'DEFAULT_AUTO_SCHEMA_CLASS': 'vng.utils.schema.CompoundTagsSchema',
-}
-
-
 # User registration settings
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_FORM = 'vng.utils.forms.RegistrationCaptcha'
@@ -439,16 +432,18 @@ REST_AUTH_TOKEN_CREATOR = 'vng.api_authentication.utils.create_token'
 
 SHIELDS_URL = 'https://shields.api-test.nl'
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API test platform',
+    'DESCRIPTION': """This API can be used to automate provider tests and consumer sessions.
 
-DRF_YASG_EXCLUDE_PATHS = [
-    '/admin/mobetta/',
-    '/admin/mobettaapi/'
-]
-SWAGGER_SETTINGS = BASE_SWAGGER_SETTINGS.copy()
-SWAGGER_SETTINGS.update(
-    {
-        "DEFAULT_INFO": "vng.api.v1.schema.info",
-        "DEFAULT_AUTO_SCHEMA_CLASS": "vng.api.v1.inspectors.AutoSchema",
-        "DEFAULT_GENERATOR_CLASS": "vng.api.v1.generators.CustomOpenAPISchemaGenerator",
-    }
-)
+The tutorial for this API can be found [here](https://github.com/VNG-Realisatie/api-test-platform/blob/master/tutorials/API.md)""",
+    'VERSION': '1.0.1',
+    # 'SERVERS': [
+    #     "https://api-test.nl/api/v1",
+    # ],
+    'PREPROCESSING_HOOKS': [
+        "vng.utils.preprocess_exclude_paths.preprocess_exclude_admin_path",
+    ],
+}
+
+CORS_ALLOW_ALL_ORIGINS = True

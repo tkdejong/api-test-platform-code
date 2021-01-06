@@ -5,7 +5,6 @@ pytz
 raven
 
 Django>=2.2.13
-vng-api-common
 django-hijack
 django-hijack-admin
 django-ckeditor
@@ -57,4 +56,7 @@ mobetta
 django-mathfilters
 openpyxl>=2.5.11
 django-ordered-model
+semver
+drf-spectacular
+django-cors-headers
 -e git+https://github.com/maykinmedia/django-subdomains.git@d1a88358569f522a81f1b9b3659aa429e55f22ea#egg=django_subdomains

@@ -1,16 +1,13 @@
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 
-from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, permissions
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authentication import (
-    SessionAuthentication
-)
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from vng.api_authentication.authentication import CustomTokenAuthentication
 from vng.design_rules.models import DesignRuleTestSuite, DesignRuleSession, DesignRuleTestVersion
@@ -20,12 +17,6 @@ from .serializers import DesignRuleSessionSerializer, DesignRuleTestSuiteSeriali
 
 
 START_SESSION_DESCRIPTION = "Start a new session for an existing Design rule Test suite. This will generate new results, without having to add the endpoint(s) again."
-# test_param = openapi.Parameter('fields', openapi.IN_QUERY, description="give a list of fields that need to be returned", type=openapi.TYPE_STRING, enum=["uuid", "api_endpoint", "sessions"])
-test_param = openapi.Parameter(
-    name='fields', in_=openapi.IN_QUERY,
-    description="give a list of fields that need to be returned, the field is comma separated",
-    type=openapi.TYPE_ARRAY, items=("uuid", "api_endpoint", "sessions")
-)
 
 
 class DesignRuleTestVersionViewSet(mixins.ListModelMixin, GenericViewSet):
@@ -55,11 +46,7 @@ class DesignRuleTestSuiteViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixi
     serializer_class = DesignRuleTestSuiteSerializer
     lookup_field = 'uuid'
 
-    @swagger_auto_schema(manual_parameters=[test_param])
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-
-    @swagger_auto_schema(operation_description=START_SESSION_DESCRIPTION, request_body=StartSessionSerializer, responses={201: DesignRuleSessionSerializer})
+    @extend_schema(description=START_SESSION_DESCRIPTION, request=StartSessionSerializer, responses={201: DesignRuleSessionSerializer})
     @action(detail=True, methods=['post'], description="Start a new session for the test suite")
     def start_session(self, request, uuid=None):
         serializer = StartSessionSerializer(data=request.data)
@@ -90,7 +77,7 @@ class DesignRuleSessionShieldView(APIView):
     serializer_class = DesignRuleSessionSerializer
     lookup_field = 'uuid'
 
-    @swagger_auto_schema(operation_description="Get the shields.io badge for a session.", responses={200: ServerRunResultShield})
+    @extend_schema(description="Get the shields.io badge for a session.", responses={200: ServerRunResultShield})
     def get(self, request, uuid=None):
         """
         Get the shield badge to display on a website.
