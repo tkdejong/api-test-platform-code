@@ -6,7 +6,7 @@ from .models import DesignRuleTestSuite, DesignRuleTestVersion
 class DesignRuleTestSuiteForm(forms.ModelForm):
     class Meta:
         model = DesignRuleTestSuite
-        fields = ("api_endpoint", )
+        fields = ("api_endpoint", "specification_url", )
 
 
 class DesignRuleSessionStart(forms.Form):
