@@ -11,10 +11,10 @@ from ....choices import DesignRuleChoices
 from ....models import DesignRuleResult
 
 
-class Api51Tests(TestCase):
+class Api56Tests(TestCase):
     def test_design_rule_already_exists(self):
         session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
-        pre_result = DesignRuleResultFactory(design_rule=session, rule_type=DesignRuleChoices.api_51_20200709)
+        pre_result = DesignRuleResultFactory(design_rule=session, rule_type=DesignRuleChoices.api_56_20200709)
 
         result = run_20200709_api_56(session)
         self.assertEqual(DesignRuleResult.objects.count(), 1)

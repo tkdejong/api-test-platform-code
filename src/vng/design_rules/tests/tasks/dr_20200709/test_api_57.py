@@ -14,10 +14,10 @@ from ....choices import DesignRuleChoices
 from ....models import DesignRuleResult
 
 
-class Api51Tests(TestCase):
+class Api57Tests(TestCase):
     def test_design_rule_already_exists(self):
         session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl/")
-        pre_result = DesignRuleResultFactory(design_rule=session, rule_type=DesignRuleChoices.api_51_20200709)
+        pre_result = DesignRuleResultFactory(design_rule=session, rule_type=DesignRuleChoices.api_57_20200709)
 
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
