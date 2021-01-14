@@ -31,7 +31,7 @@ def run_20200709_api_51(session, response, correct_location=False, is_json=False
     warnings = []
     errors = []
     if not correct_location:
-        warnings.append(_("The api endpoint is only working on the root endpoint. whilst it should be on openapi.json"))
+        warnings.append(_("The OAS file was not found at /openapi.json or at /openapi.yaml"))
 
     if not is_json:
         warnings.append(_("The API did not give a valid JSON output. It most likely was YAML"))

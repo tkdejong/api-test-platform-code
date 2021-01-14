@@ -41,7 +41,7 @@ def _get_response(session, json_endpoint, yaml_endpoint, is_json):
 
     if not session.json_result:
         response = _get_endpoint(yaml_endpoint)
-        print("json_endpoint", yaml_endpoint, response)
+        print("yaml_endpoint", yaml_endpoint, response)
         if response and response.ok:
             try:
                 yaml_dict = yaml.safe_load(response.text)
@@ -59,13 +59,18 @@ def _get_response(session, json_endpoint, yaml_endpoint, is_json):
     return session, response, is_json
 
 
-def run_tests(session, api_endpoint):
+def run_tests(session, api_endpoint, specification_url=""):
     json_endpoint = "{}/openapi.json".format(api_endpoint)
     yaml_endpoint = "{}/openapi.yaml".format(api_endpoint)
     is_json = False
     correct_location = True
 
     session, response, is_json = _get_response(session, json_endpoint, yaml_endpoint, is_json)
+
+    # If specification_url was provided, try that
+    if not session.json_result and specification_url:
+        correct_location = False
+        session, response, is_json = _get_response(session, specification_url, specification_url, is_json)
 
     # Failback for getting the base endpoint
     if not session.json_result:
@@ -99,7 +104,7 @@ def run_tests(session, api_endpoint):
             if result.success:
                 success_count += 1
         if test_option.rule_type == DesignRuleChoices.api_51_20200709:
-            result = run_20200709_api_51(session=session, response=response, correct_location=True, is_json=is_json)
+            result = run_20200709_api_51(session=session, response=response, correct_location=correct_location, is_json=is_json)
             if result.success:
                 success_count += 1
         if test_option.rule_type == DesignRuleChoices.api_56_20200709:

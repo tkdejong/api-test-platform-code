@@ -121,4 +121,4 @@ class Api51Tests(TestCase):
         result = run_20200709_api_51(session, response=response, correct_location=False, is_json=True)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
         self.assertTrue(result.success)
-        self.assertEqual(result.warnings, [_("The api endpoint is only working on the root endpoint. whilst it should be on openapi.json")])
+        self.assertEqual(result.warnings, [_("The OAS file was not found at /openapi.json or at /openapi.yaml")])

@@ -45,6 +45,53 @@ class BaseAPITests(TestCase):
         self.assertFalse(session.successful())
         self.assertEqual(session.percentage_score, Decimal("57.14"))
 
+    def test_specification_url(self):
+        spec_url = "http://localhost:8000/docs/openapi.json"
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="http://localhost:8000/api/v1", test_suite__specification_url=spec_url, test_version=self.test_version)
+
+        with requests_mock.Mocker() as mock:
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            with open(os.path.join(dir_path, "files", "good.json")) as html_file:
+                mock.get('http://localhost:8000/api/v1/openapi.json', status_code=404)
+                mock.get('http://localhost:8000/api/v1/openapi.yaml', status_code=404)
+                mock.get(spec_url, text=html_file.read(), headers={"Access-Control-Allow-Origin": "http://foo.example"})
+                mock.get('http://localhost:8000/api/v1/designrule-session/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/shield/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/', status_code=404)
+                mock.post('http://localhost:8000/api/v1/designrule-testsuite/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/', status_code=404)
+                mock.post('http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/start_session/', status_code=404)
+            run_tests(session, "http://localhost:8000/api/v1", spec_url)
+        self.assertEqual(DesignRuleResult.objects.count(), 7)
+        session.refresh_from_db()
+        self.assertTrue(session.successful())
+        self.assertEqual(session.percentage_score, Decimal("100"))
+
+    def test_unnecessary_specification_url(self):
+        spec_url = "http://localhost:8000/docs/openapi.json"
+        session = DesignRuleSessionFactory(test_suite__api_endpoint="http://localhost:8000/api/v1", test_suite__specification_url=spec_url, test_version=self.test_version)
+
+        with requests_mock.Mocker() as mock:
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            with open(os.path.join(dir_path, "files", "good.json")) as html_file:
+                # The specification URL is unnecessary, because the OpenAPI file is also served on the expected URL
+                mock.get('http://localhost:8000/api/v1/openapi.json', text=html_file.read(), headers={"Access-Control-Allow-Origin": "http://foo.example"})
+                mock.get('http://localhost:8000/api/v1/openapi.yaml', status_code=404)
+                mock.get(spec_url, text=html_file.read(), headers={"Access-Control-Allow-Origin": "http://foo.example"})
+                mock.get('http://localhost:8000/api/v1/designrule-session/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-session/shield/%7Buuid%7D/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/', status_code=404)
+                mock.post('http://localhost:8000/api/v1/designrule-testsuite/', status_code=404)
+                mock.get('http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/', status_code=404)
+                mock.post('http://localhost:8000/api/v1/designrule-testsuite/%7Buuid%7D/start_session/', status_code=404)
+            run_tests(session, "http://localhost:8000/api/v1", spec_url)
+        self.assertEqual(DesignRuleResult.objects.count(), 7)
+        session.refresh_from_db()
+        self.assertTrue(session.successful())
+        self.assertEqual(session.percentage_score, Decimal("100"))
+
     def test_no_json_or_yaml_response(self):
         session = DesignRuleSessionFactory(test_suite__api_endpoint="https://maykinmedia.nl", test_version=self.test_version)
 
