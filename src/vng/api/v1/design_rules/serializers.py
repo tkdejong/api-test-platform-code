@@ -94,8 +94,8 @@ class DesignRuleResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DesignRuleResult
-        fields = ("rule_type", "success", "errors", "url", "description")
-        read_only_fields = ("rule_type", "success", "errors")
+        fields = ("rule_type", "success", "errors", "warnings", "url", "description")
+        read_only_fields = ("rule_type", "success", "errors", "warnings")
 
     def get_rule_type(self, obj):
         return obj.get_rule_type_display()

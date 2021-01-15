@@ -45,6 +45,7 @@ def run_20200709_api_51(session, response, correct_location=False, is_json=False
         errors.append(_("The CORS headers only allow the requested domain. Please make sure that it can be loaded from outside the domain"))
 
     if warnings:
+        result.success = False
         result.warnings = warnings
 
     if errors:
