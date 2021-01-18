@@ -72,8 +72,9 @@ class Api51Tests(TestCase):
 
         result = run_20200709_api_51(session, response=response, is_json=True)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
-        self.assertTrue(result.success)
+        self.assertFalse(result.success)
         self.assertEqual(result.errors, None)
+        self.assertEqual(result.warnings, [_("The api endpoint is only working on the root endpoint. whilst it should be on openapi.json")])
 
     def test_base_in_server(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -88,8 +89,8 @@ class Api51Tests(TestCase):
 
         result = run_20200709_api_51(session, response=response, is_json=True)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
-        self.assertTrue(result.success)
-        self.assertEqual(result.errors, None)
+        self.assertFalse(result.success)
+        self.assertEqual(result.warnings, [_("The api endpoint is only working on the root endpoint. whilst it should be on openapi.json")])
 
     def test_is_not_json_parsed(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -104,7 +105,7 @@ class Api51Tests(TestCase):
 
         result = run_20200709_api_51(session, response=response, correct_location=True, is_json=False)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
-        self.assertTrue(result.success)
+        self.assertFalse(result.success)
         self.assertEqual(result.warnings, [_("The API did not give a valid JSON output. It most likely was YAML")])
 
     def test_is_not_correct_location(self):
@@ -120,5 +121,5 @@ class Api51Tests(TestCase):
 
         result = run_20200709_api_51(session, response=response, correct_location=False, is_json=True)
         self.assertEqual(DesignRuleResult.objects.count(), 1)
-        self.assertTrue(result.success)
+        self.assertFalse(result.success)
         self.assertEqual(result.warnings, [_("The api endpoint is only working on the root endpoint. whilst it should be on openapi.json")])

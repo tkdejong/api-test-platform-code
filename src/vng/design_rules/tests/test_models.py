@@ -50,7 +50,7 @@ class DesignRuleTestSuiteTests(TestCase):
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "tasks", "files", "good.json")) as json_file:
-                mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()), headers={"Access-Control-Allow-Origin": "http://foo.example"})
+                mock.get('http://localhost:8000/api/v1/openapi.json', json=json.loads(json_file.read()), headers={"Access-Control-Allow-Origin": "http://foo.example"})
                 mock.get('http://localhost:8000/api/v1/designrule-session/', status_code=404)
                 mock.get('http://localhost:8000/api/v1/designrule-session/shield/%7Buuid%7D/', status_code=404)
                 mock.get('http://localhost:8000/api/v1/designrule-session/%7Buuid%7D/', status_code=404)
@@ -78,7 +78,7 @@ class DesignRuleTestSuiteTests(TestCase):
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "tasks", "files", "good.json")) as json_file:
-                mock.get('http://localhost:8000/api/v1', json=json.loads(json_file.read()), headers={"Access-Control-Allow-Origin": "http://foo.example"})
+                mock.get('http://localhost:8000/api/v1/openapi.json', json=json.loads(json_file.read()), headers={"Access-Control-Allow-Origin": "http://foo.example"})
                 mock.get('http://localhost:8000/api/v1/designrule-session/', status_code=404)
                 mock.get('http://localhost:8000/api/v1/designrule-session/shield/%7Buuid%7D/', status_code=404)
                 mock.get('http://localhost:8000/api/v1/designrule-session/%7Buuid%7D/', status_code=404)
