@@ -65,8 +65,8 @@ class BaseAPITests(TestCase):
             run_tests(session, "http://localhost:8000/api/v1", spec_url)
         self.assertEqual(DesignRuleResult.objects.count(), 7)
         session.refresh_from_db()
-        self.assertTrue(session.successful())
-        self.assertEqual(session.percentage_score, Decimal("100"))
+        self.assertFalse(session.successful())
+        self.assertEqual(session.percentage_score, Decimal("87.71"))
 
     def test_unnecessary_specification_url(self):
         spec_url = "http://localhost:8000/docs/openapi.json"
@@ -75,7 +75,8 @@ class BaseAPITests(TestCase):
         with requests_mock.Mocker() as mock:
             dir_path = os.path.dirname(os.path.realpath(__file__))
             with open(os.path.join(dir_path, "files", "good.json")) as html_file:
-                # The specification URL is unnecessary, because the OpenAPI file is also served on the expected URL
+                # The OAS file is also served on the expected path,
+                # so api_51_20200709 should succeed and give us full points
                 mock.get('http://localhost:8000/api/v1/openapi.json', text=html_file.read(), headers={"Access-Control-Allow-Origin": "http://foo.example"})
                 mock.get('http://localhost:8000/api/v1/openapi.yaml', status_code=404)
                 mock.get(spec_url, text=html_file.read(), headers={"Access-Control-Allow-Origin": "http://foo.example"})
